@@ -1,0 +1,51 @@
+.search
+  display: flex
+  justify-content: space-between
+  align-items: center
+  background: var(--bg-base)
+  height: 100%
+  border-radius: 6px
+  border: 1px solid var(--search-controls-border)
+  padding: 6px 8px
+  &__input
+    font-size: 14px
+    color: var(--text-title)
+    width: 100%
+  &__controls
+    display: flex
+    align-items: center
+    gap: 12px
+    height: 24px
+  &__clear-button
+    display: flex
+    align-items: center
+    justify-content: center
+    padding: 5px
+    border-radius: 3px
+    transition: background-color 0.2s ease
+    &:hover
+      background-color: var(--search-controls-hover)
+  &__cross-icon
+    min-width: 14px !important
+    min-height: 14px !important
+    path
+      fill: var(--search-controls)
+  &__buttons-separator
+    width: 1px
+    height: 100%
+    background-color: var(--search-controls)
+  &__search-button
+    display: flex
+    align-items: center
+    justify-content: center
+    padding: 3px
+    border-radius: 3px
+    transition: background-color 0.2s ease
+    &:hover
+      background-color: var(--search-controls-hover)
+
+  &__search-icon
+    min-width: 18px !important
+    min-height: 18px !important
+    path
+      fill: var(--search-controls)

@@ -1,0 +1,80 @@
+
+
+:root { 
+    --light-black: #000;
+	--light-grey: #7a7a7a;
+	--light-grey-gainsboro: #dbdbdb;
+	--light-grey-whisper: #ecebeb;
+	--light-white-smoke: #f2f2f2;
+	--light-white-snow: #fcfcfc;
+	--light-white: #fff;
+	--light-blue-alice: #e9f2ff;
+	--light-accent-blue: #005fff;
+	--light-accent-dark-blue: #0056e7;
+	--light-accent-red: #ff3742;
+	--light-accent-green: #20e070;
+	--light-overlay: rgba(0, 0, 0, 0.2);
+	--light-overlay-dark: rgba(0, 0, 0, 0.6);
+	--light-button-text: #fff;
+	--light-button-background: #005fff;
+
+
+    /* dark mode colors */
+    --dark-black: #fff;
+	--dark-grey: #7a7a7a;
+	--dark-grey-gainsboro: #2d2f2f;
+	--dark-grey-whisper: #1c1e22;
+	--dark-white-smoke: #13151b;
+	--dark-white-snow: #070a0d;
+	--dark-white: #101418;
+	--dark-blue-alice: #00193d;
+	--dark-accent-blue: #005fff;
+	--dark-accent-red: #ff3742;
+	--dark-accent-green: #20e070;
+	--dark-overlay: rgba(0, 0, 0, 0.6);
+	--dark-overlay-dark: rgba(0, 0, 0, 0.8);
+	--dark-button-text: #005fff;
+	--dark-button-background: #fff;
+
+    /* fonts */
+    --font-family: "Roboto", sans-serif;
+    --second-family: "Inter", sans-serif;
+    
+    --base-black: var(--light-black);
+	--base-grey: var(--light-grey);
+	--base-grey-gainsboro: var(--light-grey-gainsboro);
+	--base-grey-whisper: var(--light-grey-whisper);
+	--base-white-smoke: var(--light-white-smoke);
+	--base-white-snow: var(--light-white-snow);
+	--base-white: var(--light-white);
+	--base-blue-alice: var(--light-blue-alice);
+	--base-accent-blue: var(--light-accent-blue);
+	--base-accent-dark-blue: var(--light-accent-dark-blue);
+	--base-accent-red: var(--light-accent-red);
+	--base-accent-green: var(--light-accent-green);
+	--base-overlay: var(--light-overlay);
+	--base-overlay-dark: var(--light-overlay-dark);
+	--base-button-text: var(--light-button-text);
+	--base-button-background: var(--light-button-background);
+
+    .dark {
+        // dark mode base
+        --base-black: var(--dark-black);
+        --base-grey: var(--dark-grey);
+        --base-grey-gainsboro: var(--dark-grey-gainsboro);
+        --base-grey-whisper: var(--dark-grey-whisper);
+        --base-white-smoke: var(--dark-white-smoke);
+        --base-white-snow: var(--dark-white-snow);
+        --base-white: var(--dark-white);
+        --base-blue-alice: var(--dark-blue-alice);
+        --base-accent-blue: var(--dark-accent-blue);
+				--base-accent-dark-blue: var(--dark-accent-dark-blue);
+        --base-accent-red: var(--dark-accent-red);
+        --base-accent-green: var(--dark-accent-green);
+        --base-overlay: var(--dark-overlay);
+        --base-overlay-dark: var(--dark-overlay-dark);
+        --base-button-text: var(--dark-button-text);
+        --base-button-background: var(--dark-button-background);
+    
+
+}}

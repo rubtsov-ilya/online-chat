@@ -1,0 +1,123 @@
+{
+  "products": [
+    {
+      "id": "1",
+      "title": "Expresso Tradicional",
+      "subtitle": "O tradicional café feito com água quente e grãos moídos",
+      "price": "9,90",
+      "currency": "R$",
+      "count": 1,
+      "img": "https://typescript-shop-vert.vercel.app/Image1.png"
+    },
+    {
+      "id": "2",
+      "title": "Expresso Americano",
+      "subtitle": "Expresso diluído, menos intenso que o tradicional",
+      "price": "8,90",
+      "currency": "R$",
+      "count": 1,
+      "img": "https://typescript-shop-vert.vercel.app/Image2.png"
+    },
+    {
+      "id": "3",
+      "title": "Expresso Cremoso",
+      "subtitle": "Café expresso tradicional com espuma cremosa",
+      "price": "9,90",
+      "currency": "R$",
+      "count": 1,
+      "img": "https://typescript-shop-vert.vercel.app/Image3.png"
+    },
+    {
+      "id": "4",
+      "title": "Expresso Gelado",
+      "subtitle": "Bebida preparada com café expresso e cubos de gelo",
+      "price": "7,90",
+      "currency": "R$",
+      "count": 1,
+      "img": "https://typescript-shop-vert.vercel.app/Image4.png"
+    },
+    {
+      "id": "5",
+      "title": "Café com Leite",
+      "subtitle": "Meio a meio de expresso tradicional com leite vaporizado",
+      "price": "8,90",
+      "currency": "R$",
+      "count": 1,
+      "img": "https://typescript-shop-vert.vercel.app/Image5.png"
+    },
+    {
+      "id": "6",
+      "title": "Latte",
+      "subtitle": "Uma dose de café expresso com o dobro de leite e espuma cremosa",
+      "price": "6,90",
+      "currency": "R$",
+      "count": 1,
+      "img": "https://typescript-shop-vert.vercel.app/Image6.png"
+    },
+    {
+      "id": "7",
+      "title": "Capuccino",
+      "subtitle": "Bebida com canela feita de doses iguais de café, leite e espuma",
+      "price": "8,90",
+      "currency": "R$",
+      "count": 1,
+      "img": "https://typescript-shop-vert.vercel.app/Image7.png"
+    },
+    {
+      "id": "8",
+      "title": "Macchiato",
+      "subtitle": "Café expresso misturado com um pouco de leite quente e espuma",
+      "price": "9,90",
+      "currency": "R$",
+      "count": 1,
+      "img": "https://typescript-shop-vert.vercel.app/Image8.png"
+    },
+    {
+      "id": "9",
+      "title": "Mocaccino",
+      "subtitle": "Café expresso com calda de chocolate, pouco leite e espuma",
+      "price": "9,90",
+      "currency": "R$",
+      "count": 1,
+      "img": "https://typescript-shop-vert.vercel.app/Image9.png"
+    },
+    {
+      "id": "10",
+      "title": "Chocolate Quente",
+      "subtitle": "Bebida feita com chocolate dissolvido no leite quente e café",
+      "price": "7,90",
+      "currency": "R$",
+      "count": 1,
+      "img": "https://typescript-shop-vert.vercel.app/Image10.png"
+    },
+    {
+      "id": "11",
+      "title": "Cubano",
+      "subtitle": "Drink gelado de café expresso com rum, creme de leite e hortelã",
+      "price": "7,90",
+      "currency": "R$",
+      "count": 1,
+      "img": "https://typescript-shop-vert.vercel.app/Image11.png"
+    },
+    {
+      "id": "12",
+      "title": "Havaiano",
+      "subtitle": "Bebida adocicada preparada com café e leite de coco",
+      "price": "9,90",
+      "currency": "R$",
+      "count": 1,
+      "img": "https://typescript-shop-vert.vercel.app/Image12.png"
+    }
+  ],
+  "cart": [
+    {
+      "id": "7",
+      "title": "Capuccino",
+      "subtitle": "Bebida com canela feita de doses iguais de café, leite e espuma",
+      "price": "8,90",
+      "currency": "R$",
+      "count": 11,
+      "img": "https://typescript-shop-vert.vercel.app/Image7.png"
+    }
+  ]
+}

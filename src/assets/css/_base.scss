@@ -1,0 +1,31 @@
+html, body {
+font-family: var(--font-family);
+color: var(--base-black);
+background-color: var(--base-white-snow);
+}
+
+body.lock {
+overflow: hidden;
+}
+
+.container {
+max-width: 1166px;
+padding: 0 8px;
+margin: 0 auto;
+flex-grow: 1;
+
+&--height {
+  height: 100%;
+}
+// @include tablet {
+//   padding: 0 39px;
+// }
+//
+// @include mobile {
+//   padding: 0 31px;
+// }
+}
+
+.none {
+display: none !important;
+}

@@ -1,0 +1,25 @@
+.header {
+  background-color: var(--bg-base);
+  padding: 32px 0;
+
+  &__content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  &__right-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  &__logo {
+    height: 40px;
+    width: 85px;
+
+    path:nth-child(n+5) {
+      fill: var(--logo-text);
+    }
+  }
+}

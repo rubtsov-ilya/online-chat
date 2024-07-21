@@ -1,0 +1,14 @@
+.first-section {
+  height: 100vh;
+  padding: 32px 0;
+
+  &__content {
+    display: flex;
+    /* justify-content: center; */
+    flex-direction: column;
+    align-items: center;
+    height: 100%;
+  }
+
+
+}

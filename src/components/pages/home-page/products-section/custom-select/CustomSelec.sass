@@ -1,0 +1,72 @@
+@import '../../../../../assets/css/_mixins'
+.custom-select
+  width: 150px !important
+  font-size: 14px !important
+  height: 100% !important
+  grid-column-end: 5 !important
+  justify-self: flex-end !important
+  @include homepage-media-breakpoint-1
+    grid-column-end: 3 !important
+  @include phone
+    width: 120px !important
+    
+  &__control
+    background: var(--bg-base) !important
+    cursor: pointer !important
+    border-radius: 6px !important
+    border: 1px solid var(--search-controls-border) !important
+    min-height: 100% !important
+    &--is-focused
+      border: 1px solid var(--search-controls-border) !important
+      box-shadow: unset !important
+
+  &__value-container
+
+  &__single-value
+    color: var(--text-title) !important
+
+  &__input-container
+    color: var(--text-title) !important
+
+  &__indicator-separator
+    display: none !important
+
+  &__indicator svg
+    transition: transform 0.1s ease
+    height: 20px !important
+    width: 20px !important
+
+  &__indicators
+    background: var(--bg-base) !important
+    border-radius: 6px !important
+    path
+      fill: var(--search-controls-border) !important
+
+  &__menu
+    color: var(--text-title) !important
+    background: var(--bg-card) !important
+    padding: 0px !important
+    border-radius: 6px !important
+    box-shadow: 0 0 0 0.5px var(--search-controls-border) !important
+
+  &__menu-list
+    padding: 0px !important
+    border-radius: 6px !important
+
+  &__option
+    transition: all 0.2s ease !important
+    &:hover
+      background: var(--button-hover) !important
+      color: var(--text-title) !important
+    &--is-focused
+      background: transparent !important
+    &--is-selected
+      background: var(--ui-purple) !important
+      //color: red !important
+    
+
+  
+.custom-select__control--menu-is-open .custom-select__indicator svg
+  transform: rotate(180deg)
+//border: 1px solid red !important
+

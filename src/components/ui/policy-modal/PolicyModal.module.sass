@@ -1,0 +1,59 @@
+@import '../../../assets/css/_mixins.sass'
+.policy
+  margin: 0 auto
+  top: 50%
+  max-width: 700px
+  transform: translateY(-50%)
+  background-color: unset
+  border-radius: 10px
+  @include tablet-small
+    max-width: 80%
+  &__wrapper
+    width: 100%
+    height: 100%
+    padding: 38px
+    background-color: var(--policy-bg)
+    @include tablet-small
+      padding: 20px
+
+  &__close-btn
+    display: flex
+    align-items: center
+    justify-content: center
+    height: 28px
+    width: 28px
+    position: absolute
+    right: 15px
+    top: 15px
+    padding: 5px
+    border-radius: 3px
+    transition: background-color 0.2s ease
+    &:hover
+      background-color: var(--search-controls-hover)
+  &__close-icon
+    height: 18px !important
+    width: 18px !important
+    path
+      fill: var(--search-controls)
+  &__title
+    color: var(--text-title)
+    font-size: 20px
+    font-weight: 700
+    @include tablet-small
+    font-size: 18px
+  &__text
+    margin-top: 15px
+    color: var(--text-title)
+    font-size: 14px
+  &__text:first-of-type
+    margin-top: 28px
+    
+
+  &__text-span
+    font-weight: 700
+    font-size: 15px
+
+  &:-internal-dialog-in-top-layer::backdrop 
+    background-color: #00000099
+    backdrop-filter: blur(2px)
+

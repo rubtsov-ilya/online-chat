@@ -1,0 +1,50 @@
+@import '../../../../../assets/css/_mixins'
+.left-wrapper
+  &__title
+    font-family: var(--second-family)
+    font-size: 48px
+    font-weight: 800
+    max-width: 588px
+    color: var(--text-accent)
+    line-height: 130%
+    letter-spacing: 0
+    @include homepage-media-breakpoint-1
+      font-size: clamp(35px, -0.391rem + 4.17vw, 40px)
+      max-width: clamp(435px, -16.641rem + 70.83vw, 520px)
+    @include tablet
+      font-size: 48px
+      max-width: 588px
+    @include tablet-small
+      font-size: clamp(36px, -0.417rem + 8.89vw, 48px)
+    @include phone
+      font-size: clamp(26px, -0.25rem + 8.33vw, 36px)
+  &__subtitle
+    font-family: var(--font-family)
+    font-weight: 400
+    font-size: 20px
+    line-height: 1.3
+    color: var(--text-title)
+    max-width: 588px
+    margin-top: 16px
+    @include homepage-media-breakpoint-1
+      max-width: clamp(435px, -16.641rem + 70.83vw, 520px)
+    @include tablet
+      max-width: 588px
+    @include phone
+      font-size: 16px
+  &__grid-wrapper
+    display: grid
+    grid-template-columns: 231px 294px
+    gap: 20px 40px
+    margin-top: 66px
+    @include homepage-media-breakpoint-1
+      margin-top: 20px
+      gap: 20px clamp(20px, -9.063rem + 16.67vw, 40px)
+    @include tablet
+      gap: 20px 40px
+      margin-top: 66px
+    @include tablet-small
+      grid-template-columns: minmax(0, 231px) minmax(0, 294px)
+      margin-top: 38px
+    @include phone
+      grid-template-columns: 1fr
