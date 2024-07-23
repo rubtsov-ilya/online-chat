@@ -7,7 +7,8 @@ import { IAuthValues } from "../../../interfaces/AuthValues.interface";
 import { Link, useNavigate } from "react-router-dom";
 import { createUserWithEmailAndPassword, getAuth, sendPasswordResetEmail, signInWithEmailAndPassword, User } from "firebase/auth";
 import { useAddUserToDataBaseMutation } from "../../../redux";
-import LogoSvg from '../../../assets/images/icons/logo-icons/Stream Mark.svg?react'
+/* import LogoSvg from '../../../assets/images/icons/logo-icons/Stream Mark.svg?react' */
+import LogoSvg from '../../../assets/images/icons/logo-icons/Logo.svg?react'
 
 interface AuthFormProps {
   btnText: string;
@@ -41,12 +42,12 @@ const AuthForm: FC<AuthFormProps> = ({ btnText, isRegister, isLogin, isResetPass
     }
    }
  
-  const formReset = (): void => { 
+/*   const formReset = (): void => { 
     setPasswordValue('')
     setMailValue('')
     setConfirmPasswordValue('')
    }
-
+ */
   async function addUserDuringRegister(user: User) {
     await addUserToDataBase({uid: user.uid})
   }
@@ -107,7 +108,7 @@ const AuthForm: FC<AuthFormProps> = ({ btnText, isRegister, isLogin, isResetPass
         }
       });
     }
-    formReset();
+    /* formReset(); */
     /* navigate('/', { state: data }); */
    }
 

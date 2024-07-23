@@ -18,14 +18,14 @@ const AuthProvider: FC = ({ }) => {
       onAuthStateChanged(auth, (user) => {
         if (user) {
           user.getIdToken().then((token) => {
-            dispatch(
+            /* dispatch(
               setUser({
                 email: user.email,
                 uid: user.uid,
                 token: token,
                 uMockid: users.find(u => u.uid === user.uid)?.mockid || null
               })
-            );
+            ); */
           });
         } else {
           // User is signed out
