@@ -1,0 +1,7 @@
+.chats-list-section {
+  height: calc(100% - 56px);
+  /* 56px = height ChatsHeader / class = .header */
+  &__content {
+    height: 100%;
+  }
+}

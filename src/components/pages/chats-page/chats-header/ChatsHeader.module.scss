@@ -1,0 +1,28 @@
+.header {
+  height: 56px;
+  display: flex;
+  align-items: center;
+  background: var(--base-white);
+  box-shadow: 0 1px 0 0 rgba(0, 0, 0, 0.08);
+
+  &__content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  &__avatar {
+    border-radius: 99999px;
+    width: 40px;
+    height: 40px;
+    object-position: center;
+    object-fit: cover;
+    background-color: var(--base-grey-gainsboro);
+  }
+
+  &__title {
+    font-weight: 700;
+    font-size: 16px;
+    color: var(--base-black);
+  }
+}

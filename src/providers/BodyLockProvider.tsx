@@ -31,7 +31,7 @@ const BodyLockProvider: FC<BodyLockProviderProps> = ({ children }) => {
     setIsBodyLock((prev) => !prev)
    }
 
-  console.log(lockPaddingValue, isBodyLock)
+  /* console.log(lockPaddingValue, isBodyLock) */
    
    const value: IValue = {isBodyLock, lockPaddingValue, toggleBodyLock}
 
