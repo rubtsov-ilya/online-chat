@@ -1,5 +1,5 @@
 import React, { FC, createContext, useEffect, useLayoutEffect, useState } from 'react'
-import { IValueDarkTheme } from '../interfaces/DarkThemeValue.interface'
+import { IValueDarkTheme } from 'src/interfaces/DarkThemeValue.interface'
 
 interface DarkThemeProviderProps {
   children: React.ReactNode

@@ -1,11 +1,8 @@
 import { FC } from "react";
 import styles from "./FirstLoginSection.module.scss";
-import AuthForm from "../../../ui/auth-form/AuthForm";
-
+import AuthForm from "src/components/ui/auth-form/AuthForm";
 
 const FirstLoginSection: FC = () => {
-
-
 
   return (
     <section className={styles["first-section"]}>

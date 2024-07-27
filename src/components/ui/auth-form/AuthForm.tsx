@@ -1,14 +1,14 @@
 import { ChangeEvent, Dispatch, FC, SetStateAction, useRef, useState } from "react";
 import styles from "./AuthForm.module.scss";
-import VisibilitySvg from "../../../assets/images/icons/auth-password-icons/visibility_24dp_FILL0_wght400_GRAD0_opsz24.svg?react";
-import VisibilityOffSvg from "../../../assets/images/icons/auth-password-icons/visibility_off_24dp_FILL0_wght400_GRAD0_opsz24.svg?react";
+import VisibilitySvg from "src/assets/images/icons/auth-password-icons/visibility_24dp_FILL0_wght400_GRAD0_opsz24.svg?react";
+import VisibilityOffSvg from "src/assets/images/icons/auth-password-icons/visibility_off_24dp_FILL0_wght400_GRAD0_opsz24.svg?react";
 import { SubmitHandler, useForm } from "react-hook-form";
-import { IAuthValues } from "../../../interfaces/AuthValues.interface";
+import { IAuthValues } from "src/interfaces/AuthValues.interface";
 import { Link, useNavigate } from "react-router-dom";
 import { createUserWithEmailAndPassword, getAuth, sendPasswordResetEmail, signInWithEmailAndPassword, User } from "firebase/auth";
-import { useAddUserToDataBaseMutation } from "../../../redux";
+import { useAddUserToDataBaseMutation } from "src/redux";
 /* import LogoSvg from '../../../assets/images/icons/logo-icons/Stream Mark.svg?react' */
-import LogoSvg from '../../../assets/images/icons/logo-icons/Logo.svg?react'
+import LogoSvg from 'src/assets/images/icons/logo-icons/Logo.svg?react'
 
 interface AuthFormProps {
   btnText: string;

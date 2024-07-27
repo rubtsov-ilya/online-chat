@@ -1,6 +1,6 @@
 import { FC } from "react"
 import FirstRegisterSection from "./first-register-section/FirstRegisterSection"
-import useAuth from "../../../hooks/useAuth";
+import useAuth from "src/hooks/useAuth";
 import { Navigate } from "react-router-dom";
 
 const RegisterPage: FC = () => {

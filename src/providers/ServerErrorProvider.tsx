@@ -1,5 +1,5 @@
 import React, { FC, createContext, useEffect, useState } from 'react'
-import { IValueServerError } from './../interfaces/ServerErrorValue.interface';
+import { IValueServerError } from 'src/interfaces/ServerErrorValue.interface';
 
 interface ServerErrorProviderProps {
   children: React.ReactNode

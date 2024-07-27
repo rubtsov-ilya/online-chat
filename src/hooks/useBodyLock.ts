@@ -1,5 +1,6 @@
 import { useContext } from "react";
-import { bodyLockContext } from "../providers/BodyLockProvider";
+import { bodyLockContext } from "src/providers/BodyLockProvider";
+
 
 export default function useBodyLock() {
   const context = useContext(bodyLockContext);

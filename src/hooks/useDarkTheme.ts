@@ -1,6 +1,7 @@
 import { useContext } from "react";
-import { darkThemeContext } from "../providers/DarkThemeProvider";
-import { IValueDarkTheme } from "../interfaces/DarkThemeValue.interface";
+import { IValueDarkTheme } from "src/interfaces/DarkThemeValue.interface";
+import { darkThemeContext } from "src/providers/DarkThemeProvider";
+
 
 const useDarkTheme = (): IValueDarkTheme => {
   const context = useContext(darkThemeContext);

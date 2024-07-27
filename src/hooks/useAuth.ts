@@ -1,5 +1,6 @@
 import { useSelector } from "react-redux";
-import { selectUser } from "../redux/slices/UserSlice";
+import { selectUser } from "src/redux/slices/UserSlice";
+
 
 const useAuth = () => {
   const {email, token, uid, uMockid} = useSelector(selectUser);

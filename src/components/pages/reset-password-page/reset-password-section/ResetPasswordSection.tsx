@@ -1,6 +1,7 @@
 import { Dispatch, FC, SetStateAction } from "react";
 import styles from "./ResetPasswordSection.module.scss";
-import AuthForm from "../../../ui/auth-form/AuthForm";
+import AuthForm from "src/components/ui/auth-form/AuthForm";
+
 
 interface ResetPasswordSectionProps {
   setIsMessageSended: Dispatch<SetStateAction<boolean>>;

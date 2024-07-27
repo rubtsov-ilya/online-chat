@@ -1,6 +1,7 @@
 import { FC } from "react";
 import styles from "./FirstRegisterSection.module.scss";
-import AuthForm from "../../../ui/auth-form/AuthForm";
+import AuthForm from "src/components/ui/auth-form/AuthForm";
+
 
 const FirstRegisterSection: FC = () => {
 

@@ -1,6 +1,7 @@
 import { FC } from "react"
 import FirstLoginSection from "./first-login-section/FirstLoginSection"
-import useAuth from "../../../hooks/useAuth";
+import useAuth from "src/hooks/useAuth"
+
 
 const LoginPage: FC = () => {
   const {isAuth} = useAuth()
