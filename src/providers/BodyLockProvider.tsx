@@ -19,9 +19,7 @@ const BodyLockProvider: FC<BodyLockProviderProps> = ({ children }) => {
 
   useEffect(() => {
     const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
-    if (isMobile) {
-      return
-    } else if (!isMobile) {
+    if (!isMobile) {
       setLockPaddingValue(window.innerWidth - (document.querySelector('#root') as HTMLDivElement).offsetWidth);
     }
   }, [])

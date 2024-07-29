@@ -1,0 +1,31 @@
+.my-panel-backdrop {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background-color: #00000021;
+  backdrop-filter: blur(2px);
+  transition: opacity 0.2s ease;
+  pointer-events: none;
+  opacity: 0;
+}
+
+.my-panel {
+  position: relative;
+  left: -246px;
+  width: 246px;
+  height: 100%;
+  background: var(--base-white);
+  transition: left 0.3s ease;
+}
+
+.active {
+  &.my-panel-backdrop{
+    pointer-events: all;
+    opacity: 1;
+  }
+  .my-panel {
+    left: 0px;
+  }
+}
