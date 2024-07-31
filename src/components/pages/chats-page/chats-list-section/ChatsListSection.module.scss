@@ -3,5 +3,7 @@
   /* 56px = height ChatsHeader / class = .header */
   &__content {
     height: 100%;
+    padding: 0 8px;
+    overflow: auto;
   }
 }
