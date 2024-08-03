@@ -21,6 +21,10 @@ flex-grow: 1;
 &--no-padding {
   padding: 0;
 }
+
+&--max-width-unset {
+  max-width: unset;
+}
 // @include tablet {
 //   padding: 0 39px;
 // }

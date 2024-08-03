@@ -37,3 +37,21 @@
     @content;
   }
 }
+
+
+@mixin scrollbar {
+  &::-webkit-scrollbar {
+    width: 9px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background-color: #8e8e8e;
+    border: 2px solid #f5f5f5;
+    border-radius: 99px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background-color: #f5f5f5;
+    border-radius: 99px;
+  }
+}

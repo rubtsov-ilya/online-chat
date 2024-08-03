@@ -1,11 +1,10 @@
 @import 'src/assets/css/_mixins.scss';
 
-.chats-list {
+.chat-messages {
   height: calc(100% - 56px);
   /* 56px = height ChatsHeader / class = .header */
   &__content {
     height: 100%;
-    padding: 0 8px;
     overflow-y: auto;
 
     @media screen and (min-width: 991px) {

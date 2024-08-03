@@ -9,9 +9,14 @@ import LoginPage from "src/components/pages/login-page/LoginPage.tsx";
 import RegisterPage from "src/components/pages/register-page/RegisterPage.tsx";
 import ResetPasswordPage from "src/components/pages/reset-password-page/ResetPasswordPage.tsx";
 import ChatsPage from "src/components/pages/chats-page/ChatsPage";
+import ChatPage from "src/components/pages/chat-page/ChatPage";
+import { useMediaQuery } from "react-responsive";
 
 
 export default function App() {
+  const isMobileScreen = useMediaQuery({ query: '(max-width: 991px)'})
+  console.log(isMobileScreen)
+
   return (
     <BodyLockProvider>
       <DarkThemeProvider>
@@ -29,10 +34,11 @@ export default function App() {
               <Route path="login" element={<LoginPage />} />
               <Route path="register" element={<RegisterPage />} />
               <Route path="reset-password" element={<ResetPasswordPage />} />
-              <Route path="chats" element={<ChatsPage />}>
-                {/* <Route path="chat" element={<RegisterPage />} /> */}
+              <Route path="chats" element={<ChatsPage />} >
+                {!isMobileScreen && <Route path="chat" element={<ChatPage />} />}
               </Route>
-              <Route path="*" element={<Navigate to="/" replace/>} />
+              {isMobileScreen && <Route path="chats/chat" element={<ChatPage />} />}
+              {/* <Route path="*" element={<Navigate to="/" replace/>} /> */}
             </Route>
           </Routes>
       </DarkThemeProvider>

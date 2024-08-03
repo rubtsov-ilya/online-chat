@@ -1,4 +1,4 @@
-.header {
+.top-bar {
   height: 56px;
   display: flex;
   align-items: center;
@@ -18,6 +18,8 @@
     object-position: center;
     object-fit: cover;
     background-color: var(--base-grey-gainsboro);
+    font-size: 12px;
+    text-align: center;
   }
 
   &__title {

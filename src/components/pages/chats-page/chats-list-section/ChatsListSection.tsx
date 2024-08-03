@@ -2,14 +2,20 @@ import { FC } from "react"
 import styles from './ChatsListSection.module.scss'
 import EmptyChatsWrapper from "./empty-chats-wrapper/EmptyChatsWrapper"
 import Search from "src/components/ui/search/Search"
+import ChatItem from "./chat-item/ChatItem"
 
-const ChatsListSection: FC = () => {
+interface ChatsListSectionProps {
+  isMobileScreen?: boolean;
+}
+
+const ChatsListSection: FC<ChatsListSectionProps> = ({isMobileScreen}) => {
   const chatsData = [{}]
+  const ComponentTag = isMobileScreen ? "section" : "div";
 
   return (
-    <section className={styles["chats-list-section"]}>
+    <ComponentTag className={styles["chats-list"]}>
     <div className={`container container--height container--no-padding`}>
-      <div className={styles["chats-list-section__content"]}>
+      <div className={styles["chats-list__content"]}>
         {chatsData.length === 0 && 
             <EmptyChatsWrapper />
         }
@@ -17,12 +23,26 @@ const ChatsListSection: FC = () => {
         {chatsData.length !== 0 && 
         <>
           <Search />
+          <ChatItem />
+          <ChatItem />
+          <ChatItem />
+          <ChatItem />
+          <ChatItem />
+          <ChatItem />
+          <ChatItem />
+          <ChatItem />
+          <ChatItem />
+          <ChatItem />
+          <ChatItem />
+          <ChatItem />
+          <ChatItem />
+          <ChatItem />
         </>
 
         }
       </div>
     </div>
-  </section>
+  </ComponentTag>
   )
 }
 
