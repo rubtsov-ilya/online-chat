@@ -8,19 +8,20 @@ interface ChatsListSectionProps {
   isMobileScreen?: boolean;
 }
 
-const ChatsListSection: FC<ChatsListSectionProps> = ({isMobileScreen}) => {
-  const chatsData = [{}]
+const ChatsListSection: FC<ChatsListSectionProps> = ({ isMobileScreen }) => {
   const ComponentTag = isMobileScreen ? "section" : "div";
+  const chatsData: any[] = [{}]
 
+  console.log('first2')
   return (
     <ComponentTag className={styles["chats-list"]}>
     <div className={`container container--height container--no-padding`}>
       <div className={styles["chats-list__content"]}>
-        {chatsData.length === 0 && 
+        {chatsData?.length === 0 && 
             <EmptyChatsWrapper />
         }
 
-        {chatsData.length !== 0 && 
+        {chatsData?.length !== 0 && 
         <>
           <Search />
           <ChatItem />

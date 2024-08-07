@@ -3,11 +3,13 @@ import ChatsHeader from 'src/components/pages/chats-page/chats-header/ChatsHeade
 import ChatsListSection from "src/components/pages/chats-page/chats-list-section/ChatsListSection"
 import styles from './ChatsPage.module.scss'
 import { useMediaQuery } from "react-responsive"
-import { Outlet } from "react-router-dom"
+import { Outlet, useLocation } from "react-router-dom"
+import ChatsDefaultSection from "./chats-default-section/ChatsDefaultSection"
 
 const ChatsPage: FC = () => {
   const isMobileScreen = useMediaQuery({ query: '(max-width: 991px)'})
-  const isChatSelected = true
+  const location = useLocation();
+  const isChatPathName = location.pathname === '/chats/chat';
 
   return (
     <main className={styles["main"]}>
@@ -17,8 +19,8 @@ const ChatsPage: FC = () => {
           <ChatsHeader isMobileScreen={isMobileScreen}/>
           <ChatsListSection isMobileScreen={isMobileScreen}/>
         </section>
-        {isChatSelected && <Outlet />}
-        {!isChatSelected && <div>Test</div>}
+        {isChatPathName && <Outlet />}
+        {!isChatPathName && <ChatsDefaultSection />}
       </>
       }
 

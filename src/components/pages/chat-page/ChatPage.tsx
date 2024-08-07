@@ -9,6 +9,8 @@ const ChatPage: FC = () => {
   const isMobileScreen = useMediaQuery({ query: '(max-width: 991px)'})
   const ComponentTag = isMobileScreen ? "main" : "section";
 
+  console.log('render_chat_page')
+
   return (
     <ComponentTag className={styles["main"]}>
       <ChatHeader isMobileScreen={isMobileScreen}/>

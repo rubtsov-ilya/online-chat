@@ -20,7 +20,7 @@
 
 
     /* dark mode colors */
-    --dark-black: #fff;
+	--dark-black: #fff;
 	--dark-grey: #7a7a7a;
 	--dark-grey-gainsboro: #2d2f2f;
 	--dark-grey-whisper: #1c1e22;
@@ -29,6 +29,7 @@
 	--dark-white: #101418;
 	--dark-blue-alice: #00193d;
 	--dark-accent-blue: #005fff;
+	--dark-accent-dark-blue: #0056e7;
 	--dark-accent-red: #ff3742;
 	--dark-accent-green: #20e070;
 	--dark-overlay: rgba(0, 0, 0, 0.6);
@@ -36,11 +37,11 @@
 	--dark-button-text: #005fff;
 	--dark-button-background: #fff;
 
-    /* fonts */
-    --font-family: "Roboto", sans-serif;
-    --second-family: "Inter", sans-serif;
+	/* fonts */
+	--font-family: "Roboto", sans-serif;
+	--second-family: "Inter", sans-serif;
     
-    --base-black: var(--light-black);
+	--base-black: var(--light-black);
 	--base-grey: var(--light-grey);
 	--base-grey-gainsboro: var(--light-grey-gainsboro);
 	--base-grey-whisper: var(--light-grey-whisper);

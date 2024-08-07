@@ -5,7 +5,7 @@
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  background: var(--base-white);
+  background: var(--light-white);
   border: 1px solid var(--base-grey-whisper);
   border-radius: 20px;
   box-shadow: 0 1px 4px 0 rgba(0, 0, 0, 0.25);
@@ -17,7 +17,7 @@
 
     path {
       transition: all 0.2s ease;
-      fill: var(--base-button-background);
+      fill: var(--base-accent-blue);
     }
 
     &:hover {

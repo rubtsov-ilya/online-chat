@@ -1,0 +1,28 @@
+.default-chats-section {
+  height: 100%;
+  width: 100%;
+  background-color: var(--base-white-smoke);
+  background-image: url('src/assets/images/backgrounds/chats-page-bg/default-chat-section-bg/pattern-7.svg');
+  
+  &__content {
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  &__title {
+    font-size: 16px;
+    font-family: var(--third-family);
+    font-weight: 500;
+    letter-spacing: 0.05em;
+    color: #ffffff;
+  }
+
+  &__title-wrapper {
+
+    padding: 8px 12px;
+    background-color: var(--base-overlay-dark);
+    border-radius: 999px;
+  }
+}
