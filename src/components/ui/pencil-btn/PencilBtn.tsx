@@ -6,7 +6,7 @@ import MyPanel from '../my-panel/MyPanel';
 
 import styles from './PencilBtn.module.scss';
 
-const PencilBtn: FC = ({}) => {
+const PencilBtn: FC = () => {
   const [isPanelOpen, setIsPanelOpen] = useState<boolean>(false);
   const { toggleBodyLock } = useBodyLock();
 

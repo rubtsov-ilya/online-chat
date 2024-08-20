@@ -15,11 +15,47 @@ const ChatMessagesSection: FC<ChatMessagesSectionProps> = ({
 
   const devMessagesArray = [
     {
+      contentText: 'sdasasdasdasdasdasddasdsdg',
+      messageDate: '10:18',
+      isChecked: false,
+      isOwn: true,
+      userAvatar:
+        'https://img.freepik.com/free-photo/futuristic-cat-with-goggles_23-2150969291.jpg?t=st=1723732192~exp=1723735792~hmac=a4a2681fc1de61379eaa4e0c3fa697ded740bab5de9171e7678b25df7276ff80&w=826',
+      images: [],
+    },
+    {
+      contentText: 'sdsdg',
+      messageDate: '10:18',
+      isChecked: false,
+      isOwn: false,
+      userAvatar:
+        'https://img.freepik.com/free-photo/futuristic-cat-with-goggles_23-2150969291.jpg?t=st=1723732192~exp=1723735792~hmac=a4a2681fc1de61379eaa4e0c3fa697ded740bab5de9171e7678b25df7276ff80&w=826',
+      images: [],
+    },
+    {
+      contentText: 'sdsdg',
+      messageDate: '10:18',
+      isChecked: false,
+      isOwn: false,
+      userAvatar:
+        'https://img.freepik.com/free-photo/futuristic-cat-with-goggles_23-2150969291.jpg?t=st=1723732192~exp=1723735792~hmac=a4a2681fc1de61379eaa4e0c3fa697ded740bab5de9171e7678b25df7276ff80&w=826',
+      images: [],
+    },
+    {
+      contentText: 'sdsdg',
+      messageDate: '10:18',
+      isChecked: false,
+      isOwn: false,
+      userAvatar:
+        'https://img.freepik.com/free-photo/futuristic-cat-with-goggles_23-2150969291.jpg?t=st=1723732192~exp=1723735792~hmac=a4a2681fc1de61379eaa4e0c3fa697ded740bab5de9171e7678b25df7276ff80&w=826',
+      images: [],
+    },
+    {
       contentText:
         'Lorem Ipsum - это текст-"рыба", часто используемый вasffsfasfasfa asf f asf фы ывп укр оа печати и вэб-дизайне. Lorem Ipsum является стандартной "рыбой" для текстов на латинице с начала XVI века. оапппп fgswtst аармсмти пофвфаы цйццаа фыафыаафыаыsf ',
       messageDate: '10:16',
       isChecked: true,
-      isOwn: false,
+      isOwn: true,
       userAvatar:
         'https://img.freepik.com/free-photo/futuristic-cat-with-goggles_23-2150969291.jpg?t=st=1723732192~exp=1723735792~hmac=a4a2681fc1de61379eaa4e0c3fa697ded740bab5de9171e7678b25df7276ff80&w=826',
       images: [
@@ -72,7 +108,7 @@ const ChatMessagesSection: FC<ChatMessagesSectionProps> = ({
         'https://img.freepik.com/free-photo/cute-kitten-playing-in-autumn-forest-surrounded-by-colorful-leaves-generated-by-artificial-intelligence_25030-63162.jpg?w=1380&t=st=1723726321~exp=1723726921~hmac=cdf9e98345c44adc4544d5e0a7ef3ed68e10491a00cb165f3955d9cc85099382',
       ],
     },
-    {
+    /*     {
       contentText: 'sdsdg',
       messageDate: '10:18',
       isChecked: false,
@@ -80,7 +116,7 @@ const ChatMessagesSection: FC<ChatMessagesSectionProps> = ({
       userAvatar:
         'https://img.freepik.com/free-photo/futuristic-cat-with-goggles_23-2150969291.jpg?t=st=1723732192~exp=1723735792~hmac=a4a2681fc1de61379eaa4e0c3fa697ded740bab5de9171e7678b25df7276ff80&w=826',
       images: [],
-    },
+    }, */
   ];
 
   useLayoutEffect(() => {
@@ -97,14 +133,9 @@ const ChatMessagesSection: FC<ChatMessagesSectionProps> = ({
         }
       >
         <div className={styles['chat-messages__content']}>
-          {devMessagesArray.map((messageData, index) => (
-            <Message
-              key={index}
-              index={index}
-              messageData={messageData}
-              devMessagesArray={devMessagesArray}
-            />
-          ))}
+          {devMessagesArray.map((messageData, index) => {
+            return <Message key={index} messageData={messageData} isLast={index === devMessagesArray.length - 1 || messageData.isOwn !== devMessagesArray[index + 1]?.isOwn} isFirst={index === 0 || messageData.isOwn !== devMessagesArray[index - 1]?.isOwn}/>
+          })}
         </div>
         <div ref={endRef}></div>
       </div>

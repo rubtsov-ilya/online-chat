@@ -5,24 +5,10 @@ import UncheckedStatusSvg from 'src/assets/images/icons/16x16-icons/Check.svg?re
 
 import styles from './Message.module.scss';
 
-const Message: FC = ({ index, messageData, devMessagesArray }) => {
-  if (index > 0 && devMessagesArray[index - 1].isOwn !== messageData.isOwn) {
-    if (messageData.isOwn) {
-      console.log('first-one');
-    } else {
-      console.log('first-two');
-    }
-  } else {
-    console.log('second');
-  }
-
+const Message: FC = ({ messageData, isLast, isFirst }) => {
   return (
     <div
-      className={
-        messageData.isOwn
-          ? `${styles['message']} ${styles['own']}`
-          : `${styles['message']}`
-      }
+      className={`${styles['message']} ${messageData?.isOwn ? styles['own'] : null} ${isLast ? styles['border'] : null} ${isFirst ? styles['margin-top'] : null}`}
     >
       {messageData.images.length > 0 && (
         <div className={styles['message__album']}>
@@ -41,26 +27,48 @@ const Message: FC = ({ index, messageData, devMessagesArray }) => {
               </div>
             );
           })}
+          {messageData.contentText.length === 0 &&
+            messageData.images.length > 0 && (
+              <div className={styles['message__image-info-wrapper']}>
+                {messageData.isChecked && (
+                  <CheckedStatusSvg
+                    className={`${styles['message__checked-mark']} ${styles['message__checked-mark--image']}`}
+                  />
+                )}
+                {!messageData.isChecked && (
+                  <UncheckedStatusSvg
+                    className={`${styles['message__unchecked-mark']} ${styles['message__unchecked-mark--image']}`}
+                  />
+                )}
+                <span
+                  className={`${styles['message__timestamp']} ${styles['message__timestamp--image']}`}
+                >
+                  {messageData.messageDate}
+                </span>
+              </div>
+            )}
         </div>
       )}
-      <div className={styles['message__content']}>
-        <div className={styles['message__text']}>
-          {messageData.contentText}
-          <div className={styles['message__info-wrapper']}>
-            {messageData.isChecked && (
-              <CheckedStatusSvg className={styles['message__checked-mark']} />
-            )}
-            {!messageData.isChecked && (
-              <UncheckedStatusSvg
-                className={styles['message__unchecked-mark']}
-              />
-            )}
-            <span className={styles['message__timestamp']}>
-              {messageData.messageDate}
-            </span>
+      {messageData.contentText && (
+        <div className={styles['message__content']}>
+          <div className={styles['message__text']}>
+            {messageData.contentText}
+            <div className={styles['message__info-wrapper']}>
+              {messageData.isChecked && (
+                <CheckedStatusSvg className={styles['message__checked-mark']} />
+              )}
+              {!messageData.isChecked && (
+                <UncheckedStatusSvg
+                  className={styles['message__unchecked-mark']}
+                />
+              )}
+              <span className={styles['message__timestamp']}>
+                {messageData.messageDate}
+              </span>
+            </div>
           </div>
         </div>
-      </div>
+      )}
     </div>
   );
 };

@@ -1,5 +1,5 @@
 /// <reference types='vite-plugin-svgr/client' />
-import { Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route } from 'react-router-dom';
 import BodyLockProvider from 'src/providers/BodyLockProvider.tsx';
 import ScrollToTopProvider from 'src/providers/ScrollToTopProvider.tsx';
 import DarkThemeProvider from 'src/providers/DarkThemeProvider.tsx';

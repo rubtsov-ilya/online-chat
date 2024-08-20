@@ -5,16 +5,22 @@
   flex-direction: column;
   border-radius: 16px 16px 16px 16px;
   max-width: 480px;
-  margin: 8px auto 0 0;
+  margin: 2px auto 0 0;
   background: var(--base-grey-whisper);
   overflow: hidden;
+  &.margin-top {
+    margin-top: 8px;
+  }
   &.own {
-    margin: 8px 0 0 auto;
-    &:last-child {
+    margin: 2px 0 0 auto;
+    &.margin-top {
+      margin-top: 8px;
+    }
+    &.border {
       border-radius: 16px 16px 0 16px;
     }
   }
-  &:last-child {
+  &.border {
     border-radius: 16px 16px 16px 0;
   }
   @include tablet-small {
@@ -26,6 +32,7 @@
 
   
   &__album {
+    position: relative;
     display: flex;
     flex-wrap: wrap;
     width: 100%;
@@ -65,20 +72,37 @@
     }
   }
 
+  &__image-info-wrapper {
+    display: flex;
+    align-items: center;
+    position: absolute;
+    bottom: 4px;
+    right: 7px;
+    background-color: rgba(0, 0, 0, 0.2);
+    border-radius: 999px;
+    padding: 1px 7px 1px 2px;
+
+  }
+
   &__info-wrapper {
     position: relative;
-    top: 8px;
-    left: 4px;
+    top: 5px;
+    left: 2px;
     display: flex;
     align-items: center;
     float: right;
   }
+
 
   &__timestamp {
     font-family: var(--font-family);
     font-weight: 400;
     font-size: 12px;
     color: var(--base-grey);
+    width: 30px;
+    &--image {
+      color: var(--light-white);
+    }
   }
 
   &__checked-mark {
@@ -86,6 +110,11 @@
     min-height: 16px;
     path {
       fill: var(--base-accent-blue);
+    }
+    &--image {
+      path {
+        fill: var(--light-white);
+      }
     }
   }
 
@@ -95,5 +124,14 @@
     path {
       fill: var(--base-grey);
     }
+    &--image {
+      path {
+        fill: var(--light-white);
+      }
+    }
   }
+}
+
+.bebra {
+  border: 1px solid red;
 }
