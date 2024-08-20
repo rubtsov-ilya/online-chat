@@ -17,7 +17,6 @@ interface IShopApiUser {
   uid: string;
   cart: IShopApiDataItem[];
   orders: IOrder[];
-  
 }
 
 interface IShopApiDataQuery {
@@ -28,9 +27,9 @@ interface IShopApiDataQuery {
 
 interface IRegisterUserState {
   user: {
-    uid: string,
-    cart: [],
-    orders: [],
+    uid: string;
+    cart: [];
+    orders: [];
   };
 }
 

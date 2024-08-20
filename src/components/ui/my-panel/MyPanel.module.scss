@@ -1,11 +1,3 @@
-@mixin wrapper {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  margin-top: 16px;
-  padding-left: 8px;
-}
-
 .my-panel-backdrop {
   position: absolute;
   top: 0;
@@ -32,29 +24,15 @@
   transition: left 0.3s ease;
   cursor: default;
 
-  &__item {
-    @include wrapper;
-
-    &:first-child {
-      margin-top: 0px;
-      padding-left: 0px;
-    }
-    &:last-child {
-      margin-top: auto;
-    }
-
-    &:hover .my-panel__text{
-      color: var(--base-accent-blue);
-    }
-  }
-
-  &__user-avatar {
-    border-radius: 99999px;
-    width: 40px;
-    height: 40px;
-    object-position: center;
-    object-fit: cover;
-    background-color: var(--base-grey-gainsboro);
+  &__user-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-top: 16px;
+    padding-left: 8px;
+    margin-top: 0px;
+    padding-left: 0px;
+    
   }
 
   &__user-name {
@@ -62,22 +40,6 @@
     font-weight: 700;
     font-size: 16px;
     color: var(--base-black);
-  }
-
-  &__svg {
-    min-height: 24px;
-    min-width: 24px;
-    path {
-      fill: var(--base-grey);
-    }
-  }
-
-  &__text {
-    font-family: var(--font-family);
-    font-weight: 500;
-    font-size: 14px;
-    color: var(--base-black);
-    transition: color 0.2s ease;
   }
 }
 

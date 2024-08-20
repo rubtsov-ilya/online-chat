@@ -1,17 +1,16 @@
-import { useSelector } from "react-redux";
-import { selectUser } from "src/redux/slices/UserSlice";
-
+import { useSelector } from 'react-redux';
+import { selectUser } from 'src/redux/slices/UserSlice';
 
 const useAuth = () => {
-  const {email, token, uid, uMockid} = useSelector(selectUser);
+  const { email, token, uid, uMockid } = useSelector(selectUser);
 
   return {
     isAuth: !!email,
     email,
     token,
     uid,
-    uMockid
-  }
-}
+    uMockid,
+  };
+};
 
-export default useAuth
+export default useAuth;

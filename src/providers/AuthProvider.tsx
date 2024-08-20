@@ -1,21 +1,21 @@
-import { getAuth, onAuthStateChanged } from "firebase/auth";
-import { FC, useLayoutEffect } from 'react'
-import { useDispatch } from 'react-redux'
-import { firebaseApp } from "src/firebase";
-import { setUser } from "src/redux/slices/UserSlice";
-import { useGetUsersQuery } from "src/redux";
-import useAuth from "src/hooks/useAuth";
+import { onAuthStateChanged } from 'firebase/auth';
+import { FC, useLayoutEffect } from 'react';
+import { useDispatch } from 'react-redux';
+import { firebaseAuth } from 'src/firebase';
+import { setUser } from 'src/redux/slices/UserSlice';
+import { useGetUsersQuery } from 'src/redux';
+import useAuth from 'src/hooks/useAuth';
 
-const AuthProvider: FC = ({ }) => {
-  const {uMockid} = useAuth()
-  const { data: users = [] } = useGetUsersQuery(undefined, { skip: uMockid !== null });
-  const dispatch = useDispatch()
-
+const AuthProvider: FC = ({}) => {
+  const { uMockid } = useAuth();
+  const { data: users = [] } = useGetUsersQuery(undefined, {
+    skip: uMockid !== null,
+  });
+  const dispatch = useDispatch();
 
   useLayoutEffect(() => {
     if (users.length > 0) {
-      const auth = getAuth(firebaseApp);
-      onAuthStateChanged(auth, (user) => {
+      onAuthStateChanged(firebaseAuth, (user) => {
         if (user) {
           user.getIdToken().then((token) => {
             /* dispatch(
@@ -29,14 +29,13 @@ const AuthProvider: FC = ({ }) => {
           });
         } else {
           // User is signed out
-          console.log("User is signed out");
+          console.log('User is signed out');
         }
       });
     }
-  }, [users])
+  }, [users]);
 
+  return null;
+};
 
-  return null
-}
-
-export default AuthProvider
+export default AuthProvider;

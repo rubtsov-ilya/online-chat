@@ -1,0 +1,31 @@
+.btn {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-top: 16px;
+  padding-left: 8px;
+
+  &:last-child {
+    margin-top: auto;
+  }
+
+  &:hover &__text{
+    color: var(--base-accent-blue);
+  }
+
+  &__svg {
+    min-height: 24px;
+    min-width: 24px;
+    path {
+      fill: var(--base-grey);
+    }
+  }
+
+  &__text {
+    font-family: var(--font-family);
+    font-weight: 500;
+    font-size: 14px;
+    color: var(--base-black);
+    transition: color 0.2s ease;
+  }
+}

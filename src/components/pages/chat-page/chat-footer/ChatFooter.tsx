@@ -1,21 +1,27 @@
-import { FC } from 'react'
-import styles from './ChatFooter.module.scss'
+import { FC } from 'react';
+
+import styles from './ChatFooter.module.scss';
+import MessageInputWrapper from './message-input-wrapper/MessageInputWrapper';
 
 interface ChatFooterProps {
   isMobileScreen?: boolean;
 }
 
-const ChatFooter: FC<ChatFooterProps> = ({isMobileScreen}) => {
-  const ComponentTag = isMobileScreen ? "footer" : "div";
+const ChatFooter: FC<ChatFooterProps> = ({ isMobileScreen }) => {
+  const ComponentTag = isMobileScreen ? 'footer' : 'div';
   return (
-    <ComponentTag className={styles["bottom-bar"]}>
-    <div className={isMobileScreen ? `container` : `container container--max-width-unset`}>
-      <div className={styles["bottom-bar__content"]}>
-        <h1 className={styles["bottom-bar__title"]}>Online Chat</h1>
+    <ComponentTag className={styles['bottom-bar']}>
+      <div
+        className={
+          isMobileScreen ? 'container' : 'container container--max-width-unset'
+        }
+      >
+        <div className={styles['bottom-bar__content']}>
+          <MessageInputWrapper />
+        </div>
       </div>
-    </div>
-  </ComponentTag>
-  )
-}
+    </ComponentTag>
+  );
+};
 
-export default ChatFooter
+export default ChatFooter;

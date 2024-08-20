@@ -1,52 +1,60 @@
-import React, { FC, createContext, useEffect, useLayoutEffect, useState } from 'react'
-import { IValueDarkTheme } from 'src/interfaces/DarkThemeValue.interface'
+import React, {
+  FC,
+  createContext,
+  useEffect,
+  useLayoutEffect,
+  useState,
+} from 'react';
+import { IValueDarkTheme } from 'src/interfaces/DarkThemeValue.interface';
 
 interface DarkThemeProviderProps {
-  children: React.ReactNode
+  children: React.ReactNode;
 }
 
-export const darkThemeContext = createContext<IValueDarkTheme | null>(null)
+export const darkThemeContext = createContext<IValueDarkTheme | null>(null);
 
 const DarkThemeProvider: FC<DarkThemeProviderProps> = ({ children }) => {
-  const bodyTag = document.querySelector('body') as HTMLBodyElement
-  const [isDarkTheme, setIsDarkTheme] = useState<boolean>(false)
+  const bodyTag = document.querySelector('body') as HTMLBodyElement;
+  const [isDarkTheme, setIsDarkTheme] = useState<boolean>(false);
 
   useLayoutEffect(() => {
-    const isDeviceDarkTheme: boolean = window.matchMedia('(prefers-color-scheme: dark)').matches
+    const isDeviceDarkTheme: boolean = window.matchMedia(
+      '(prefers-color-scheme: dark)',
+    ).matches;
     const theme = localStorage.getItem('theme');
     if (theme === 'dark') {
-      setIsDarkTheme(true)
+      setIsDarkTheme(true);
     } else if (theme === 'light') {
-      setIsDarkTheme(false)
+      setIsDarkTheme(false);
     } else if (!theme && isDeviceDarkTheme) {
-      setIsDarkTheme(true)
+      setIsDarkTheme(true);
     } else if (!theme && !isDeviceDarkTheme) {
-      localStorage.setItem('theme', 'light')
+      localStorage.setItem('theme', 'light');
     }
-  }, [])
+  }, []);
 
   useEffect(() => {
     if (isDarkTheme) {
-      bodyTag.classList.add('dark')
-      localStorage.setItem('theme', 'dark')
+      bodyTag.classList.add('dark');
+      localStorage.setItem('theme', 'dark');
     } else if (!isDarkTheme) {
-      bodyTag.classList.remove('dark')
-      localStorage.setItem('theme', 'light')
+      bodyTag.classList.remove('dark');
+      localStorage.setItem('theme', 'light');
     }
-  }, [isDarkTheme])
+  }, [isDarkTheme]);
 
-  const changeDarkThemeState = () => { 
-    setIsDarkTheme((prev) => !prev)
-   }
-   
-  const value: IValueDarkTheme = { isDarkTheme, changeDarkThemeState }
+  const changeDarkThemeState = () => {
+    setIsDarkTheme((prev) => !prev);
+  };
+
+  const value: IValueDarkTheme = { isDarkTheme, changeDarkThemeState };
   // получение в компонентах
   // const {isDarkTheme, changeDarkThemeState} = useDarkTheme()
   return (
     <darkThemeContext.Provider value={value}>
       {children}
     </darkThemeContext.Provider>
-  )
-}
+  );
+};
 
-export default DarkThemeProvider
+export default DarkThemeProvider;

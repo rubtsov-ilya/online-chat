@@ -6,5 +6,5 @@ export interface IFormValues {
   bairro: string;
   cidade: string;
   uf: string;
-  payment: 'Cartão de crédito' | 'Cartão de débito' | 'Dinheiro'
+  payment: 'Cartão de crédito' | 'Cartão de débito' | 'Dinheiro';
 }

@@ -1,23 +1,25 @@
-import { FC, useRef, useState } from "react";
-import styles from "./Search.module.scss";
-import DeleteCircleSvg from 'src/assets/images/icons/24x24-icons/Delete cirlce.svg?react'
-import SearchSvg from 'src/assets/images/icons/24x24-icons/Search.svg?react'
+import { FC, useRef, useState } from 'react';
+
+import DeleteCircleSvg from 'src/assets/images/icons/24x24-icons/Delete cirlce.svg?react';
+import SearchSvg from 'src/assets/images/icons/24x24-icons/Search.svg?react';
+
+import styles from './Search.module.scss';
 
 const Search: FC = () => {
-  const [searchInputValue, setSearchInputValue] = useState<string>("");
+  const [searchInputValue, setSearchInputValue] = useState<string>('');
   const searchRef = useRef<HTMLInputElement>(null);
 
   const onSearchInputKeyDown = (
-    event: React.KeyboardEvent<HTMLInputElement>
+    event: React.KeyboardEvent<HTMLInputElement>,
   ): void => {
-    if (event.key === "Enter") {
+    if (event.key === 'Enter') {
       /* main callback */
-      console.log(`first`);
+      console.log('first');
     }
   };
 
   const onClearButtonClick = (): void => {
-    setSearchInputValue("");
+    setSearchInputValue('');
   };
 
   const onSearchInputClick = () => {
@@ -27,8 +29,8 @@ const Search: FC = () => {
   };
 
   return (
-    <div onClick={onSearchInputClick} className={styles["search"]}>
-      <SearchSvg className={styles["search__search-svg"]}/>
+    <div onClick={onSearchInputClick} className={styles['search']}>
+      <SearchSvg className={styles['search__search-svg']} />
       <input
         ref={searchRef}
         value={searchInputValue}
@@ -39,9 +41,15 @@ const Search: FC = () => {
           setSearchInputValue(e.target.value)
         }
         placeholder="Поиск"
-        className={styles["search__input"]}
+        className={styles['search__input']}
       />
-      {searchInputValue.length > 0 && <DeleteCircleSvg onClick={onClearButtonClick} role="button" className={styles["search__delete-svg"]} />}
+      {searchInputValue.length > 0 && (
+        <DeleteCircleSvg
+          onClick={onClearButtonClick}
+          role="button"
+          className={styles['search__delete-svg']}
+        />
+      )}
     </div>
   );
 };

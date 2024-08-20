@@ -1,2 +1,2 @@
-export * from "./store.js";
-export * from "./shopApi.js";
+export * from './store.js';
+export * from './shopApi.js';

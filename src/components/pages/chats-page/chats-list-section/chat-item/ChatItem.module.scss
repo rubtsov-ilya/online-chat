@@ -31,12 +31,14 @@
     font-weight: 700;
     font-size: 14px;
     color: var(--base-black);
+    user-select: none;
   }
   &__user-message {
     font-family: var(--font-family);
     font-weight: 400;
     font-size: 12px;
     color: var(--base-grey);
+    user-select: none;
   }
 
   &__right-wrapper {
@@ -61,6 +63,7 @@
     font-size: 11px;
     text-align: center;
     color: var(--base-white);
+    user-select: none;
   }
   &__message-statuses-wrapper {
     display: flex;
@@ -80,5 +83,6 @@
     font-size: 12px;
     color: var(--base-grey);
     line-height: 1;
+    user-select: none;
   }
 }

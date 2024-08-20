@@ -1,37 +1,40 @@
-import { FC } from "react"
-import ChatsHeader from 'src/components/pages/chats-page/chats-header/ChatsHeader'
-import ChatsListSection from "src/components/pages/chats-page/chats-list-section/ChatsListSection"
-import styles from './ChatsPage.module.scss'
-import { useMediaQuery } from "react-responsive"
-import { Outlet, useLocation } from "react-router-dom"
-import ChatsDefaultSection from "./chats-default-section/ChatsDefaultSection"
+import { FC } from 'react';
+import ChatsHeader from 'src/components/pages/chats-page/chats-header/ChatsHeader';
+import ChatsListSection from 'src/components/pages/chats-page/chats-list-section/ChatsListSection';
+import { Outlet, useLocation } from 'react-router-dom';
 
-const ChatsPage: FC = () => {
-  const isMobileScreen = useMediaQuery({ query: '(max-width: 991px)'})
+import styles from './ChatsPage.module.scss';
+import ChatsDefaultSection from './chats-default-section/ChatsDefaultSection';
+
+interface ChatsPageProps {
+  isMobileScreen: boolean;
+}
+
+const ChatsPage: FC<ChatsPageProps> = ({ isMobileScreen }) => {
   const location = useLocation();
   const isChatPathName = location.pathname === '/chats/chat';
 
   return (
-    <main className={styles["main"]}>
-      {!isMobileScreen && 
-      <>
-        <section className={styles["chats-section"]}>
-          <ChatsHeader isMobileScreen={isMobileScreen}/>
-          <ChatsListSection isMobileScreen={isMobileScreen}/>
-        </section>
-        {isChatPathName && <Outlet />}
-        {!isChatPathName && <ChatsDefaultSection />}
-      </>
-      }
+    <main className={styles['main']}>
+      {!isMobileScreen && (
+        <>
+          <section className={styles['chats-section']}>
+            <ChatsHeader isMobileScreen={isMobileScreen} />
+            <ChatsListSection isMobileScreen={isMobileScreen} />
+          </section>
+          {isChatPathName && <Outlet />}
+          {!isChatPathName && <ChatsDefaultSection />}
+        </>
+      )}
 
-      {isMobileScreen && 
-      <>
-        <ChatsHeader />
-        <ChatsListSection />
-      </>
-      }
+      {isMobileScreen && (
+        <>
+          <ChatsHeader />
+          <ChatsListSection />
+        </>
+      )}
     </main>
-  )
-}
+  );
+};
 
-export default ChatsPage
+export default ChatsPage;

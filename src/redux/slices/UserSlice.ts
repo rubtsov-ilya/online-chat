@@ -11,14 +11,14 @@ const initialState: IInitialState = {
   email: null,
   token: null,
   uid: null,
-  uMockid: null
+  uMockid: null,
 };
 
 const userSlice = createSlice({
   name: 'user',
   initialState,
   selectors: {
-    selectUser: state => state,
+    selectUser: (state) => state,
   },
   reducers: {
     setUser(state, action: PayloadAction<IInitialState>) {
@@ -32,10 +32,10 @@ const userSlice = createSlice({
       state.token = null;
       state.uid = null;
       state.uMockid = null;
-    }
+    },
   },
 });
 
-export const { setUser, removeUser } = userSlice.actions
-export const { selectUser } = userSlice.selectors
-export default userSlice.reducer
+export const { setUser, removeUser } = userSlice.actions;
+export const { selectUser } = userSlice.selectors;
+export default userSlice.reducer;

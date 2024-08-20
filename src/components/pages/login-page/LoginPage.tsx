@@ -1,10 +1,10 @@
-import { FC } from "react"
-import FirstLoginSection from "./first-login-section/FirstLoginSection"
-import useAuth from "src/hooks/useAuth"
+import { FC } from 'react';
+import useAuth from 'src/hooks/useAuth';
 
+import FirstLoginSection from './first-login-section/FirstLoginSection';
 
 const LoginPage: FC = () => {
-  const {isAuth} = useAuth()
+  const { isAuth } = useAuth();
   /* if (isAuth) {
     return <Navigate to="/" replace />;
   } */
@@ -13,7 +13,7 @@ const LoginPage: FC = () => {
     <main>
       <FirstLoginSection />
     </main>
-  )
-}
+  );
+};
 
-export default LoginPage
+export default LoginPage;

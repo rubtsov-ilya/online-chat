@@ -1,41 +1,44 @@
-import Select from "react-select";
-import './CustomSelec.sass'
-import { FC } from "react";
-import { ISelectOptions } from "../../../../../interfaces/SelectOptions.interface";
+import Select from 'react-select';
+import './CustomSelec.sass';
+import { FC } from 'react';
+
 import { SingleValue } from 'react-select';
-import { SortParams } from "../../../../../interfaces/SortParams.interface";
+
+import { ISelectOptions } from '../../../../../interfaces/SelectOptions.interface';
+import { SortParams } from '../../../../../interfaces/SortParams.interface';
 
 interface CustomSelectProps {
-  setSortParams: React.Dispatch<React.SetStateAction<SortParams>>
+  setSortParams: React.Dispatch<React.SetStateAction<SortParams>>;
 }
 
 const CustomSelect: FC<CustomSelectProps> = ({ setSortParams }) => {
-
-  const handleChangeSelect = (selectValue: SingleValue<ISelectOptions>): void => { 
+  const handleChangeSelect = (
+    selectValue: SingleValue<ISelectOptions>,
+  ): void => {
     if (selectValue) {
       if (selectValue.value === 'title') {
         setSortParams({
           sortBy: 'title',
-          order: 'asc'
-        })
+          order: 'asc',
+        });
       } else if (selectValue.value === 'title-reverce') {
         setSortParams({
           sortBy: 'title',
-          order: 'desc'
-        })
+          order: 'desc',
+        });
       } else if (selectValue.value === 'price') {
         setSortParams({
           sortBy: 'price',
-          order: 'asc'
-        })
+          order: 'asc',
+        });
       } else if (selectValue.value === 'price-reverce') {
         setSortParams({
           sortBy: 'price',
-          order: 'desc'
-        })
+          order: 'desc',
+        });
       }
     }
-  }
+  };
 
   const selectOptions: ISelectOptions[] = [
     { value: 'title', label: 'Nome' },

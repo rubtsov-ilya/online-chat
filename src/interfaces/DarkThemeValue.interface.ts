@@ -1,4 +1,4 @@
 export interface IValueDarkTheme {
   isDarkTheme: boolean;
-  changeDarkThemeState: () => void
+  changeDarkThemeState: () => void;
 }

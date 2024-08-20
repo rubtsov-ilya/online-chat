@@ -1,14 +1,16 @@
-import { Outlet } from "react-router-dom";
-import Header from "./header/Header.tsx";
-import { FC } from "react";
+import { Outlet } from 'react-router-dom';
+
+import { FC } from 'react';
+
+import Header from './header/Header.tsx';
 
 const Layout: FC = () => {
   return (
     <>
       <Header />
-        <Outlet />
+      <Outlet />
     </>
-  )
-}
+  );
+};
 
-export default Layout
+export default Layout;

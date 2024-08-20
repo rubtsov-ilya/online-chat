@@ -1,0 +1,99 @@
+@import 'src/assets/css/_mixins.scss';
+
+.message {
+  display: flex;
+  flex-direction: column;
+  border-radius: 16px 16px 16px 16px;
+  max-width: 480px;
+  margin: 8px auto 0 0;
+  background: var(--base-grey-whisper);
+  overflow: hidden;
+  &.own {
+    margin: 8px 0 0 auto;
+    &:last-child {
+      border-radius: 16px 16px 0 16px;
+    }
+  }
+  &:last-child {
+    border-radius: 16px 16px 16px 0;
+  }
+  @include tablet-small {
+    max-width: 380px;
+  }
+  @include phone {
+    max-width: 300px;
+  }
+
+  
+  &__album {
+    display: flex;
+    flex-wrap: wrap;
+    width: 100%;
+
+  }
+  &__img {
+    background-color: var(--base-grey-whisper);;
+    object-fit: cover;
+    object-position: center center;
+    width: 100%;
+    height: 100%;
+    max-height: 360px;
+    @include tablet-small {
+      max-height: 340px;
+    }
+  
+    @include phone {
+      max-height: 320px;
+    }
+  }
+
+  &__img-wrapper {
+    border: 1px solid var(--base-grey-whisper);;
+  }
+
+  &__content {
+    padding: 8px 16px;
+  }
+
+  &__text {
+    font-family: var(--font-family);
+    font-weight: 500;
+    font-size: 16px;
+    color: var(--light-black);
+    @include tablet-small {
+      font-size: 14px;
+    }
+  }
+
+  &__info-wrapper {
+    position: relative;
+    top: 8px;
+    left: 4px;
+    display: flex;
+    align-items: center;
+    float: right;
+  }
+
+  &__timestamp {
+    font-family: var(--font-family);
+    font-weight: 400;
+    font-size: 12px;
+    color: var(--base-grey);
+  }
+
+  &__checked-mark {
+    min-width: 16px;
+    min-height: 16px;
+    path {
+      fill: var(--base-accent-blue);
+    }
+  }
+
+  &__unchecked-mark {
+    min-width: 16px;
+    min-height: 16px;
+    path {
+      fill: var(--base-grey);
+    }
+  }
+}

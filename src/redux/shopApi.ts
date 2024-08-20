@@ -2,19 +2,24 @@ import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 
 export const shopApi = createApi({
   reducerPath: 'shopApi',
-  baseQuery: fetchBaseQuery({ baseUrl: 'https://6623b27c3e17a3ac846fe8ef.mockapi.io/' }),
+  baseQuery: fetchBaseQuery({
+    baseUrl: 'https://6623b27c3e17a3ac846fe8ef.mockapi.io/',
+  }),
   tagTypes: ['Products', 'Cart'],
   endpoints: (build) => ({
     /* QUERY */
     /* Products */
-    getProducts: build.query<IShopApiDataItem[], {sortBy: 'title' | 'price', order: 'asc' | 'desc', title: string}>({
-      query: ({sortBy, order, title = ''}) => ({
-        url: `products`,
+    getProducts: build.query<
+      IShopApiDataItem[],
+      { sortBy: 'title' | 'price'; order: 'asc' | 'desc'; title: string }
+    >({
+      query: ({ sortBy, order, title = '' }) => ({
+        url: 'products',
         params: {
           sortBy: sortBy,
           order: order,
           title: title,
-        }
+        },
       }),
       providesTags: (result): any =>
         result
@@ -26,7 +31,7 @@ export const shopApi = createApi({
     }),
     /* get users to get the mockid of the user */
     getUsers: build.query<IShopApiUser[], void>({
-      query: () => `users`,
+      query: () => 'users',
       providesTags: (result): any =>
         result
           ? [
@@ -36,8 +41,8 @@ export const shopApi = createApi({
           : [{ type: 'Cart', id: 'LIST' }],
     }),
     /* get userState */
-    getUserState: build.query<IShopApiUser, {uMockid: string}>({
-      query: ({uMockid}) => ({
+    getUserState: build.query<IShopApiUser, { uMockid: string }>({
+      query: ({ uMockid }) => ({
         url: `users/${uMockid}`,
       }),
       providesTags: (result): any =>
@@ -50,8 +55,11 @@ export const shopApi = createApi({
     }),
 
     /* MUTATIONS */
-    putCart: build.mutation<IShopApiDataItem, { newCartArray: IShopApiDataItem[], uMockid: string }>({
-      query: ({newCartArray, uMockid}) => ({
+    putCart: build.mutation<
+      IShopApiDataItem,
+      { newCartArray: IShopApiDataItem[]; uMockid: string }
+    >({
+      query: ({ newCartArray, uMockid }) => ({
         url: `users/${uMockid}`,
         method: 'PUT',
         body: {
@@ -61,8 +69,11 @@ export const shopApi = createApi({
       invalidatesTags: [{ type: 'Cart', id: 'LIST' }],
     }),
 
-    putOrders: build.mutation<IShopApiDataItem, { newOrdersArray: IOrder[], uMockid: string }>({
-      query: ({newOrdersArray, uMockid}) => ({
+    putOrders: build.mutation<
+      IShopApiDataItem,
+      { newOrdersArray: IOrder[]; uMockid: string }
+    >({
+      query: ({ newOrdersArray, uMockid }) => ({
         url: `users/${uMockid}`,
         method: 'PUT',
         body: {
@@ -73,8 +84,8 @@ export const shopApi = createApi({
     }),
 
     addUserToDataBase: build.mutation<IRegisterUserState, { uid: string }>({
-      query: ({uid}) => ({
-        url: `users`,
+      query: ({ uid }) => ({
+        url: 'users',
         method: 'POST',
         body: {
           uid: uid,
@@ -87,4 +98,11 @@ export const shopApi = createApi({
   }),
 });
 
-export const { useGetProductsQuery, useGetUsersQuery, useGetUserStateQuery, usePutCartMutation, useAddUserToDataBaseMutation, usePutOrdersMutation } = shopApi;
+export const {
+  useGetProductsQuery,
+  useGetUsersQuery,
+  useGetUserStateQuery,
+  usePutCartMutation,
+  useAddUserToDataBaseMutation,
+  usePutOrdersMutation,
+} = shopApi;
