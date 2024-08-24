@@ -1,0 +1,22 @@
+@import 'src/assets/css/_mixins.scss';
+
+.image-wrapper {
+  border: 1px solid var(--base-grey-whisper);
+}
+
+.image {
+  background-color: var(--base-grey-whisper);
+  object-fit: cover;
+  object-position: center center;
+  width: 100%;
+  /* height: 100%; */
+  height: 240px;
+  max-height: 240px;
+  @include tablet-small {
+    max-height: 220px;
+  }
+
+  @include phone {
+    max-height: 200px;
+  }
+}

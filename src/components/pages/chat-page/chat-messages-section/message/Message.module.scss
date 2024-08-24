@@ -30,16 +30,14 @@
     max-width: 300px;
   }
 
-  
   &__album {
     position: relative;
     display: flex;
     flex-wrap: wrap;
     width: 100%;
-
   }
   &__img {
-    background-color: var(--base-grey-whisper);;
+    background-color: var(--base-grey-whisper);
     object-fit: cover;
     object-position: center center;
     width: 100%;
@@ -48,14 +46,17 @@
     @include tablet-small {
       max-height: 340px;
     }
-  
+
     @include phone {
       max-height: 320px;
+    }
+    &--horizontal {
+      border: 1px solid red;
     }
   }
 
   &__img-wrapper {
-    border: 1px solid var(--base-grey-whisper);;
+    border: 1px solid var(--base-grey-whisper);
   }
 
   &__content {
@@ -81,7 +82,6 @@
     background-color: rgba(0, 0, 0, 0.2);
     border-radius: 999px;
     padding: 1px 7px 1px 2px;
-
   }
 
   &__info-wrapper {
@@ -92,7 +92,6 @@
     align-items: center;
     float: right;
   }
-
 
   &__timestamp {
     font-family: var(--font-family);
