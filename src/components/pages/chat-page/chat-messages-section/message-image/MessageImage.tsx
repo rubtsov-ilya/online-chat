@@ -2,7 +2,7 @@ import { FC } from 'react';
 import styles from './MessageImage.module.scss';
 
 interface MessageImageProps {
-  width: '100%' | '50%';
+  width: '100%' | '50%' | '33.33%' | '66.66%';
   img: string;
 }
 

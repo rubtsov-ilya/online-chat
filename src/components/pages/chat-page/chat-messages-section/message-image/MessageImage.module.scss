@@ -13,10 +13,12 @@
   height: 240px;
   max-height: 240px;
   @include tablet-small {
+    height: 220px;
     max-height: 220px;
   }
 
   @include phone {
+    height: 200px;
     max-height: 200px;
   }
 }

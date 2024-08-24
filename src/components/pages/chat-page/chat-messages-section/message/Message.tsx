@@ -39,7 +39,7 @@ const Message: FC = ({ messageData, isLastOfGroup, isFirstOfGroup }) => {
     >
       {messageData.images.length > 0 && (
         <div className={styles['message__album']}>
-          {imageData?.map(({ img, isHorizontal, isSquare }, index: any) => {
+          {imageData?.map(({ img, isHorizontal, isSquare }, index: number) => {
             const isArrayLengthOdd = imageData.length % 2 !== 0;
             /* isArrayLengthOdd = если нечётная длина массива, тогда true */
             const isOdd = index % 2 !== 0;

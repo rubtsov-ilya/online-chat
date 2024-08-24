@@ -3,16 +3,19 @@
 .message {
   display: flex;
   flex-direction: column;
-  border-radius: 16px 16px 16px 16px;
   max-width: 480px;
   margin: 2px auto 0 0;
-  background: var(--base-grey-whisper);
   overflow: hidden;
+  border-radius: 16px 16px 16px 16px;
+  background: var(--base-white);
+  border: 1px solid var(--base-grey-whisper);
   &.margin-top {
     margin-top: 8px;
   }
   &.own {
     margin: 2px 0 0 auto;
+    background: var(--base-grey-whisper);
+    border: unset;
     &.margin-top {
       margin-top: 8px;
     }
@@ -67,7 +70,7 @@
     font-family: var(--font-family);
     font-weight: 500;
     font-size: 16px;
-    color: var(--light-black);
+    color: var(--base-black);
     @include tablet-small {
       font-size: 14px;
     }
