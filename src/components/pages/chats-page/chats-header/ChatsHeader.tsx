@@ -16,7 +16,7 @@ const Header: FC<HeaderProps> = ({ isMobileScreen }) => {
     <ComponentTag className={styles['top-bar']}>
       <div className="container">
         <div className={styles['top-bar__content']}>
-          <AvatarImage userAvatarImg={userAvatarImg} />
+          <AvatarImage AvatarImg={userAvatarImg} />
           <h1 className={styles['top-bar__title']}>Online Chat</h1>
           <PencilBtn />
         </div>

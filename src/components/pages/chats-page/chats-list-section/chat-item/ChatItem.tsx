@@ -17,7 +17,7 @@ const ChatItem: FC = ({}) => {
   return (
     <div className={styles['chat-item']}>
       <div className={styles['chat-item__left-wrapper']}>
-        <AvatarImage userAvatarImg={userAvatarImg} />
+        <AvatarImage AvatarImg={userAvatarImg} />
         <div className={styles['chat-item__user-details-wrapper']}>
           <p className={styles['chat-item__user-name']}>{userData.userName}</p>
           <p className={styles['chat-item__user-message']}>

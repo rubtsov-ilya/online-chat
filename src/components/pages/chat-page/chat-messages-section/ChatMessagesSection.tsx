@@ -1,4 +1,4 @@
-import { FC, useLayoutEffect, useRef } from 'react';
+import { FC, useLayoutEffect, useRef, useState } from 'react';
 
 import styles from './ChatMessagesSection.module.scss';
 import Message from './message/Message';
@@ -11,7 +11,10 @@ const ChatMessagesSection: FC<ChatMessagesSectionProps> = ({
   isMobileScreen,
 }) => {
   const ComponentTag = isMobileScreen ? 'section' : 'div';
+  const [messagesArray, setMessagesArray] = useState([]);
   const endRef = useRef<HTMLDivElement>(null);
+
+  console.log(messagesArray);
 
   const devMessagesArray = [
     {
@@ -161,8 +164,57 @@ const ChatMessagesSection: FC<ChatMessagesSectionProps> = ({
   ];
 
   useLayoutEffect(() => {
-    endRef.current?.scrollIntoView({ behavior: 'auto' });
+    let ignore = false;
+
+    const loadImages = async (message) => {
+      if (message.images.length > 0) {
+        const imageData: {
+          img: string;
+          isHorizontal: boolean;
+          isSquare: boolean;
+        }[] = await Promise.all(
+          message.images.map(async (img) => {
+            const image = new Image();
+            image.src = img;
+            await new Promise((resolve) => {
+              image.onload = resolve;
+            });
+            return {
+              img,
+              isHorizontal:
+                image.width > image.height || image.width === image.height,
+              isSquare: image.width === image.height,
+            };
+          }),
+        );
+        return {
+          ...message,
+          images: imageData,
+        };
+      } else {
+        return {
+          ...message,
+        };
+      }
+    };
+
+    const loadMessages = async () => {
+      if (devMessagesArray && !ignore) {
+        const newArray = await Promise.all(devMessagesArray.map(loadImages));
+        setMessagesArray(newArray);
+      }
+    };
+
+    loadMessages();
+
+    return () => {
+      ignore = true;
+    };
   }, []);
+
+  useLayoutEffect(() => {
+    endRef.current?.scrollIntoView({ behavior: 'auto' });
+  }, [messagesArray]);
 
   return (
     <ComponentTag className={styles['chat-messages']}>
@@ -174,18 +226,18 @@ const ChatMessagesSection: FC<ChatMessagesSectionProps> = ({
         }
       >
         <div className={styles['chat-messages__content']}>
-          {devMessagesArray.map((messageData, index) => {
+          {messagesArray.map((messageData, index) => {
             return (
               <Message
                 key={index}
                 messageData={messageData}
                 isLastOfGroup={
-                  index === devMessagesArray.length - 1 ||
-                  messageData.isOwn !== devMessagesArray[index + 1]?.isOwn
+                  index === messagesArray.length - 1 ||
+                  messageData.isOwn !== messagesArray[index + 1]?.isOwn
                 }
                 isFirstOfGroup={
                   index === 0 ||
-                  messageData.isOwn !== devMessagesArray[index - 1]?.isOwn
+                  messageData.isOwn !== messagesArray[index - 1]?.isOwn
                 }
               />
             );

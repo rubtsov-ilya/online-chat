@@ -3,12 +3,17 @@ import { FC } from 'react';
 import styles from './AvatarImage.module.scss';
 
 interface UserAvatarProps {
-  userAvatarImg: string;
+  AvatarImg: string;
+  isLittle?: boolean;
 }
 
-const AvatarImage: FC<UserAvatarProps> = ({ userAvatarImg }) => {
+const AvatarImage: FC<UserAvatarProps> = ({ AvatarImg, isLittle }) => {
   return (
-    <img src={userAvatarImg} alt="Avatar" className={styles['avatar-image']} />
+    <img
+      src={AvatarImg}
+      alt="Avatar"
+      className={`${styles['avatar-image']} ${isLittle ? styles['avatar-image--little'] : ''}`}
+    />
   );
 };
 
