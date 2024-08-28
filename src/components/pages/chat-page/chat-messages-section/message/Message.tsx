@@ -1,4 +1,4 @@
-import { FC, useLayoutEffect, useState } from 'react';
+import { FC } from 'react';
 
 import CheckedStatusSvg from 'src/assets/images/icons/16x16-icons/Check all.svg?react';
 import UncheckedStatusSvg from 'src/assets/images/icons/16x16-icons/Check.svg?react';
@@ -6,6 +6,7 @@ import UncheckedStatusSvg from 'src/assets/images/icons/16x16-icons/Check.svg?re
 import styles from './Message.module.scss';
 import MessageImage from '../message-image/MessageImage';
 import AvatarImage from 'src/components/ui/avatar-image/AvatarImage';
+import Linkify from 'linkify-react';
 
 const Message: FC = ({ messageData, isLastOfGroup, isFirstOfGroup }) => {
 
@@ -158,7 +159,7 @@ const Message: FC = ({ messageData, isLastOfGroup, isFirstOfGroup }) => {
         {messageData.contentText && (
           <div className={styles['message__content']}>
             <div className={styles['message__text']}>
-              {messageData.contentText}
+              <Linkify options={{ target: '_blank' }}>{messageData.contentText}</Linkify>
               <div className={styles['message__info-wrapper']}>
                 {messageData.isChecked && (
                   <CheckedStatusSvg

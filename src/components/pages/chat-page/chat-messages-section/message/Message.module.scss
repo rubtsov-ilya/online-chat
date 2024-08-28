@@ -58,6 +58,17 @@
     @include tablet-small {
       font-size: 14px;
     }
+    a {
+      font-family: var(--font-family);
+      font-weight: 500;
+      font-size: 14px;
+      color: var(--base-accent-blue);
+      transition: color 0.2s ease;
+
+      &:hover {
+        color: var(--base-accent-dark-blue);
+      }
+    }
   }
 
   &__image-info-wrapper {
