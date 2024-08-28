@@ -1,25 +1,25 @@
 import { createPortal } from 'react-dom';
 import { FC, useEffect, useRef } from 'react';
 
-import useBodyLock from '../../../hooks/useBodyLock';
-import CrossSvg from '../../../assets/images/home-page-icons/cross.svg?react';
+import useBodyLock from 'src/hooks/useBodyLock';
+/* import CrossSvg from '../../../assets/images/home-page-icons/cross.svg?react'; */
 
-import styles from './PolicyModal.module.sass';
+import styles from './ModalGallery.module.scss';
 
-interface PolicyModalProps {
+interface ModalGalleryProps {
   isOpen: boolean;
   setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-const PolicyModal: FC<PolicyModalProps> = ({ isOpen, setIsOpen }) => {
-  const policyRef = useRef<HTMLDialogElement>(null);
+const ModalGallery: FC<ModalGalleryProps> = ({ isOpen, setIsOpen }) => {
+  const modalGalleryRef = useRef<HTMLDialogElement>(null);
   const { toggleBodyLock } = useBodyLock();
 
   useEffect(() => {
     if (isOpen) {
-      policyRef.current?.showModal();
+      modalGalleryRef.current?.showModal();
     } else {
-      policyRef.current?.close();
+      modalGalleryRef.current?.close();
     }
   }, [isOpen]);
 
@@ -31,7 +31,7 @@ const PolicyModal: FC<PolicyModalProps> = ({ isOpen, setIsOpen }) => {
   const handleBackdropClick = (
     e: React.MouseEvent<HTMLDialogElement>,
   ): void => {
-    if (e.target === policyRef.current) {
+    if (e.target === modalGalleryRef.current) {
       setIsOpen((prev) => !prev);
       toggleBodyLock();
     }
@@ -46,40 +46,41 @@ const PolicyModal: FC<PolicyModalProps> = ({ isOpen, setIsOpen }) => {
 
   return createPortal(
     <dialog
-      className={styles['policy']}
+      className={styles['modal-gallery']}
       onKeyDown={handleEscKeyDown}
       onClick={handleBackdropClick}
-      ref={policyRef}
+      ref={modalGalleryRef}
     >
       <div
         onClick={(e: React.MouseEvent<HTMLDivElement>) => e.stopPropagation()}
-        className={styles['policy__wrapper']}
+        className={styles['modal-gallery__wrapper']}
       >
         <button
-          className={styles['policy__close-btn']}
+          className={styles['modal-gallery__close-btn']}
           onClick={handleCloseBtnClick}
         >
-          <CrossSvg className={styles['policy__close-icon']} />
+          {/* <CrossSvg className={styles['modal-gallery__close-icon']} /> */}
+          X
         </button>
-        <h1 className={styles['policy__title']}>Política de Privacidade</h1>
-        <p className={styles['policy__text']}>
-          <span className={styles['policy__text-span']}>
+        <h1 className={styles['modal-gallery__title']}>Política de Privacidade</h1>
+        <p className={styles['modal-gallery__text']}>
+          <span className={styles['modal-gallery__text-span']}>
             Coleta de Informações:
           </span>{' '}
           Nosso site coleta apenas as informações necessárias para processar
           seus pedidos, incluindo seu nome, endereço, informações de contato e
           informações do cartão de crédito.
         </p>
-        <p className={styles['policy__text']}>
-          <span className={styles['policy__text-span']}>
+        <p className={styles['modal-gallery__text']}>
+          <span className={styles['modal-gallery__text-span']}>
             Uso das Informações:
           </span>{' '}
           Usamos suas informações apenas para processar seus pedidos, fornecer
           serviços, melhorar nosso site e informá-lo sobre novos produtos ou
           ofertas.
         </p>
-        <p className={styles['policy__text']}>
-          <span className={styles['policy__text-span']}>
+        <p className={styles['modal-gallery__text']}>
+          <span className={styles['modal-gallery__text-span']}>
             Confidencialidade:
           </span>{' '}
           Suas informações são estritamente confidenciais e não serão vendidas,
@@ -87,19 +88,19 @@ const PolicyModal: FC<PolicyModalProps> = ({ isOpen, setIsOpen }) => {
           terceiros, exceto quando necessário para cumprir seus pedidos ou
           quando exigido pela lei.
         </p>
-        <p className={styles['policy__text']}>
-          <span className={styles['policy__text-span']}>Segurança:</span>{' '}
+        <p className={styles['modal-gallery__text']}>
+          <span className={styles['modal-gallery__text-span']}>Segurança:</span>{' '}
           Tomamos todas as medidas de segurança necessárias para proteger suas
           informações contra acesso, uso ou divulgação não autorizados.
         </p>
-        <p className={styles['policy__text']}>
-          <span className={styles['policy__text-span']}>Cookies:</span> Nosso
+        <p className={styles['modal-gallery__text']}>
+          <span className={styles['modal-gallery__text-span']}>Cookies:</span> Nosso
           site utiliza cookies para melhorar sua experiência de usuário. Você
           pode desativar os cookies nas configurações do seu navegador, mas isso
           pode afetar a funcionalidade do site.
         </p>
-        <p className={styles['policy__text']}>
-          <span className={styles['policy__text-span']}>
+        <p className={styles['modal-gallery__text']}>
+          <span className={styles['modal-gallery__text-span']}>
             Alterações na Política de Privacidade:
           </span>{' '}
           Quaisquer alterações em nossa política de privacidade serão publicadas
@@ -107,8 +108,8 @@ const PolicyModal: FC<PolicyModalProps> = ({ isOpen, setIsOpen }) => {
         </p>
       </div>
     </dialog>,
-    document.getElementById('policy-modal') as HTMLDivElement,
+    document.getElementById('modal-gallery') as HTMLDivElement,
   );
 };
 
-export default PolicyModal;
+export default ModalGallery;
