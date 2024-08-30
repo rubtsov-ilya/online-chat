@@ -1,4 +1,4 @@
-import { FC } from 'react';
+import { FC, useState } from 'react';
 
 import CheckedStatusSvg from 'src/assets/images/icons/16x16-icons/Check all.svg?react';
 import UncheckedStatusSvg from 'src/assets/images/icons/16x16-icons/Check.svg?react';
@@ -7,8 +7,17 @@ import styles from './Message.module.scss';
 import MessageImage from '../message-image/MessageImage';
 import AvatarImage from 'src/components/ui/avatar-image/AvatarImage';
 import Linkify from 'linkify-react';
+import useBodyLock from 'src/hooks/useBodyLock';
+import ModalGallery from 'src/components/ui/modal-gallery/ModalGallery';
 
 const Message: FC = ({ messageData, isLastOfGroup, isFirstOfGroup }) => {
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  const { toggleBodyLock } = useBodyLock();
+
+  const toggleModal = () => {
+    setIsModalOpen((prev) => !prev);
+    toggleBodyLock();
+  };
 
   return (
     <div className={styles['message']}>
@@ -29,12 +38,14 @@ const Message: FC = ({ messageData, isLastOfGroup, isFirstOfGroup }) => {
                 const isLast = index === messageData.images.length - 1;
                 const prevIsHorizontal =
                   index > 0 && messageData.images[index - 1].isHorizontal;
-                const prevIsSquare = index > 0 && messageData.images[index - 1].isSquare;
+                const prevIsSquare =
+                  index > 0 && messageData.images[index - 1].isSquare;
                 const nextIsHorizontal =
                   index < messageData.images.length - 1 &&
                   messageData.images[index + 1].isHorizontal;
                 const nextIsSquare =
-                  index < messageData.images.length - 1 && messageData.images[index + 1].isSquare;
+                  index < messageData.images.length - 1 &&
+                  messageData.images[index + 1].isSquare;
 
                 /* первыми идут проверки на isSquare, чтобы не писать везде проверку на isSquare nextIsSquare prevIsSquare в каждой проверке */
 
@@ -114,24 +125,34 @@ const Message: FC = ({ messageData, isLastOfGroup, isFirstOfGroup }) => {
                                                   !isHorizontal &&
                                                   nextIsHorizontal
                                                 ? '33.33%'
-                                                : messageData.images.length > 1 &&
+                                                : messageData.images.length >
+                                                      1 &&
                                                     isOdd &&
                                                     !isHorizontal &&
                                                     prevIsHorizontal
                                                   ? '33.33%'
-                                                  : messageData.images.length > 1 &&
+                                                  : messageData.images.length >
+                                                        1 &&
                                                       isOdd &&
                                                       !isHorizontal &&
                                                       !prevIsHorizontal
                                                     ? '50%'
-                                                    : messageData.images.length > 1 &&
+                                                    : messageData.images
+                                                          .length > 1 &&
                                                         !isOdd &&
                                                         !isHorizontal &&
                                                         !nextIsHorizontal
                                                       ? '50%'
                                                       : '100%';
 
-                return <MessageImage key={index} width={width} img={img} />;
+                return (
+                  <MessageImage
+                    key={index}
+                    width={width}
+                    img={img}
+                    onImageClick={toggleModal}
+                  />
+                );
               },
             )}
             {messageData.contentText.length === 0 &&
@@ -159,7 +180,9 @@ const Message: FC = ({ messageData, isLastOfGroup, isFirstOfGroup }) => {
         {messageData.contentText && (
           <div className={styles['message__content']}>
             <div className={styles['message__text']}>
-              <Linkify options={{ target: '_blank' }}>{messageData.contentText}</Linkify>
+              <Linkify options={{ target: '_blank' }}>
+                {messageData.contentText}
+              </Linkify>
               <div className={styles['message__info-wrapper']}>
                 {messageData.isChecked && (
                   <CheckedStatusSvg
@@ -179,6 +202,7 @@ const Message: FC = ({ messageData, isLastOfGroup, isFirstOfGroup }) => {
           </div>
         )}
       </div>
+      {isModalOpen && <ModalGallery isOpen={isModalOpen} toggleModal={toggleModal}/>}
     </div>
   );
 };

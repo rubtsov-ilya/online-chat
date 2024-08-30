@@ -1,19 +1,17 @@
 import { createPortal } from 'react-dom';
 import { FC, useEffect, useRef } from 'react';
 
-import useBodyLock from 'src/hooks/useBodyLock';
 /* import CrossSvg from '../../../assets/images/home-page-icons/cross.svg?react'; */
 
 import styles from './ModalGallery.module.scss';
 
 interface ModalGalleryProps {
   isOpen: boolean;
-  setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  toggleModal: () => void;
 }
 
-const ModalGallery: FC<ModalGalleryProps> = ({ isOpen, setIsOpen }) => {
+const ModalGallery: FC<ModalGalleryProps> = ({ isOpen, toggleModal }) => {
   const modalGalleryRef = useRef<HTMLDialogElement>(null);
-  const { toggleBodyLock } = useBodyLock();
 
   useEffect(() => {
     if (isOpen) {
@@ -23,32 +21,29 @@ const ModalGallery: FC<ModalGalleryProps> = ({ isOpen, setIsOpen }) => {
     }
   }, [isOpen]);
 
-  const handleCloseBtnClick = () => {
-    setIsOpen((prev) => !prev);
-    toggleBodyLock();
-  };
-
-  const handleBackdropClick = (
-    e: React.MouseEvent<HTMLDialogElement>,
-  ): void => {
+  const onBackdropClick = (e: React.MouseEvent<HTMLDialogElement>): void => {
     if (e.target === modalGalleryRef.current) {
-      setIsOpen((prev) => !prev);
-      toggleBodyLock();
+      toggleModal();
     }
   };
 
-  const handleEscKeyDown = (e: React.KeyboardEvent<HTMLDialogElement>) => {
-    if (e.key === 'Escape') {
-      setIsOpen((prev) => !prev);
-      toggleBodyLock();
+  const closeModal = (
+    e:
+      | React.MouseEvent<HTMLButtonElement>
+      | React.KeyboardEvent<HTMLDialogElement>,
+  ) => {
+    if ((e as React.KeyboardEvent).key === 'Escape') {
+      toggleModal();
+    } else if ((e as React.MouseEvent).type === 'click') {
+      toggleModal();
     }
   };
 
   return createPortal(
     <dialog
       className={styles['modal-gallery']}
-      onKeyDown={handleEscKeyDown}
-      onClick={handleBackdropClick}
+      onKeyDown={closeModal}
+      onClick={onBackdropClick}
       ref={modalGalleryRef}
     >
       <div
@@ -57,12 +52,13 @@ const ModalGallery: FC<ModalGalleryProps> = ({ isOpen, setIsOpen }) => {
       >
         <button
           className={styles['modal-gallery__close-btn']}
-          onClick={handleCloseBtnClick}
+          onClick={closeModal}
         >
-          {/* <CrossSvg className={styles['modal-gallery__close-icon']} /> */}
-          X
+          {/* <CrossSvg className={styles['modal-gallery__close-icon']} /> */}X
         </button>
-        <h1 className={styles['modal-gallery__title']}>Política de Privacidade</h1>
+        <h1 className={styles['modal-gallery__title']}>
+          Política de Privacidade
+        </h1>
         <p className={styles['modal-gallery__text']}>
           <span className={styles['modal-gallery__text-span']}>
             Coleta de Informações:
@@ -94,10 +90,10 @@ const ModalGallery: FC<ModalGalleryProps> = ({ isOpen, setIsOpen }) => {
           informações contra acesso, uso ou divulgação não autorizados.
         </p>
         <p className={styles['modal-gallery__text']}>
-          <span className={styles['modal-gallery__text-span']}>Cookies:</span> Nosso
-          site utiliza cookies para melhorar sua experiência de usuário. Você
-          pode desativar os cookies nas configurações do seu navegador, mas isso
-          pode afetar a funcionalidade do site.
+          <span className={styles['modal-gallery__text-span']}>Cookies:</span>{' '}
+          Nosso site utiliza cookies para melhorar sua experiência de usuário.
+          Você pode desativar os cookies nas configurações do seu navegador, mas
+          isso pode afetar a funcionalidade do site.
         </p>
         <p className={styles['modal-gallery__text']}>
           <span className={styles['modal-gallery__text-span']}>

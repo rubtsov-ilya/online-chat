@@ -21,7 +21,7 @@ const MessageInputWrapper: FC = () => {
         className={styles['message-input-wrapper__input']}
       />
       <button
-        disabled={!messageContent}
+        disabled={messageContent.length === 0}
         className={styles['message-input-wrapper__btn']}
       >
         <ArrowCircleSvg

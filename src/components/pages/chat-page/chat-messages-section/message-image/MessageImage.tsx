@@ -1,25 +1,21 @@
-import { FC, useState } from 'react';
+import { FC } from 'react';
 import styles from './MessageImage.module.scss';
-import useBodyLock from 'src/hooks/useBodyLock';
-import ModalGallery from 'src/components/ui/modal-gallery/ModalGallery';
 
 interface MessageImageProps {
   width: '100%' | '50%' | '33.33%' | '66.66%';
   img: string;
+  onImageClick: () => void;
 }
 
-const MessageImage: FC<MessageImageProps> = ({ width, img }) => {
-  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
-  const { toggleBodyLock } = useBodyLock();
-  const onImageClick = (): void => {
-    setIsModalOpen((prev) => !prev);
-    toggleBodyLock();
-  };
-
+const MessageImage: FC<MessageImageProps> = ({ width, img, onImageClick }) => {
   return (
     <div style={{ width }} className={styles['image-wrapper']}>
-      <img onClick={onImageClick} src={img} alt="" className={styles['image']} />
-      <ModalGallery isOpen={isModalOpen} setIsOpen={setIsModalOpen} />
+      <img
+        onClick={onImageClick}
+        src={img}
+        alt=""
+        className={styles['image']}
+      />
     </div>
   );
 };
