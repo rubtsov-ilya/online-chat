@@ -1,49 +1,59 @@
 import { createPortal } from 'react-dom';
-import { FC, useEffect, useRef } from 'react';
+import { FC, useEffect, useRef, useState } from 'react';
 
 /* import CrossSvg from '../../../assets/images/home-page-icons/cross.svg?react'; */
 
 import styles from './ModalGallery.module.scss';
 
 interface ModalGalleryProps {
-  isOpen: boolean;
+  isModalOpen: boolean;
   toggleModal: () => void;
+  media: string[];
 }
 
-const ModalGallery: FC<ModalGalleryProps> = ({ isOpen, toggleModal }) => {
+const ModalGallery: FC<ModalGalleryProps> = ({
+  isModalOpen,
+  toggleModal,
+  media,
+}) => {
   const modalGalleryRef = useRef<HTMLDialogElement>(null);
+  const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
-    if (isOpen) {
+    setIsVisible(true);
+  }, []);
+
+  useEffect(() => {
+    if (isModalOpen) {
       modalGalleryRef.current?.showModal();
     } else {
       modalGalleryRef.current?.close();
     }
-  }, [isOpen]);
-
-  const onBackdropClick = (e: React.MouseEvent<HTMLDialogElement>): void => {
-    if (e.target === modalGalleryRef.current) {
-      toggleModal();
-    }
-  };
+  }, [isModalOpen]);
 
   const closeModal = (
     e:
       | React.MouseEvent<HTMLButtonElement>
+      | React.MouseEvent<HTMLDialogElement>
       | React.KeyboardEvent<HTMLDialogElement>,
   ) => {
-    if ((e as React.KeyboardEvent).key === 'Escape') {
-      toggleModal();
-    } else if ((e as React.MouseEvent).type === 'click') {
-      toggleModal();
+    if (
+      (e as React.KeyboardEvent).key === 'Escape' ||
+      (e as React.MouseEvent).type === 'click' ||
+      (e as React.MouseEvent).target === modalGalleryRef.current
+    ) {
+      setIsVisible(false);
+      setTimeout(() => {
+        toggleModal();
+      }, 200); /* 200 длительность transition opacity в modal-gallery--visible */
     }
   };
 
   return createPortal(
     <dialog
-      className={styles['modal-gallery']}
+      className={`${styles['modal-gallery']} ${isVisible ? styles['modal-gallery--visible'] : ''}`}
       onKeyDown={closeModal}
-      onClick={onBackdropClick}
+      onClick={closeModal}
       ref={modalGalleryRef}
     >
       <div

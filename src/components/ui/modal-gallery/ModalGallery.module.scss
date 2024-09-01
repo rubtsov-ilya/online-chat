@@ -7,6 +7,11 @@
   transform: translateY(-50%);
   background-color: unset;
   border-radius: 10px;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  &--visible {
+    opacity: 1;
+  }
   @include tablet-small {
     max-width: 80%;
   }
@@ -54,5 +59,11 @@
   &::backdrop {
     background-color: #00000099;
     backdrop-filter: blur(2px);
+    opacity: 0;
+    transition: opacity 0.2s ease;
+  }
+
+  &--visible::backdrop{
+    opacity: 1;
   }
 }

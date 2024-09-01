@@ -10,6 +10,8 @@ import Linkify from 'linkify-react';
 import useBodyLock from 'src/hooks/useBodyLock';
 import ModalGallery from 'src/components/ui/modal-gallery/ModalGallery';
 
+/* interface MessageProps {} */
+
 const Message: FC = ({ messageData, isLastOfGroup, isFirstOfGroup }) => {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const { toggleBodyLock } = useBodyLock();
@@ -202,7 +204,13 @@ const Message: FC = ({ messageData, isLastOfGroup, isFirstOfGroup }) => {
           </div>
         )}
       </div>
-      {isModalOpen && <ModalGallery isOpen={isModalOpen} toggleModal={toggleModal}/>}
+      {messageData.images.length > 0 && isModalOpen && (
+        <ModalGallery
+          isModalOpen={isModalOpen}
+          toggleModal={toggleModal}
+          media={messageData.images}
+        />
+      )}
     </div>
   );
 };
