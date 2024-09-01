@@ -16,9 +16,17 @@ const Message: FC = ({ messageData, isLastOfGroup, isFirstOfGroup }) => {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const { toggleBodyLock } = useBodyLock();
 
-  const toggleModal = () => {
-    setIsModalOpen((prev) => !prev);
-    toggleBodyLock();
+  const toggleModal = (timer?: number): void => {
+    if (timer) {
+      /* задержка для анимации при закрытии окна */
+      toggleBodyLock();
+      setTimeout(() => {
+        setIsModalOpen((prev) => !prev);
+      }, timer);
+    } else {
+      setIsModalOpen((prev) => !prev);
+      toggleBodyLock();
+    }
   };
 
   return (
@@ -205,11 +213,7 @@ const Message: FC = ({ messageData, isLastOfGroup, isFirstOfGroup }) => {
         )}
       </div>
       {messageData.images.length > 0 && isModalOpen && (
-        <ModalGallery
-          isModalOpen={isModalOpen}
-          toggleModal={toggleModal}
-          media={messageData.images}
-        />
+        <ModalGallery toggleModal={toggleModal} media={messageData.images} />
       )}
     </div>
   );

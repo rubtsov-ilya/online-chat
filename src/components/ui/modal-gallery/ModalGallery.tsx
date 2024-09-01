@@ -1,64 +1,45 @@
 import { createPortal } from 'react-dom';
-import { FC, useEffect, useRef, useState } from 'react';
+import { FC, useEffect, useState } from 'react';
 
 /* import CrossSvg from '../../../assets/images/home-page-icons/cross.svg?react'; */
 
 import styles from './ModalGallery.module.scss';
 
 interface ModalGalleryProps {
-  isModalOpen: boolean;
-  toggleModal: () => void;
+  toggleModal: (timer?: number) => void;
   media: string[];
 }
 
 const ModalGallery: FC<ModalGalleryProps> = ({
-  isModalOpen,
   toggleModal,
   media,
 }) => {
-  const modalGalleryRef = useRef<HTMLDialogElement>(null);
-  const [isVisible, setIsVisible] = useState(false);
+  const [isVisible, setIsVisible] = useState<boolean>(false);
 
   useEffect(() => {
-    setIsVisible(true);
+    setTimeout(() => {
+      setIsVisible(true);
+    }, 0);
   }, []);
 
-  useEffect(() => {
-    if (isModalOpen) {
-      modalGalleryRef.current?.showModal();
-    } else {
-      modalGalleryRef.current?.close();
-    }
-  }, [isModalOpen]);
-
   const closeModal = (
-    e:
-      | React.MouseEvent<HTMLButtonElement>
-      | React.MouseEvent<HTMLDialogElement>
-      | React.KeyboardEvent<HTMLDialogElement>,
+    e: React.MouseEvent<HTMLButtonElement> | React.MouseEvent<HTMLDivElement>,
   ) => {
-    if (
-      (e as React.KeyboardEvent).key === 'Escape' ||
-      (e as React.MouseEvent).type === 'click' ||
-      (e as React.MouseEvent).target === modalGalleryRef.current
-    ) {
+    if ((e as React.MouseEvent).type === 'click') {
       setIsVisible(false);
-      setTimeout(() => {
-        toggleModal();
-      }, 200); /* 200 длительность transition opacity в modal-gallery--visible */
+      toggleModal(150);
+      /* длительность transition opacity в modal-gallery--visible */
     }
   };
 
   return createPortal(
-    <dialog
+    <div
       className={`${styles['modal-gallery']} ${isVisible ? styles['modal-gallery--visible'] : ''}`}
-      onKeyDown={closeModal}
       onClick={closeModal}
-      ref={modalGalleryRef}
     >
       <div
+        className={styles['modal-gallery__content']}
         onClick={(e: React.MouseEvent<HTMLDivElement>) => e.stopPropagation()}
-        className={styles['modal-gallery__wrapper']}
       >
         <button
           className={styles['modal-gallery__close-btn']}
@@ -113,7 +94,7 @@ const ModalGallery: FC<ModalGalleryProps> = ({
           nesta página.
         </p>
       </div>
-    </dialog>,
+    </div>,
     document.getElementById('modal-gallery') as HTMLDivElement,
   );
 };
