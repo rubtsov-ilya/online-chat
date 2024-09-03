@@ -1,7 +1,7 @@
 @import 'src/assets/css/_mixins.scss';
 
 .main {
-  height: 100vh;
+  height: 100dvh;
   display: flex;
   align-items: center;
   @include tablet {

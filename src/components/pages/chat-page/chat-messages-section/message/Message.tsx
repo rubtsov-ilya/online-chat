@@ -1,4 +1,4 @@
-import { FC, useState } from 'react';
+import { FC } from 'react';
 
 import CheckedStatusSvg from 'src/assets/images/icons/16x16-icons/Check all.svg?react';
 import UncheckedStatusSvg from 'src/assets/images/icons/16x16-icons/Check.svg?react';
@@ -7,28 +7,10 @@ import styles from './Message.module.scss';
 import MessageImage from '../message-image/MessageImage';
 import AvatarImage from 'src/components/ui/avatar-image/AvatarImage';
 import Linkify from 'linkify-react';
-import useBodyLock from 'src/hooks/useBodyLock';
-import ModalGallery from 'src/components/ui/modal-gallery/ModalGallery';
 
 /* interface MessageProps {} */
 
 const Message: FC = ({ messageData, isLastOfGroup, isFirstOfGroup }) => {
-  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
-  const { toggleBodyLock } = useBodyLock();
-
-  const toggleModal = (timer?: number): void => {
-    if (timer) {
-      /* задержка для анимации при закрытии окна */
-      toggleBodyLock();
-      setTimeout(() => {
-        setIsModalOpen((prev) => !prev);
-      }, timer);
-    } else {
-      setIsModalOpen((prev) => !prev);
-      toggleBodyLock();
-    }
-  };
-
   return (
     <div className={styles['message']}>
       {isLastOfGroup && !messageData.isOwn && (
@@ -160,7 +142,8 @@ const Message: FC = ({ messageData, isLastOfGroup, isFirstOfGroup }) => {
                     key={index}
                     width={width}
                     img={img}
-                    onImageClick={toggleModal}
+                    messageData={messageData}
+                    index={index}
                   />
                 );
               },
@@ -212,9 +195,6 @@ const Message: FC = ({ messageData, isLastOfGroup, isFirstOfGroup }) => {
           </div>
         )}
       </div>
-      {messageData.images.length > 0 && isModalOpen && (
-        <ModalGallery toggleModal={toggleModal} media={messageData.images} />
-      )}
     </div>
   );
 };

@@ -1,11 +1,13 @@
 @import '../../../assets/css/_mixins';
 
-.form-welcome-wrapper {
+.form-wrapper {
   display: flex;
+  /* justify-content: center; */
   flex-direction: column;
-  justify-content: center;
   align-items: center;
-
+  height: 100%;
+  width: 100%;
+  
   &__logo {
     min-width: 66px;
     min-height: 40px;

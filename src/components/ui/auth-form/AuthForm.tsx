@@ -144,243 +144,243 @@ const AuthForm: FC<AuthFormProps> = ({
 
   return (
     <>
-      <div className={styles['form-welcome-wrapper']}>
-        <LogoSvg className={styles['form-welcome-wrapper__logo']} />
+      <div className={styles['form-wrapper']}>
+        <LogoSvg className={styles['form-wrapper__logo']} />
+        {/* <div className={styles['form-welcome-wrapper']}> */}
         {isLogin && (
-          <h1 className={styles['form-welcome-wrapper__title']}>
-            Войти в Online Chat
-          </h1>
+          <h1 className={styles['form-wrapper__title']}>Войти в Online Chat</h1>
         )}
         {isRegister && (
-          <h1 className={styles['form-welcome-wrapper__title']}>
+          <h1 className={styles['form-wrapper__title']}>
             Регистрация в Online Chat
           </h1>
         )}
         {isResetPassword && (
-          <h1 className={styles['form-welcome-wrapper__title']}>
+          <h1 className={styles['form-wrapper__title']}>
             Сброс пароля в Online Chat
           </h1>
         )}
-      </div>
-      <form onSubmit={handleSubmit(onFormSubmit)} className={styles['form']}>
-        <label
-          className={
-            errors.email
-              ? `${styles['form__label']} ${styles['form__label-error']}`
-              : styles['form__label']
-          }
-          htmlFor="login"
-        >
-          {errors.email ? errors.email.message : 'Введите email'}
-        </label>
-        <input
-          value={mailValue}
-          {...register('email', {
-            required: {
-              value: true,
-              message: 'Обязательное поле',
-            },
-            pattern: {
-              value: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
-              message: 'Неверный email адрес',
-            },
-          })}
-          onChange={(e: ChangeEvent<HTMLInputElement>) =>
-            setMailValue(e.target.value)
-          }
-          className={
-            errors.email
-              ? `${styles['form__input-bg']} ${styles['form__input-error']}`
-              : `${styles['form__input-bg']}`
-          }
-          type="text"
-          placeholder="example@email.com"
-        />
-
-        {isRegister && (
+        {/* </div> */}
+        <form onSubmit={handleSubmit(onFormSubmit)} className={styles['form']}>
           <label
             className={
-              errors.password
+              errors.email
                 ? `${styles['form__label']} ${styles['form__label-error']}`
                 : styles['form__label']
             }
-            htmlFor="password"
+            htmlFor="login"
           >
-            {errors.password ? errors.password.message : 'Задайте пароль'}
+            {errors.email ? errors.email.message : 'Введите email'}
           </label>
-        )}
-
-        {isLogin && (
-          <label
-            className={
-              errors.password
-                ? `${styles['form__label']} ${styles['form__label-error']}`
-                : styles['form__label']
+          <input
+            value={mailValue}
+            {...register('email', {
+              required: {
+                value: true,
+                message: 'Обязательное поле',
+              },
+              pattern: {
+                value: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
+                message: 'Неверный email адрес',
+              },
+            })}
+            onChange={(e: ChangeEvent<HTMLInputElement>) =>
+              setMailValue(e.target.value)
             }
-            htmlFor="password"
-          >
-            {errors.password && !isRegister
-              ? errors.password.message
-              : 'Введите пароль'}
-          </label>
-        )}
-        {!isResetPassword && (
-          <div
             className={
-              errors.password
-                ? `${styles['form__input-bg']} ${styles['form__input-wrapper']} ${styles['form__input-error']}`
-                : `${styles['form__input-bg']} ${styles['form__input-wrapper']}`
+              errors.email
+                ? `${styles['form__input-bg']} ${styles['form__input-error']}`
+                : `${styles['form__input-bg']}`
             }
-            onClick={onPasswordInputClick}
-          >
-            <input
-              {...register('password', {
-                required: {
-                  value: true,
-                  message: 'Обязательное поле',
-                },
-                minLength: {
-                  value: 8,
-                  message: 'Минимальная длина 8 символов',
-                },
-              })}
-              ref={(e) => {
-                ref(e);
-                passwordInputRef.current = e;
-              }}
-              className={styles['form__input']}
-              value={passwordValue}
-              onChange={(e: ChangeEvent<HTMLInputElement>) =>
-                setPasswordValue(e.target.value)
-              }
-              type={isPasswordHidden ? 'password' : 'text'}
-              placeholder="Пароль"
-            />
+            type="text"
+            placeholder="example@email.com"
+          />
 
-            {isPasswordHidden && passwordValue.length > 0 && (
-              <div
-                onClick={() => setIsPasswordHidden((prev) => !prev)}
-                className={styles['form__hide-btn']}
-              >
-                <VisibilitySvg className={styles['form__svg']} />
-              </div>
-            )}
-            {!isPasswordHidden && passwordValue.length > 0 && (
-              <div
-                onClick={() => setIsPasswordHidden((prev) => !prev)}
-                className={styles['form__hide-btn']}
-              >
-                <VisibilityOffSvg className={styles['form__svg']} />
-              </div>
-            )}
-          </div>
-        )}
-
-        {isRegister && (
-          <>
+          {isRegister && (
             <label
               className={
-                errors.confirmPassword
+                errors.password
                   ? `${styles['form__label']} ${styles['form__label-error']}`
                   : styles['form__label']
               }
-              htmlFor="confirmPassword"
+              htmlFor="password"
             >
-              {errors.confirmPassword
-                ? errors.confirmPassword.message
-                : 'Подтвердите пароль'}
+              {errors.password ? errors.password.message : 'Задайте пароль'}
             </label>
+          )}
 
-            <input
-              {...register('confirmPassword', {
-                required: {
-                  value: true,
-                  message: 'Обязательное поле',
-                },
-                minLength: {
-                  value: 8,
-                  message: 'Минимальная длина 8 символов',
-                },
-                validate: {
-                  matchesPassword: (value) => {
-                    if (value !== passwordValue) {
-                      return 'Пароли не совпадают';
-                    }
+          {isLogin && (
+            <label
+              className={
+                errors.password
+                  ? `${styles['form__label']} ${styles['form__label-error']}`
+                  : styles['form__label']
+              }
+              htmlFor="password"
+            >
+              {errors.password && !isRegister
+                ? errors.password.message
+                : 'Введите пароль'}
+            </label>
+          )}
+          {!isResetPassword && (
+            <div
+              className={
+                errors.password
+                  ? `${styles['form__input-bg']} ${styles['form__input-wrapper']} ${styles['form__input-error']}`
+                  : `${styles['form__input-bg']} ${styles['form__input-wrapper']}`
+              }
+              onClick={onPasswordInputClick}
+            >
+              <input
+                {...register('password', {
+                  required: {
+                    value: true,
+                    message: 'Обязательное поле',
                   },
-                },
-              })}
-              className={
-                errors.confirmPassword
-                  ? `${styles['form__input-bg']} ${styles['form__input-error']}`
-                  : `${styles['form__input-bg']}`
-              }
-              value={confirmPasswordValue}
-              onChange={(e: ChangeEvent<HTMLInputElement>) =>
-                setConfirmPasswordValue(e.target.value)
-              }
-              type={'password'}
-              placeholder="Пароль"
-            />
+                  minLength: {
+                    value: 8,
+                    message: 'Минимальная длина 8 символов',
+                  },
+                })}
+                ref={(e) => {
+                  ref(e);
+                  passwordInputRef.current = e;
+                }}
+                className={styles['form__input']}
+                value={passwordValue}
+                onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                  setPasswordValue(e.target.value)
+                }
+                type={isPasswordHidden ? 'password' : 'text'}
+                placeholder="Пароль"
+              />
 
-            <label
-              className={
-                errors.username
-                  ? `${styles['form__label']} ${styles['form__label-error']}`
-                  : styles['form__label']
-              }
-              htmlFor="username"
-            >
-              {errors.username ? errors.username.message : 'Введите имя'}
-            </label>
+              {isPasswordHidden && passwordValue.length > 0 && (
+                <div
+                  onClick={() => setIsPasswordHidden((prev) => !prev)}
+                  className={styles['form__hide-btn']}
+                >
+                  <VisibilitySvg className={styles['form__svg']} />
+                </div>
+              )}
+              {!isPasswordHidden && passwordValue.length > 0 && (
+                <div
+                  onClick={() => setIsPasswordHidden((prev) => !prev)}
+                  className={styles['form__hide-btn']}
+                >
+                  <VisibilityOffSvg className={styles['form__svg']} />
+                </div>
+              )}
+            </div>
+          )}
 
-            <input
-              value={usernameValue}
-              {...register('username', {
-                required: {
-                  value: true,
-                  message: 'Обязательное поле',
-                },
-                minLength: {
-                  value: 3,
-                  message: 'Минимальная длина 3 символа',
-                },
-              })}
-              onChange={(e: ChangeEvent<HTMLInputElement>) =>
-                setUsernameValue(e.target.value)
-              }
-              className={
-                errors.email
-                  ? `${styles['form__input-bg']} ${styles['form__input-error']}`
-                  : `${styles['form__input-bg']}`
-              }
-              type="text"
-              placeholder="Имя"
-            />
-          </>
-        )}
+          {isRegister && (
+            <>
+              <label
+                className={
+                  errors.confirmPassword
+                    ? `${styles['form__label']} ${styles['form__label-error']}`
+                    : styles['form__label']
+                }
+                htmlFor="confirmPassword"
+              >
+                {errors.confirmPassword
+                  ? errors.confirmPassword.message
+                  : 'Подтвердите пароль'}
+              </label>
 
-        {isLogin && (
-          <Link to={'/register'} className={styles['form__link']}>
-            Создать аккаунт
-          </Link>
-        )}
-        {isLogin && (
-          <Link to={'/reset-password'} className={styles['form__link']}>
-            Не помню пароль
-          </Link>
-        )}
-        {isRegister && (
-          <Link to={'/login'} className={styles['form__link']}>
-            Войти в аккаунт
-          </Link>
-        )}
-        {isResetPassword && (
-          <Link to={'/login'} className={styles['form__link']}>
-            Войти в аккаунт
-          </Link>
-        )}
-        <button className={styles['form__btn']}>{btnText}</button>
-      </form>
+              <input
+                {...register('confirmPassword', {
+                  required: {
+                    value: true,
+                    message: 'Обязательное поле',
+                  },
+                  minLength: {
+                    value: 8,
+                    message: 'Минимальная длина 8 символов',
+                  },
+                  validate: {
+                    matchesPassword: (value) => {
+                      if (value !== passwordValue) {
+                        return 'Пароли не совпадают';
+                      }
+                    },
+                  },
+                })}
+                className={
+                  errors.confirmPassword
+                    ? `${styles['form__input-bg']} ${styles['form__input-error']}`
+                    : `${styles['form__input-bg']}`
+                }
+                value={confirmPasswordValue}
+                onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                  setConfirmPasswordValue(e.target.value)
+                }
+                type={'password'}
+                placeholder="Пароль"
+              />
+
+              <label
+                className={
+                  errors.username
+                    ? `${styles['form__label']} ${styles['form__label-error']}`
+                    : styles['form__label']
+                }
+                htmlFor="username"
+              >
+                {errors.username ? errors.username.message : 'Введите имя'}
+              </label>
+
+              <input
+                value={usernameValue}
+                {...register('username', {
+                  required: {
+                    value: true,
+                    message: 'Обязательное поле',
+                  },
+                  minLength: {
+                    value: 3,
+                    message: 'Минимальная длина 3 символа',
+                  },
+                })}
+                onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                  setUsernameValue(e.target.value)
+                }
+                className={
+                  errors.email
+                    ? `${styles['form__input-bg']} ${styles['form__input-error']}`
+                    : `${styles['form__input-bg']}`
+                }
+                type="text"
+                placeholder="Имя"
+              />
+            </>
+          )}
+
+          {isLogin && (
+            <Link to={'/register'} className={styles['form__link']}>
+              Создать аккаунт
+            </Link>
+          )}
+          {isLogin && (
+            <Link to={'/reset-password'} className={styles['form__link']}>
+              Не помню пароль
+            </Link>
+          )}
+          {isRegister && (
+            <Link to={'/login'} className={styles['form__link']}>
+              Войти в аккаунт
+            </Link>
+          )}
+          {isResetPassword && (
+            <Link to={'/login'} className={styles['form__link']}>
+              Войти в аккаунт
+            </Link>
+          )}
+          <button className={styles['form__btn']}>{btnText}</button>
+        </form>
+      </div>
     </>
   );
 };

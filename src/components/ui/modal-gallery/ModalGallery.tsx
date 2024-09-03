@@ -1,20 +1,31 @@
 import { createPortal } from 'react-dom';
 import { FC, useEffect, useState } from 'react';
+import { Swiper, SwiperSlide } from 'swiper/react';
+import { Navigation } from 'swiper/modules';
+import 'swiper/css';
+import 'swiper/css/navigation';
 
 /* import CrossSvg from '../../../assets/images/home-page-icons/cross.svg?react'; */
 
 import styles from './ModalGallery.module.scss';
+import { useMediaQuery } from 'react-responsive';
 
 interface ModalGalleryProps {
   toggleModal: (timer?: number) => void;
-  media: string[];
+  media: {
+    img: string;
+  }[];
+  imageIndex: number;
 }
 
 const ModalGallery: FC<ModalGalleryProps> = ({
   toggleModal,
   media,
+  imageIndex,
 }) => {
+  const isMobileScreen = useMediaQuery({ query: '(max-width: 991px)' });
   const [isVisible, setIsVisible] = useState<boolean>(false);
+  const [isTopBarVisible, setIsTopBarVisible] = useState<boolean>(true);
 
   useEffect(() => {
     setTimeout(() => {
@@ -22,14 +33,10 @@ const ModalGallery: FC<ModalGalleryProps> = ({
     }, 0);
   }, []);
 
-  const closeModal = (
-    e: React.MouseEvent<HTMLButtonElement> | React.MouseEvent<HTMLDivElement>,
-  ) => {
-    if ((e as React.MouseEvent).type === 'click') {
-      setIsVisible(false);
-      toggleModal(150);
-      /* длительность transition opacity в modal-gallery--visible */
-    }
+  const closeModal = () => {
+    setIsVisible(false);
+    toggleModal(100);
+    /* аргумент - длительность transition opacity в modal-gallery */
   };
 
   return createPortal(
@@ -38,7 +45,7 @@ const ModalGallery: FC<ModalGalleryProps> = ({
       onClick={closeModal}
     >
       <div
-        className={styles['modal-gallery__content']}
+        className={`${styles['modal-gallery__top-bar']} ${isMobileScreen ? styles['modal-gallery__top-bar--mobile'] : ''} ${isMobileScreen && isTopBarVisible ? styles['active'] : ''}`}
         onClick={(e: React.MouseEvent<HTMLDivElement>) => e.stopPropagation()}
       >
         <button
@@ -47,53 +54,31 @@ const ModalGallery: FC<ModalGalleryProps> = ({
         >
           {/* <CrossSvg className={styles['modal-gallery__close-icon']} /> */}X
         </button>
-        <h1 className={styles['modal-gallery__title']}>
-          Política de Privacidade
-        </h1>
-        <p className={styles['modal-gallery__text']}>
-          <span className={styles['modal-gallery__text-span']}>
-            Coleta de Informações:
-          </span>{' '}
-          Nosso site coleta apenas as informações necessárias para processar
-          seus pedidos, incluindo seu nome, endereço, informações de contato e
-          informações do cartão de crédito.
-        </p>
-        <p className={styles['modal-gallery__text']}>
-          <span className={styles['modal-gallery__text-span']}>
-            Uso das Informações:
-          </span>{' '}
-          Usamos suas informações apenas para processar seus pedidos, fornecer
-          serviços, melhorar nosso site e informá-lo sobre novos produtos ou
-          ofertas.
-        </p>
-        <p className={styles['modal-gallery__text']}>
-          <span className={styles['modal-gallery__text-span']}>
-            Confidencialidade:
-          </span>{' '}
-          Suas informações são estritamente confidenciais e não serão vendidas,
-          trocadas, transferidas ou divulgadas de qualquer outra forma a
-          terceiros, exceto quando necessário para cumprir seus pedidos ou
-          quando exigido pela lei.
-        </p>
-        <p className={styles['modal-gallery__text']}>
-          <span className={styles['modal-gallery__text-span']}>Segurança:</span>{' '}
-          Tomamos todas as medidas de segurança necessárias para proteger suas
-          informações contra acesso, uso ou divulgação não autorizados.
-        </p>
-        <p className={styles['modal-gallery__text']}>
-          <span className={styles['modal-gallery__text-span']}>Cookies:</span>{' '}
-          Nosso site utiliza cookies para melhorar sua experiência de usuário.
-          Você pode desativar os cookies nas configurações do seu navegador, mas
-          isso pode afetar a funcionalidade do site.
-        </p>
-        <p className={styles['modal-gallery__text']}>
-          <span className={styles['modal-gallery__text-span']}>
-            Alterações na Política de Privacidade:
-          </span>{' '}
-          Quaisquer alterações em nossa política de privacidade serão publicadas
-          nesta página.
-        </p>
       </div>
+
+      <Swiper
+        className={styles['modal-gallery__swiper']}
+        slidesPerView={1}
+        modules={[Navigation]}
+        navigation={!isMobileScreen}
+        initialSlide={imageIndex}
+      >
+        {media.map((mediaItem, index) => (
+          <SwiperSlide key={index} className={styles['modal-gallery__slide']}>
+            <img
+              src={mediaItem.img}
+              className={styles['modal-gallery__media-item']}
+              alt=""
+              onClick={(e: React.MouseEvent<HTMLDivElement>) => {
+                e.stopPropagation();
+                if (isMobileScreen) {
+                  setIsTopBarVisible((prev) => !prev);
+                }
+              }}
+            />
+          </SwiperSlide>
+        ))}
+      </Swiper>
     </div>,
     document.getElementById('modal-gallery') as HTMLDivElement,
   );
