@@ -1,7 +1,9 @@
 import { createPortal } from 'react-dom';
-import { FC, useEffect, useState } from 'react';
+import { FC, useEffect, useRef, useState } from 'react';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation } from 'swiper/modules';
+import NextSvg from 'src/assets/images/icons/24x24-icons/Right Chevron.svg?react';
+import PrevSvg from 'src/assets/images/icons/24x24-icons/Left Chevron.svg?react';
 import 'swiper/css';
 import 'swiper/css/navigation';
 
@@ -9,6 +11,7 @@ import 'swiper/css/navigation';
 
 import styles from './ModalGallery.module.scss';
 import { useMediaQuery } from 'react-responsive';
+import type { Swiper as SwiperType } from 'swiper';
 
 interface ModalGalleryProps {
   toggleModal: (timer?: number) => void;
@@ -26,6 +29,13 @@ const ModalGallery: FC<ModalGalleryProps> = ({
   const isMobileScreen = useMediaQuery({ query: '(max-width: 991px)' });
   const [isVisible, setIsVisible] = useState<boolean>(false);
   const [isTopBarVisible, setIsTopBarVisible] = useState<boolean>(true);
+  const [navigationState, setNavigationState] = useState<
+    'isBeginning' | null | 'isEnd' | 'isOne'
+  >(null);
+  const prevRef = useRef<HTMLButtonElement>(null);
+  const nextRef = useRef<HTMLButtonElement>(null);
+
+  console.log(navigationState);
 
   useEffect(() => {
     setTimeout(() => {
@@ -37,6 +47,18 @@ const ModalGallery: FC<ModalGalleryProps> = ({
     setIsVisible(false);
     toggleModal(100);
     /* аргумент - длительность transition opacity в modal-gallery */
+  };
+
+  const toggleNavitation = (swiper: SwiperType) => {
+    if (swiper.isBeginning && swiper.isEnd) {
+      setNavigationState('isOne');
+    } else if (swiper.isBeginning) {
+      setNavigationState('isBeginning');
+    } else if (swiper.isEnd) {
+      setNavigationState('isEnd');
+    } else {
+      setNavigationState(null);
+    }
   };
 
   return createPortal(
@@ -60,8 +82,17 @@ const ModalGallery: FC<ModalGalleryProps> = ({
         className={styles['modal-gallery__swiper']}
         slidesPerView={1}
         modules={[Navigation]}
-        navigation={!isMobileScreen}
+        navigation={
+          !isMobileScreen
+            ? {
+                nextEl: nextRef.current,
+                prevEl: prevRef.current,
+              }
+            : undefined
+        }
         initialSlide={imageIndex}
+        onInit={toggleNavitation}
+        onSlideChange={toggleNavitation}
       >
         {media.map((mediaItem, index) => (
           <SwiperSlide key={index} className={styles['modal-gallery__slide']}>
@@ -78,6 +109,32 @@ const ModalGallery: FC<ModalGalleryProps> = ({
             />
           </SwiperSlide>
         ))}
+        {!isMobileScreen &&
+          navigationState !== 'isOne' &&
+          navigationState !== 'isBeginning' && (
+            <button
+              ref={prevRef}
+              onClick={(e: React.MouseEvent<HTMLButtonElement>) =>
+                e.stopPropagation()
+              }
+              className={styles['modal-gallery__prev-btn']}
+            >
+              <PrevSvg className={styles['modal-gallery__navigation-svg']} />
+            </button>
+          )}
+        {!isMobileScreen &&
+          navigationState !== 'isOne' &&
+          navigationState !== 'isEnd' && (
+            <button
+              ref={nextRef}
+              onClick={(e: React.MouseEvent<HTMLButtonElement>) =>
+                e.stopPropagation()
+              }
+              className={styles['modal-gallery__next-btn']}
+            >
+              <NextSvg className={styles['modal-gallery__navigation-svg']} />
+            </button>
+          )}
       </Swiper>
     </div>,
     document.getElementById('modal-gallery') as HTMLDivElement,

@@ -1,5 +1,13 @@
 @import 'src/assets/css/_mixins.scss';
 
+@mixin navigation-hover {
+  &:hover .modal-gallery__navigation-svg {
+    path {
+      fill: rgb(255, 255, 255);
+    }
+  }
+}
+
 .modal-gallery {
   position: absolute;
   z-index: 50;
@@ -88,5 +96,49 @@
   &__close-icon path {
     /* fill: #your-search-controls-color; */
     fill: red;
+  }
+
+  &__prev-btn {
+    position: fixed;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    top: 56px;
+    bottom: 0;
+
+    left: 0;
+    padding: 20px 0 76px 10px;
+    /* 76px padding of swiper - 56px height of top-bar = 20px  */
+
+    width: 100px;
+    z-index: 51;
+    @include navigation-hover
+  }
+
+  &__navigation-svg {
+    min-width: 50px;
+    min-height: 50px;
+    path {
+      transition: fill 0.2s ease;
+      fill: rgba(0, 0, 0, 0);
+      filter: drop-shadow(0px 0px 1px rgba(0, 0, 0, 0.8));
+    }
+  }
+
+  &__next-btn {
+    position: fixed;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    top: 56px;
+    bottom: 0;
+
+    right: 0;
+    padding: 20px 10px 76px 0;
+    /* 76px padding of swiper - 56px height of top-bar = 20px  */
+
+    width: 100px;
+    z-index: 51;
+    @include navigation-hover
   }
 }
