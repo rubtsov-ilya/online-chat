@@ -36,6 +36,8 @@ const ModalGallery: FC<ModalGalleryProps> = ({
   const nextRef = useRef<HTMLButtonElement>(null);
 
   console.log(navigationState);
+  console.log('next', nextRef.current);
+  console.log('prev', prevRef.current);
 
   useEffect(() => {
     setTimeout(() => {
@@ -109,32 +111,28 @@ const ModalGallery: FC<ModalGalleryProps> = ({
             />
           </SwiperSlide>
         ))}
-        {!isMobileScreen &&
-          navigationState !== 'isOne' &&
-          navigationState !== 'isBeginning' && (
-            <button
-              ref={prevRef}
-              onClick={(e: React.MouseEvent<HTMLButtonElement>) =>
-                e.stopPropagation()
-              }
-              className={styles['modal-gallery__prev-btn']}
-            >
-              <PrevSvg className={styles['modal-gallery__navigation-svg']} />
-            </button>
-          )}
-        {!isMobileScreen &&
-          navigationState !== 'isOne' &&
-          navigationState !== 'isEnd' && (
-            <button
-              ref={nextRef}
-              onClick={(e: React.MouseEvent<HTMLButtonElement>) =>
-                e.stopPropagation()
-              }
-              className={styles['modal-gallery__next-btn']}
-            >
-              <NextSvg className={styles['modal-gallery__navigation-svg']} />
-            </button>
-          )}
+        {!isMobileScreen && navigationState !== 'isOne' && (
+          <button
+            ref={prevRef}
+            onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
+              e.stopPropagation();
+            }}
+            className={`${styles['modal-gallery__prev-btn']} ${navigationState === 'isBeginning' ? 'none' : ''}`}
+          >
+            <PrevSvg className={styles['modal-gallery__navigation-svg']} />
+          </button>
+        )}
+        {!isMobileScreen && navigationState !== 'isOne' && (
+          <button
+            ref={nextRef}
+            onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
+              e.stopPropagation();
+            }}
+            className={`${styles['modal-gallery__next-btn']} ${navigationState === 'isEnd' ? 'none' : ''}`}
+          >
+            <NextSvg className={styles['modal-gallery__navigation-svg']} />
+          </button>
+        )}
       </Swiper>
     </div>,
     document.getElementById('modal-gallery') as HTMLDivElement,

@@ -2,9 +2,8 @@
 
 @mixin navigation-hover {
   &:hover .modal-gallery__navigation-svg {
-    path {
-      fill: rgb(255, 255, 255);
-    }
+    background-color: rgba(0, 0, 0, 0.35);
+    border-radius: 999px
   }
 }
 
@@ -118,9 +117,9 @@
   &__navigation-svg {
     min-width: 50px;
     min-height: 50px;
+    transition: all 0.2s ease;
     path {
-      transition: fill 0.2s ease;
-      fill: rgba(0, 0, 0, 0);
+      fill: rgb(255, 255, 255);
       filter: drop-shadow(0px 0px 1px rgba(0, 0, 0, 0.8));
     }
   }
