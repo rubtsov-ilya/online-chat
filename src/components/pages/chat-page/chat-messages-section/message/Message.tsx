@@ -19,62 +19,62 @@ const Message: FC = ({ messageData, isLastOfGroup, isFirstOfGroup }) => {
       <div
         className={`${styles['message__wrapper']} ${messageData.isOwn ? styles['own'] : ''} ${isLastOfGroup ? `${styles['border']} ${styles['margin-left']}` : ''} ${isFirstOfGroup ? styles['margin-top'] : ''}`}
       >
-        {messageData.images.length > 0 && (
+        {messageData.media.length > 0 && (
           <div className={styles['message__album']}>
-            {messageData?.images.map(
+            {messageData?.media.map(
               ({ img, isHorizontal, isSquare }, index: number) => {
-                const isArrayLengthOdd = messageData.images.length % 2 !== 0;
+                const isArrayLengthOdd = messageData.media.length % 2 !== 0;
                 /* isArrayLengthOdd = если нечётная длина массива, тогда true */
                 const isOdd = index % 2 !== 0;
                 /* isOdd если индекс нечётный, то true */
-                const isLast = index === messageData.images.length - 1;
+                const isLast = index === messageData.media.length - 1;
                 const prevIsHorizontal =
-                  index > 0 && messageData.images[index - 1].isHorizontal;
+                  index > 0 && messageData.media[index - 1].isHorizontal;
                 const prevIsSquare =
-                  index > 0 && messageData.images[index - 1].isSquare;
+                  index > 0 && messageData.media[index - 1].isSquare;
                 const nextIsHorizontal =
-                  index < messageData.images.length - 1 &&
-                  messageData.images[index + 1].isHorizontal;
+                  index < messageData.media.length - 1 &&
+                  messageData.media[index + 1].isHorizontal;
                 const nextIsSquare =
-                  index < messageData.images.length - 1 &&
-                  messageData.images[index + 1].isSquare;
+                  index < messageData.media.length - 1 &&
+                  messageData.media[index + 1].isSquare;
 
                 /* первыми идут проверки на isSquare, чтобы не писать везде проверку на isSquare nextIsSquare prevIsSquare в каждой проверке */
 
                 const width =
-                  messageData.images.length === 1
+                  messageData.media.length === 1
                     ? '100%'
                     : isArrayLengthOdd && isLast
                       ? '100%'
                       : !isOdd &&
                           isSquare &&
-                          messageData.images.length > 1 &&
+                          messageData.media.length > 1 &&
                           nextIsSquare
                         ? '50%'
                         : isOdd &&
                             isSquare &&
-                            messageData.images.length > 1 &&
+                            messageData.media.length > 1 &&
                             prevIsSquare
                           ? '50%'
-                          : messageData.images.length > 1 &&
+                          : messageData.media.length > 1 &&
                               !isOdd &&
                               isSquare &&
                               nextIsHorizontal &&
                               !nextIsSquare
                             ? '33.33%'
-                            : messageData.images.length > 1 &&
+                            : messageData.media.length > 1 &&
                                 isOdd &&
                                 isSquare &&
                                 prevIsHorizontal &&
                                 !prevIsSquare
                               ? '33.33%'
-                              : messageData.images.length > 1 &&
+                              : messageData.media.length > 1 &&
                                   !isOdd &&
                                   nextIsSquare &&
                                   isHorizontal &&
                                   !isSquare
                                 ? '66.66%'
-                                : messageData.images.length > 1 &&
+                                : messageData.media.length > 1 &&
                                     isOdd &&
                                     prevIsSquare &&
                                     isHorizontal &&
@@ -84,53 +84,53 @@ const Message: FC = ({ messageData, isLastOfGroup, isFirstOfGroup }) => {
                                       prevIsHorizontal &&
                                       isHorizontal &&
                                       !isArrayLengthOdd &&
-                                      messageData.images.length === 2
+                                      messageData.media.length === 2
                                     ? '100%'
                                     : !isOdd &&
                                         nextIsHorizontal &&
                                         isHorizontal &&
                                         !isArrayLengthOdd &&
-                                        messageData.images.length === 2
+                                        messageData.media.length === 2
                                       ? '100%'
                                       : isOdd &&
                                           prevIsHorizontal &&
                                           isHorizontal &&
-                                          messageData.images.length > 2
+                                          messageData.media.length > 2
                                         ? '50%'
                                         : !isOdd &&
                                             nextIsHorizontal &&
                                             isHorizontal &&
-                                            messageData.images.length > 2
+                                            messageData.media.length > 2
                                           ? '50%'
-                                          : messageData.images.length > 1 &&
+                                          : messageData.media.length > 1 &&
                                               !isOdd &&
                                               isHorizontal &&
                                               !nextIsHorizontal
                                             ? '66.66%'
-                                            : messageData.images.length > 1 &&
+                                            : messageData.media.length > 1 &&
                                                 isOdd &&
                                                 isHorizontal &&
                                                 !prevIsHorizontal
                                               ? '66.66%'
-                                              : messageData.images.length > 1 &&
+                                              : messageData.media.length > 1 &&
                                                   !isOdd &&
                                                   !isHorizontal &&
                                                   nextIsHorizontal
                                                 ? '33.33%'
-                                                : messageData.images.length >
+                                                : messageData.media.length >
                                                       1 &&
                                                     isOdd &&
                                                     !isHorizontal &&
                                                     prevIsHorizontal
                                                   ? '33.33%'
-                                                  : messageData.images.length >
+                                                  : messageData.media.length >
                                                         1 &&
                                                       isOdd &&
                                                       !isHorizontal &&
                                                       !prevIsHorizontal
                                                     ? '50%'
-                                                    : messageData.images
-                                                          .length > 1 &&
+                                                    : messageData.media.length >
+                                                          1 &&
                                                         !isOdd &&
                                                         !isHorizontal &&
                                                         !nextIsHorizontal
@@ -149,7 +149,7 @@ const Message: FC = ({ messageData, isLastOfGroup, isFirstOfGroup }) => {
               },
             )}
             {messageData.contentText.length === 0 &&
-              messageData.images.length > 0 && (
+              messageData.media.length > 0 && (
                 <div className={styles['message__image-info-wrapper']}>
                   {messageData.isChecked && (
                     <CheckedStatusSvg

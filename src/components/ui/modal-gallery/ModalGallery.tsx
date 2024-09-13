@@ -4,6 +4,8 @@ import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation } from 'swiper/modules';
 import NextSvg from 'src/assets/images/icons/24x24-icons/Right Chevron.svg?react';
 import PrevSvg from 'src/assets/images/icons/24x24-icons/Left Chevron.svg?react';
+import CloseSvg from 'src/assets/images/icons/24x24-icons/Close.svg?react';
+import DownloadSvg from 'src/assets/images/icons/24x24-icons/Download.svg?react';
 import 'swiper/css';
 import 'swiper/css/navigation';
 
@@ -32,12 +34,9 @@ const ModalGallery: FC<ModalGalleryProps> = ({
   const [navigationState, setNavigationState] = useState<
     'isBeginning' | null | 'isEnd' | 'isOne'
   >(null);
+  const [downloadLink, setDownloadLink] = useState<string | null>(null);
   const prevRef = useRef<HTMLButtonElement>(null);
   const nextRef = useRef<HTMLButtonElement>(null);
-
-  console.log(navigationState);
-  console.log('next', nextRef.current);
-  console.log('prev', prevRef.current);
 
   useEffect(() => {
     setTimeout(() => {
@@ -51,7 +50,8 @@ const ModalGallery: FC<ModalGalleryProps> = ({
     /* аргумент - длительность transition opacity в modal-gallery */
   };
 
-  const toggleNavitation = (swiper: SwiperType) => {
+  const onSwiperAction = (swiper: SwiperType) => {
+    setDownloadLink(media[swiper.activeIndex].img);
     if (swiper.isBeginning && swiper.isEnd) {
       setNavigationState('isOne');
     } else if (swiper.isBeginning) {
@@ -59,7 +59,9 @@ const ModalGallery: FC<ModalGalleryProps> = ({
     } else if (swiper.isEnd) {
       setNavigationState('isEnd');
     } else {
-      setNavigationState(null);
+      if (navigationState !== null) {
+        setNavigationState(null);
+      }
     }
   };
 
@@ -72,11 +74,21 @@ const ModalGallery: FC<ModalGalleryProps> = ({
         className={`${styles['modal-gallery__top-bar']} ${isMobileScreen ? styles['modal-gallery__top-bar--mobile'] : ''} ${isMobileScreen && isTopBarVisible ? styles['active'] : ''}`}
         onClick={(e: React.MouseEvent<HTMLDivElement>) => e.stopPropagation()}
       >
+        {downloadLink && (
+          <a
+            href={downloadLink}
+            download={'file.jpg'}
+            rel="noreferrer"
+            className={styles['modal-gallery__tob-bar-btn']}
+          >
+            <DownloadSvg className={styles['modal-gallery__tob-bar-icon']} />
+          </a>
+        )}
         <button
-          className={styles['modal-gallery__close-btn']}
+          className={styles['modal-gallery__tob-bar-btn']}
           onClick={closeModal}
         >
-          {/* <CrossSvg className={styles['modal-gallery__close-icon']} /> */}X
+          <CloseSvg className={styles['modal-gallery__tob-bar-icon']} />
         </button>
       </div>
 
@@ -93,8 +105,8 @@ const ModalGallery: FC<ModalGalleryProps> = ({
             : undefined
         }
         initialSlide={imageIndex}
-        onInit={toggleNavitation}
-        onSlideChange={toggleNavitation}
+        onInit={onSwiperAction}
+        onSlideChange={onSwiperAction}
       >
         {media.map((mediaItem, index) => (
           <SwiperSlide key={index} className={styles['modal-gallery__slide']}>

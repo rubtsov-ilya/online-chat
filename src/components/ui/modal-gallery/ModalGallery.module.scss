@@ -3,7 +3,7 @@
 @mixin navigation-hover {
   &:hover .modal-gallery__navigation-svg {
     background-color: rgba(0, 0, 0, 0.35);
-    border-radius: 999px
+    border-radius: 999px;
   }
 }
 
@@ -60,6 +60,7 @@
     display: flex;
     align-items: center;
     justify-content: flex-end;
+    gap: 6px;
     background-color: var(--light-overlay-dark);
     &--mobile {
       top: -56px;
@@ -71,30 +72,34 @@
     }
   }
 
-  &__close-btn {
+  &__tob-bar-btn {
     display: flex;
     align-items: center;
     justify-content: center;
-    height: 28px;
-    width: 28px;
+    height: 40px;
+    width: 40px;
     padding: 5px;
     border-radius: 999px;
-    transition: background-color 0.2s ease;
+    transition: all 0.2s ease;
+    &:hover {
+      /* background-color: #your-search-controls-hover-color; */
+      background-color: var(--light-overlay);
+
+      .modal-gallery__tob-bar-icon {
+        path {
+          fill: var(--light-white);
+        }
+      }
+    }
   }
 
-  &__close-btn:hover {
-    /* background-color: #your-search-controls-hover-color; */
-    background-color: red;
-  }
-
-  &__close-icon {
-    height: 18px !important;
-    width: 18px !important;
-  }
-
-  &__close-icon path {
-    /* fill: #your-search-controls-color; */
-    fill: red;
+  &__tob-bar-icon {
+    min-width: 30px !important;
+    min-height: 30px !important;
+    path {
+      transition: all 0.2s ease;
+      fill: var(--light-grey);
+    }
   }
 
   &__prev-btn {
@@ -111,7 +116,7 @@
 
     width: 100px;
     z-index: 51;
-    @include navigation-hover
+    @include navigation-hover;
   }
 
   &__navigation-svg {
@@ -138,6 +143,6 @@
 
     width: 100px;
     z-index: 51;
-    @include navigation-hover
+    @include navigation-hover;
   }
 }

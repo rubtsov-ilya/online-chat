@@ -43,8 +43,8 @@ const MessageImage: FC<MessageImageProps> = ({
         alt=""
         className={styles['image']}
       />
-      {messageData.images.length > 0 && isModalOpen && (
-        <ModalGallery imageIndex={index} toggleModal={toggleModal} media={messageData.images} />
+      {messageData.media.length > 0 && isModalOpen && (
+        <ModalGallery imageIndex={index} toggleModal={toggleModal} media={messageData.media} />
       )}
     </div>
   );
