@@ -20,7 +20,6 @@ import {
   User,
 } from 'firebase/auth';
 import { useAddUserToDataBaseMutation } from 'src/redux';
-/* import LogoSvg from '../../../assets/images/icons/logo-icons/Stream Mark.svg?react' */
 import LogoSvg from 'src/assets/images/icons/logo-icons/Logo.svg?react';
 
 import styles from './AuthForm.module.scss';

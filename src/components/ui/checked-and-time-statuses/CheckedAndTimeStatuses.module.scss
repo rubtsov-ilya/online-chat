@@ -1,0 +1,40 @@
+.checked-and-time-statuses {
+  display: flex;
+  align-items: center;
+  &__checked-mark {
+    min-width: 16px;
+    min-height: 16px;
+    path {
+      fill: var(--base-accent-blue);
+    }
+    &--image {
+      path {
+        fill: var(--light-white);
+      }
+    }
+  }
+
+  &__unchecked-mark {
+    min-width: 16px;
+    min-height: 16px;
+    path {
+      fill: var(--base-grey);
+    }
+    &--image {
+      path {
+        fill: var(--light-white);
+      }
+    }
+  }
+
+  &__timestamp {
+    font-family: var(--font-family);
+    font-weight: 400;
+    font-size: 12px;
+    color: var(--base-grey);
+    width: 30px;
+    &--image {
+      color: var(--light-white);
+    }
+  }
+}

@@ -1,10 +1,11 @@
 @import 'src/assets/css/_mixins.scss';
 
-.image-wrapper {
+.media-item-wrapper {
   border: 1px solid var(--base-grey-whisper);
+  display: flex;
 }
 
-.image {
+.media-item {
   background-color: var(--base-grey-whisper);
   object-fit: cover;
   object-position: center center;

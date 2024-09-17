@@ -5,6 +5,7 @@ import userAvatarImg from 'src/assets/images/icons/dev-icons/avatar.jpg';
 import AvatarImage from 'src/components/ui/avatar-image/AvatarImage';
 
 import styles from './ChatItem.module.scss';
+import CheckedAndTimeStatuses from 'src/components/ui/checked-and-time-statuses/CheckedAndTimeStatuses';
 
 const ChatItem: FC = ({}) => {
   const userData = {
@@ -33,12 +34,7 @@ const ChatItem: FC = ({}) => {
             {userData.counter}
           </span>
         </div>
-        <div className={styles['chat-item__message-statuses-wrapper']}>
-          <CheckedStatusSvg className={styles['chat-item__check-mark']} />
-          <span className={styles['chat-item__message-date']}>
-            {userData.messageDate}
-          </span>
-        </div>
+        <CheckedAndTimeStatuses isChecked={true} time={'10:16'} />
       </div>
     </div>
   );

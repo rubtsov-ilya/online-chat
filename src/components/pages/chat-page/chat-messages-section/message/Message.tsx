@@ -4,9 +4,11 @@ import CheckedStatusSvg from 'src/assets/images/icons/16x16-icons/Check all.svg?
 import UncheckedStatusSvg from 'src/assets/images/icons/16x16-icons/Check.svg?react';
 
 import styles from './Message.module.scss';
-import MessageImage from '../message-image/MessageImage';
 import AvatarImage from 'src/components/ui/avatar-image/AvatarImage';
 import Linkify from 'linkify-react';
+import MessageMediaItem from '../message-media-item/MessageMediaItem';
+import MessageFileItem from '../message-file-item/MessageFileItem';
+import CheckedAndTimeStatuses from 'src/components/ui/checked-and-time-statuses/CheckedAndTimeStatuses';
 
 /* interface MessageProps {} */
 
@@ -22,7 +24,7 @@ const Message: FC = ({ messageData, isLastOfGroup, isFirstOfGroup }) => {
         {messageData.media.length > 0 && (
           <div className={styles['message__album']}>
             {messageData?.media.map(
-              ({ img, isHorizontal, isSquare }, index: number) => {
+              ({ imgUrl, videoUrl, isHorizontal, isSquare }, index: number) => {
                 const isArrayLengthOdd = messageData.media.length % 2 !== 0;
                 /* isArrayLengthOdd = если нечётная длина массива, тогда true */
                 const isOdd = index % 2 !== 0;
@@ -39,7 +41,7 @@ const Message: FC = ({ messageData, isLastOfGroup, isFirstOfGroup }) => {
                   index < messageData.media.length - 1 &&
                   messageData.media[index + 1].isSquare;
 
-                /* первыми идут проверки на isSquare, чтобы не писать везде проверку на isSquare nextIsSquare prevIsSquare в каждой проверке */
+                /* первыми идут проверки на isSquare, чтобы не писать везде доп проверки на isSquare nextIsSquare prevIsSquare в каждой проверке */
 
                 const width =
                   messageData.media.length === 1
@@ -138,60 +140,64 @@ const Message: FC = ({ messageData, isLastOfGroup, isFirstOfGroup }) => {
                                                       : '100%';
 
                 return (
-                  <MessageImage
+                  <MessageMediaItem
                     key={index}
                     width={width}
-                    img={img}
+                    imgUrl={imgUrl}
+                    videoUrl={videoUrl}
                     messageData={messageData}
                     index={index}
                   />
                 );
               },
             )}
-            {messageData.contentText.length === 0 &&
+            {messageData.messageText.length === 0 &&
+              messageData.files.length === 0 &&
               messageData.media.length > 0 && (
                 <div className={styles['message__image-info-wrapper']}>
-                  {messageData.isChecked && (
-                    <CheckedStatusSvg
-                      className={`${styles['message__checked-mark']} ${styles['message__checked-mark--image']}`}
-                    />
-                  )}
-                  {!messageData.isChecked && (
-                    <UncheckedStatusSvg
-                      className={`${styles['message__unchecked-mark']} ${styles['message__unchecked-mark--image']}`}
-                    />
-                  )}
-                  <span
-                    className={`${styles['message__timestamp']} ${styles['message__timestamp--image']}`}
-                  >
-                    {messageData.messageDate}
-                  </span>
+                  <CheckedAndTimeStatuses
+                    isChecked={messageData.isChecked}
+                    time={messageData.messageDate}
+                    isForImage={true}
+                  />
                 </div>
               )}
           </div>
         )}
-        {messageData.contentText && (
-          <div className={styles['message__content']}>
-            <div className={styles['message__text']}>
-              <Linkify options={{ target: '_blank' }}>
-                {messageData.contentText}
-              </Linkify>
-              <div className={styles['message__info-wrapper']}>
-                {messageData.isChecked && (
-                  <CheckedStatusSvg
-                    className={styles['message__checked-mark']}
+        {messageData.files.length > 0 && (
+          <div
+            className={`${styles['message__files-wrapper']} ${messageData.messageText.length === 0 ? styles['message__files-wrapper--padding-bottom'] : ''}`}
+          >
+            {messageData.files.map((file, index: number) => (
+              <MessageFileItem
+                key={index}
+                fileUrl={file.fileUrl}
+                fileName={file.fileName}
+                isStatusesVisible={
+                  messageData.messageText.length === 0 &&
+                  messageData.files.length - 1 === index
+                }
+                isCheckedStatus={messageData.isChecked}
+                timeStatus={messageData.messageDate}
+              />
+            ))}
+          </div>
+        )}
+        {messageData.messageText.length > 0 && (
+          <div className={styles['message__text-wrapper']}>
+            {messageData.messageText.length > 0 && (
+              <div className={styles['message__text']}>
+                <Linkify options={{ target: '_blank' }}>
+                  {messageData.messageText}
+                </Linkify>
+                <div className={styles['message__text-info-wrapper']}>
+                  <CheckedAndTimeStatuses
+                    isChecked={messageData.isChecked}
+                    time={messageData.messageDate}
                   />
-                )}
-                {!messageData.isChecked && (
-                  <UncheckedStatusSvg
-                    className={styles['message__unchecked-mark']}
-                  />
-                )}
-                <span className={styles['message__timestamp']}>
-                  {messageData.messageDate}
-                </span>
+                </div>
               </div>
-            </div>
+            )}
           </div>
         )}
       </div>

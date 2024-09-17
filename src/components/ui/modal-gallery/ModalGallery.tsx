@@ -18,15 +18,16 @@ import type { Swiper as SwiperType } from 'swiper';
 interface ModalGalleryProps {
   toggleModal: (timer?: number) => void;
   media: {
-    img: string;
+    imgUrl?: string;
+    videoUrl?: string;
   }[];
-  imageIndex: number;
+  mediaIndex: number;
 }
 
 const ModalGallery: FC<ModalGalleryProps> = ({
   toggleModal,
   media,
-  imageIndex,
+  mediaIndex,
 }) => {
   const isMobileScreen = useMediaQuery({ query: '(max-width: 991px)' });
   const [isVisible, setIsVisible] = useState<boolean>(false);
@@ -51,16 +52,30 @@ const ModalGallery: FC<ModalGalleryProps> = ({
   };
 
   const onSwiperAction = (swiper: SwiperType) => {
-    setDownloadLink(media[swiper.activeIndex].img);
-    if (swiper.isBeginning && swiper.isEnd) {
-      setNavigationState('isOne');
-    } else if (swiper.isBeginning) {
-      setNavigationState('isBeginning');
-    } else if (swiper.isEnd) {
-      setNavigationState('isEnd');
-    } else {
-      if (navigationState !== null) {
-        setNavigationState(null);
+    if (
+      media[swiper.activeIndex].imgUrl &&
+      downloadLink !== media[swiper.activeIndex].imgUrl
+    ) {
+      setDownloadLink(media[swiper.activeIndex].imgUrl!);
+    }
+    if (
+      media[swiper.activeIndex].videoUrl &&
+      downloadLink !== media[swiper.activeIndex].videoUrl
+    ) {
+      setDownloadLink(media[swiper.activeIndex].videoUrl!);
+    }
+
+    if (!isMobileScreen) {
+      if (swiper.isBeginning && swiper.isEnd) {
+        setNavigationState('isOne');
+      } else if (swiper.isBeginning) {
+        setNavigationState('isBeginning');
+      } else if (swiper.isEnd) {
+        setNavigationState('isEnd');
+      } else {
+        if (navigationState !== null) {
+          setNavigationState(null);
+        }
       }
     }
   };
@@ -77,7 +92,8 @@ const ModalGallery: FC<ModalGalleryProps> = ({
         {downloadLink && (
           <a
             href={downloadLink}
-            download={'file.jpg'}
+            aria-label="Download"
+            download
             rel="noreferrer"
             className={styles['modal-gallery__tob-bar-btn']}
           >
@@ -104,23 +120,38 @@ const ModalGallery: FC<ModalGalleryProps> = ({
               }
             : undefined
         }
-        initialSlide={imageIndex}
+        initialSlide={mediaIndex}
         onInit={onSwiperAction}
         onSlideChange={onSwiperAction}
       >
         {media.map((mediaItem, index) => (
           <SwiperSlide key={index} className={styles['modal-gallery__slide']}>
-            <img
-              src={mediaItem.img}
-              className={styles['modal-gallery__media-item']}
-              alt=""
-              onClick={(e: React.MouseEvent<HTMLDivElement>) => {
-                e.stopPropagation();
-                if (isMobileScreen) {
-                  setIsTopBarVisible((prev) => !prev);
-                }
-              }}
-            />
+            {mediaItem.imgUrl && (
+              <img
+                src={mediaItem.imgUrl}
+                className={styles['modal-gallery__media-item']}
+                alt=""
+                onClick={(e: React.MouseEvent<HTMLImageElement>) => {
+                  e.stopPropagation();
+                  if (isMobileScreen) {
+                    setIsTopBarVisible((prev) => !prev);
+                  }
+                }}
+              />
+            )}
+            {mediaItem.videoUrl && (
+              <video
+                src={mediaItem.videoUrl}
+                className={styles['modal-gallery__media-item']}
+                controls
+                onClick={(e: React.MouseEvent<HTMLVideoElement>) => {
+                  e.stopPropagation();
+                  if (isMobileScreen) {
+                    setIsTopBarVisible((prev) => !prev);
+                  }
+                }}
+              />
+            )}
           </SwiperSlide>
         ))}
         {!isMobileScreen && navigationState !== 'isOne' && (
