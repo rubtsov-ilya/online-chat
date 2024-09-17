@@ -355,7 +355,7 @@ const ChatMessagesSection: FC<ChatMessagesSectionProps> = ({
         },
         {
           fileUrl: 'https://i.imgur.com/8yEqycg.mp4',
-          fileName: 'Anton-1337.pdf',
+          fileName: 'ASDASDSFASFASFASFASF.docx',
         },
       ],
     },
