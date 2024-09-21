@@ -140,17 +140,21 @@ const ModalGallery: FC<ModalGalleryProps> = ({
               />
             )}
             {mediaItem.videoUrl && (
-              <video
-                src={mediaItem.videoUrl}
-                className={styles['modal-gallery__media-item']}
-                controls
-                onClick={(e: React.MouseEvent<HTMLVideoElement>) => {
+              <div
+                className={styles['modal-gallery__video-wrapper']}
+                onClick={(e: React.MouseEvent<HTMLDivElement>) => {
                   e.stopPropagation();
                   if (isMobileScreen) {
                     setIsTopBarVisible((prev) => !prev);
                   }
                 }}
-              />
+              >
+                <video
+                  src={mediaItem.videoUrl}
+                  className={`${styles['modal-gallery__media-item']} ${styles['modal-gallery__media-item--video']}`}
+                  controls
+                />
+              </div>
             )}
           </SwiperSlide>
         ))}

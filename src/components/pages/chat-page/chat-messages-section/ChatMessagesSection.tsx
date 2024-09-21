@@ -332,9 +332,15 @@ const ChatMessagesSection: FC<ChatMessagesSectionProps> = ({
         'https://img.freepik.com/free-photo/futuristic-cat-with-goggles_23-2150969291.jpg?t=st=1723732192~exp=1723735792~hmac=a4a2681fc1de61379eaa4e0c3fa697ded740bab5de9171e7678b25df7276ff80&w=826',
       media: [
         {
-          videoUrl: 'https://i.imgur.com/8yEqycg.mp4',
+          videoUrl: 'https://i.imgur.com/v5DeFBo.mp4',
           preview: 'here',
-          isHorizontal: false,
+          isHorizontal: true,
+          isSquare: false,
+        },
+        {
+          imgUrl:
+            'https://img.freepik.com/free-photo/cute-kitten-playing-in-autumn-forest-surrounded-by-colorful-leaves-generated-by-artificial-intelligence_25030-63162.jpg?w=1380&t=st=1723726321~exp=1723726921~hmac=cdf9e98345c44adc4544d5e0a7ef3ed68e10491a00cb165f3955d9cc85099382',
+          isHorizontal: true,
           isSquare: false,
         },
       ],

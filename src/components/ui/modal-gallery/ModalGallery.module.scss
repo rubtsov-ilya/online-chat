@@ -41,6 +41,7 @@
 
   &__slide {
     display: flex;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
   }
@@ -49,6 +50,90 @@
     max-height: 100%;
     background-color: var(--dark-white);
     object-fit: contain;
+    &--video {
+      max-width: 100%;
+      pointer-events: none;
+
+      /* Chrome */
+      &::-webkit-media-controls-timeline {
+        pointer-events: all;
+      }
+      &::-webkit-media-controls-play-button {
+        pointer-events: all;
+      }
+      &::-webkit-media-controls-mute-button {
+        pointer-events: all;
+      }
+      &::-webkit-media-controls-volume-slider {
+        pointer-events: all;
+      }
+      &::-webkit-media-controls-current-time-display {
+        pointer-events: all;
+      }
+      &::-webkit-media-controls-time-remaining-display {
+        pointer-events: all;
+      }
+      &::-webkit-media-controls-fullscreen-button {
+        pointer-events: all;
+      }
+      &::-webkit-media-controls-toggle-closed-captions-button {
+        pointer-events: all;
+      }
+      &::-webkit-media-controls-overflow-menu-button {
+        pointer-events: all;
+      }
+
+      /* Firefox */
+      &::-moz-media-controls-timeline {
+        pointer-events: all;
+      }
+      &::-moz-media-controls-play-button {
+        pointer-events: all;
+      }
+      &::-moz-media-controls-mute-button {
+        pointer-events: all;
+      }
+      &::-moz-media-controls-volume-slider {
+        pointer-events: all;
+      }
+      &::-moz-media-controls-current-time-display {
+        pointer-events: all;
+      }
+      &::-moz-media-controls-time-remaining-display {
+        pointer-events: all;
+      }
+      &::-moz-media-controls-fullscreen-button {
+        pointer-events: all;
+      }
+
+      /* Microsoft Edge */
+      &::-ms-media-controls-timeline {
+        pointer-events: all;
+      }
+      &::-ms-media-controls-play-button {
+        pointer-events: all;
+      }
+      &::-ms-media-controls-mute-button {
+        pointer-events: all;
+      }
+      &::-ms-media-controls-volume-slider {
+        pointer-events: all;
+      }
+      &::-ms-media-controls-current-time-display {
+        pointer-events: all;
+      }
+      &::-ms-media-controls-time-remaining-display {
+        pointer-events: all;
+      }
+      &::-ms-media-controls-fullscreen-button {
+        pointer-events: all;
+      }
+    }
+  }
+
+  &__video-wrapper {
+    display: flex;
+    max-height: 100%;
   }
 
   &__top-bar {
