@@ -21,7 +21,9 @@ const ChatsListSection: FC<ChatsListSectionProps> = ({ isMobileScreen }) => {
 
           {chatsData?.length !== 0 && (
             <>
-              <Search />
+              <div className={styles['chats-list__search-wrapper']}>
+                <Search />
+              </div>
               <ChatItem />
               <ChatItem />
               <ChatItem />

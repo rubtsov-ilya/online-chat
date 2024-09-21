@@ -1,8 +1,17 @@
+@import 'src/assets/css/_mixins.scss';
 .chat-item {
-  padding: 12px 0;
+  padding: 12px 8px;
   display: flex;
   align-items: center;
   justify-content: space-between;
+  border-radius: 10px;
+  transition: background-color 0.2s ease;
+  @include tablet {
+    border-radius: 0px;
+  }
+  &:hover {
+    background-color: rgb(245, 245, 245);
+  }
 
   &__left-wrapper {
     display: flex;
