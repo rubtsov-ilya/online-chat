@@ -1,9 +1,10 @@
 @import 'src/assets/css/_mixins.scss';
 .chat-item {
-  padding: 12px 8px;
   display: flex;
-  align-items: center;
+  align-items: flex-end;
   justify-content: space-between;
+  height: 64px;
+  padding: 12px 8px;
   border-radius: 10px;
   transition: background-color 0.2s ease;
   @include tablet {
@@ -51,13 +52,11 @@
   }
 
   &__right-wrapper {
-    height: 40px;
-    padding-bottom: 3px;
     display: flex;
     flex-direction: column;
-    gap: 2px;
     align-items: flex-end;
-    justify-content: flex-end;
+    gap: 2px;
+    padding-bottom: 3px;
   }
 
   &__counter-wrapper {
