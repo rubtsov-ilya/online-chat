@@ -1,8 +1,5 @@
 import { FC } from 'react';
 
-import CheckedStatusSvg from 'src/assets/images/icons/16x16-icons/Check all.svg?react';
-import UncheckedStatusSvg from 'src/assets/images/icons/16x16-icons/Check.svg?react';
-
 import styles from './Message.module.scss';
 import AvatarImage from 'src/components/ui/avatar-image/AvatarImage';
 import Linkify from 'linkify-react';

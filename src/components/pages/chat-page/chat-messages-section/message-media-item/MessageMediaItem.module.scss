@@ -3,6 +3,8 @@
 .media-item-wrapper {
   border: 1px solid var(--base-grey-whisper);
   display: flex;
+  position: relative;
+  cursor: pointer;
 }
 
 .media-item {
@@ -18,5 +20,31 @@
 
   @include phone {
     height: 180px;
+  }
+
+  &__play-icon-wrapper {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 55px;
+    height: 55px;
+    border-radius: 9999px;
+    background-color: var(--light-overlay-dark);
+    pointer-events: none;
+    @include phone {
+      width: 45px;
+      height: 45px;
+    }
+  }
+
+  &__play-icon {
+    max-width: 100%;
+    max-height: 100%;
+    path {
+    }
   }
 }

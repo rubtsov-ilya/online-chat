@@ -2,6 +2,7 @@ import { FC, useState } from 'react';
 import styles from './MessageMediaItem.module.scss';
 import ModalGallery from 'src/components/ui/modal-gallery/ModalGallery';
 import useBodyLock from 'src/hooks/useBodyLock';
+import PlaySvg from 'src/assets/images/icons/misc/Play.svg?react';
 
 interface MessageMediaItemProps {
   width: '100%' | '50%' | '33.33%' | '66.66%';
@@ -49,15 +50,20 @@ const MessageMediaItem: FC<MessageMediaItemProps> = ({
         />
       )}
       {videoUrl && (
-        <video
-          preload="metadata"
-          onClick={onItemClick}
-          className={styles['media-item']}
-        >
-          <source src={videoUrl} type="video/mp4" />
-          <source src={videoUrl} type="video/webm" />
-          <source src={videoUrl} type="video/ogg" />
-        </video>
+        <>
+          <video
+            preload="metadata"
+            onClick={onItemClick}
+            className={styles['media-item']}
+          >
+            <source src={videoUrl} type="video/mp4" />
+            <source src={videoUrl} type="video/webm" />
+            <source src={videoUrl} type="video/ogg" />
+          </video>
+          <div className={styles['media-item__play-icon-wrapper']}>
+            <PlaySvg className={styles['media-item__play-icon']} />
+          </div>
+        </>
       )}
       {messageData.media.length > 0 && isModalOpen && (
         <ModalGallery

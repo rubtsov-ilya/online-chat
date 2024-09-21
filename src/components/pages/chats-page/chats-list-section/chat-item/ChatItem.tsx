@@ -1,6 +1,4 @@
 import { FC } from 'react';
-import CheckedStatusSvg from 'src/assets/images/icons/16x16-icons/Check all.svg?react';
-import UncheckedStatusSvg from 'src/assets/images/icons/16x16-icons/Check.svg?react';
 import userAvatarImg from 'src/assets/images/icons/dev-icons/avatar.jpg';
 import AvatarImage from 'src/components/ui/avatar-image/AvatarImage';
 
@@ -11,7 +9,7 @@ const ChatItem: FC = ({}) => {
   const userData = {
     lastMessage: 'The weather will be perfect for the stuses isisisisisi sas a',
     messageDate: '10:16',
-    counter: '1',
+    counter: 14,
     userName: 'Антон Арбузов',
   };
 
