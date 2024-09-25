@@ -14,6 +14,8 @@ import 'swiper/css/navigation';
 import styles from './ModalGallery.module.scss';
 import { useMediaQuery } from 'react-responsive';
 import type { Swiper as SwiperType } from 'swiper';
+import VideoMediaItem from '../video-media-item/VideoMediaItem';
+import ImageMediaItem from '../image-media-item/ImageMediaItem';
 
 interface ModalGalleryProps {
   toggleModal: (timer?: number) => void;
@@ -123,38 +125,26 @@ const ModalGallery: FC<ModalGalleryProps> = ({
         initialSlide={mediaIndex}
         onInit={onSwiperAction}
         onSlideChange={onSwiperAction}
+        allowTouchMove={true}
       >
         {media.map((mediaItem, index) => (
           <SwiperSlide key={index} className={styles['modal-gallery__slide']}>
             {mediaItem.imgUrl && (
-              <img
-                src={mediaItem.imgUrl}
-                className={styles['modal-gallery__media-item']}
-                alt=""
-                onClick={(e: React.MouseEvent<HTMLImageElement>) => {
-                  e.stopPropagation();
-                  if (isMobileScreen) {
-                    setIsTopBarVisible((prev) => !prev);
-                  }
-                }}
+              <ImageMediaItem
+                key={index}
+                imgUrl={mediaItem.imgUrl}
+                isMobileScreen={isMobileScreen}
+                setIsTopBarVisible={setIsTopBarVisible}
               />
             )}
             {mediaItem.videoUrl && (
-              <div
-                className={styles['modal-gallery__video-wrapper']}
-                onClick={(e: React.MouseEvent<HTMLDivElement>) => {
-                  e.stopPropagation();
-                  if (isMobileScreen) {
-                    setIsTopBarVisible((prev) => !prev);
-                  }
-                }}
-              >
-                <video
-                  src={mediaItem.videoUrl}
-                  className={`${styles['modal-gallery__media-item']} ${styles['modal-gallery__media-item--video']}`}
-                  controls
-                />
-              </div>
+              <VideoMediaItem
+                key={index}
+                isMobileScreen={isMobileScreen}
+                setIsTopBarVisible={setIsTopBarVisible}
+                videoUrl={mediaItem.videoUrl}
+                isTopBarVisible={isTopBarVisible}
+              />
             )}
           </SwiperSlide>
         ))}

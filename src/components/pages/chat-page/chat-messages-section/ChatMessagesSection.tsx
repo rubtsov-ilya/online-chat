@@ -429,23 +429,31 @@ const ChatMessagesSection: FC<ChatMessagesSectionProps> = ({
             : 'container container--max-width-unset container--height'
         }
       >
-        <div className={styles['chat-messages__content']}>
-          {devMessagesArray.map((messageData, index) => {
-            return (
-              <Message
-                key={index}
-                messageData={messageData}
-                isLastOfGroup={
-                  index === devMessagesArray.length - 1 ||
-                  messageData.isOwn !== devMessagesArray[index + 1]?.isOwn
-                }
-                isFirstOfGroup={
-                  index === 0 ||
-                  messageData.isOwn !== devMessagesArray[index - 1]?.isOwn
-                }
-              />
-            );
-          })}
+        <div
+          className={`${styles['chat-messages__content']} ${devMessagesArray.length === 0 ? styles['chat-messages__content--no-messages'] : ''}`}
+        >
+          {devMessagesArray.length > 0 &&
+            devMessagesArray.map((messageData, index) => {
+              return (
+                <Message
+                  key={index}
+                  messageData={messageData}
+                  isLastOfGroup={
+                    index === devMessagesArray.length - 1 ||
+                    messageData.isOwn !== devMessagesArray[index + 1]?.isOwn
+                  }
+                  isFirstOfGroup={
+                    index === 0 ||
+                    messageData.isOwn !== devMessagesArray[index - 1]?.isOwn
+                  }
+                />
+              );
+            })}
+          {devMessagesArray.length === 0 && (
+            <p className={styles['chat-messages__no-messages']}>
+              Нет сообщений
+            </p>
+          )}
         </div>
         <div ref={endRef}></div>
       </div>
