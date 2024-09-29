@@ -4,7 +4,7 @@ import styles from './ChatFooter.module.scss';
 import MessageInputWrapper from './message-input-wrapper/MessageInputWrapper';
 
 interface ChatFooterProps {
-  isMobileScreen?: boolean;
+  isMobileScreen: boolean;
 }
 
 const ChatFooter: FC<ChatFooterProps> = ({ isMobileScreen }) => {
@@ -17,7 +17,7 @@ const ChatFooter: FC<ChatFooterProps> = ({ isMobileScreen }) => {
         }
       >
         <div className={styles['bottom-bar__content']}>
-          <MessageInputWrapper />
+          <MessageInputWrapper isMobileScreen={isMobileScreen} />
         </div>
       </div>
     </ComponentTag>

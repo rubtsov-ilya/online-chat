@@ -1,17 +1,21 @@
 import { FC, useState } from 'react';
 import ArrowCircleSvg from 'src/assets/images/icons/24x24-icons/Left arrow circle.svg?react';
-import AttachSvg from 'src/assets/images/icons/24x24-icons/Attach.svg?react';
 
 import styles from './MessageInputWrapper.module.scss';
+import AttachMenu from '../attach-btn/AttachMenu';
 
-const MessageInputWrapper: FC = () => {
+interface MessageInputWrapperProps {
+  isMobileScreen: boolean;
+}
+
+const MessageInputWrapper: FC<MessageInputWrapperProps> = ({
+  isMobileScreen,
+}) => {
   const [messageContent, setMessageContent] = useState<string>('');
 
   return (
     <>
-      <button className={styles['message-input-wrapper__btn']}>
-        <AttachSvg className={styles['message-input-wrapper__attach-svg']} />
-      </button>
+      <AttachMenu isMobileScreen={isMobileScreen} />
       <input
         type="text"
         onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
@@ -27,8 +31,8 @@ const MessageInputWrapper: FC = () => {
         <ArrowCircleSvg
           className={
             !messageContent
-              ? styles['message-input-wrapper__arrow-svg']
-              : `${styles['message-input-wrapper__arrow-svg']} ${styles['active']}`
+              ? styles['message-input-wrapper__arrow-icon']
+              : `${styles['message-input-wrapper__arrow-icon']} ${styles['active']}`
           }
         />
       </button>

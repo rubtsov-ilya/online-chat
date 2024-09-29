@@ -1,4 +1,4 @@
-import { FC, useEffect, useRef, useState } from 'react';
+import { FC, useRef, useState } from 'react';
 import styles from './VideoMediaItem.module.scss';
 
 import PauseSvg from 'src/assets/images/icons/misc/Pause.svg?react';

@@ -23,7 +23,7 @@ const ChatHeader: FC<ChatHeaderProps> = ({ isMobileScreen }) => {
           <button className={styles['top-bar__back-btn']}>
             <LeftChevronSvg className={styles['top-bar__left-chevron-svg']} />
           </button>
-          <p className={styles['top-bar__chat-name']}>{'Павел Дуров'}</p>
+          <span className={styles['top-bar__chat-name']}>{'Павел Дуров'}</span>
           <AvatarImage AvatarImg={userAvatarImg} />
         </div>
       </div>

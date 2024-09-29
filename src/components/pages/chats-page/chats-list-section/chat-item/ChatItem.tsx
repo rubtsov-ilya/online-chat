@@ -21,14 +21,14 @@ const ChatItem: FC<ChatItemProps> = ({}) => {
         <div className={styles['chat-item__left-wrapper']}>
           <AvatarImage AvatarImg={userAvatarImg} />
           <div className={styles['chat-item__user-details-wrapper']}>
-            <p className={styles['chat-item__user-name']}>
+            <span className={styles['chat-item__user-name']}>
               {userData.userName}
-            </p>
-            <p className={styles['chat-item__user-message']}>
+            </span>
+            <span className={styles['chat-item__user-message']}>
               {userData.lastMessage.length > 38
                 ? userData.lastMessage.slice(0, 38) + '...'
                 : userData.lastMessage}
-            </p>
+            </span>
           </div>
         </div>
         <div className={styles['chat-item__right-wrapper']}>

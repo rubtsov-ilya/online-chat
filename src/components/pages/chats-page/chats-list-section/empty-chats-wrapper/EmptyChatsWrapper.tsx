@@ -14,7 +14,7 @@ const EmptyChatsWrapper: FC = () => {
           viewBox="0 0 24 24"
           className={styles['icon-wrapper__svg']}
         />
-        <p className={styles['icon-wrapper__text']}>Начните общаться!</p>
+        <span className={styles['icon-wrapper__text']}>Начните общаться!</span>
       </div>
       <Link to={'/'} className={styles['wrapper__link']}>
         Начать чат

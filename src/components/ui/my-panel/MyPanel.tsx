@@ -61,7 +61,7 @@ const MyPanel: FC<MyPanelProps> = ({ isPanelOpen, setIsPanelOpen }) => {
         >
           <div className={styles['my-panel__user-wrapper']}>
             <AvatarImage AvatarImg={userAvatarImg} />
-            <p className={styles['my-panel__user-name']}>{'Andrew Jones'}</p>
+            <span className={styles['my-panel__user-name']}>{'Andrew Jones'}</span>
           </div>
           <MyPanelBtn
             Svg={PencilSvg}

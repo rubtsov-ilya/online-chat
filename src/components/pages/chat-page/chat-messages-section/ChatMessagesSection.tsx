@@ -450,9 +450,9 @@ const ChatMessagesSection: FC<ChatMessagesSectionProps> = ({
               );
             })}
           {devMessagesArray.length === 0 && (
-            <p className={styles['chat-messages__no-messages']}>
+            <span className={styles['chat-messages__no-messages']}>
               Нет сообщений
-            </p>
+            </span>
           )}
         </div>
         <div ref={endRef}></div>
