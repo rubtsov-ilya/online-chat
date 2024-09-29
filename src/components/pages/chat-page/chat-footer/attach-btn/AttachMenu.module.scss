@@ -35,6 +35,7 @@
     gap: 16px;
     padding: 8px 16px;
     transition: all 0.2s ease;
+    
     &:hover {
       background-color: var(--base-grey-whisper);
       .attach-menu__btn-icon {
@@ -42,6 +43,10 @@
           fill: var(--base-black);
         }
       }
+    }
+
+    &:not(:first-child) {
+      border-top: 1px solid var(--base-grey-whisper);
     }
   }
 
