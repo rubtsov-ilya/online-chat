@@ -24,9 +24,7 @@ const MessageFileItem: FC<MessageFileItemProps> = ({
       <div className={styles['file-item__left-wrapper']}>
         <FileSvg className={styles['file-item__file-icon']} />
         <div className={styles['file-item__info-wrapper']}>
-          <span className={styles['file-item__name']}>
-            {fileName.length > 25 ? fileName.slice(0, 25) + '...' : fileName}
-          </span>
+          <span className={styles['file-item__name']}>{fileName}</span>
           <span className={styles['file-item__size']}>{`${'123'} KB`}</span>
         </div>
       </div>
