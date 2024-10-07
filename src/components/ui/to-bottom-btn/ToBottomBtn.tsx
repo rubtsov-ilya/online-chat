@@ -18,7 +18,9 @@ const ToBottomBtn: FC<ToBottomBtnProps> = ({ endRef, chatMessagesRef }) => {
     const onScroll = () => {
       if (chatMessagesCurrent) {
         const { scrollTop, clientHeight, scrollHeight } = chatMessagesCurrent;
-        const isAtBottom = scrollTop + clientHeight >= scrollHeight;
+        const deadZone = 200;
+        /* deadZone - желаемое количество пикселей от самого низа секции в диапозоне которого не будет появляться кнопка прокрутки */
+        const isAtBottom = scrollTop + clientHeight >= scrollHeight - deadZone;
         /* когда полностью прокручена до низа секция, то isAtBottom == true */
         const isScrollingDown =
           prevScrollPosition !== 0 && prevScrollPosition < scrollTop;
@@ -44,7 +46,19 @@ const ToBottomBtn: FC<ToBottomBtnProps> = ({ endRef, chatMessagesRef }) => {
   }, []);
 
   const scrollToBottom = () => {
-    endRef.current?.scrollIntoView({ behavior: 'smooth' });
+    if (chatMessagesRef.current) {
+      const chatMessagesCurrent = chatMessagesRef.current;
+      const animationLength = 80;
+      const scrollCoefficient = 2.8;
+      const { scrollTop, clientHeight, scrollHeight } = chatMessagesCurrent;
+      if (scrollHeight - scrollTop > clientHeight * scrollCoefficient) {
+        const scrollPosition = scrollHeight - clientHeight - animationLength;
+        chatMessagesCurrent.scrollTo({ top: scrollPosition, behavior: 'auto' });
+        endRef.current?.scrollIntoView({ behavior: 'smooth' });
+      } else {
+        endRef.current?.scrollIntoView({ behavior: 'smooth' });
+      }
+    }
   };
 
   return createPortal(
