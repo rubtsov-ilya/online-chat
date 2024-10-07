@@ -1,8 +1,8 @@
-import { FC, useLayoutEffect, useRef } from 'react';
+import { FC, useEffect, useLayoutEffect, useRef, useState } from 'react';
 
 import styles from './ChatMessagesSection.module.scss';
 import Message from './message/Message';
-import devVideoVertical1 from 'src/assets/dev-video/video_2024-09-13_14-28-51.mp4';
+import ToBottomBtn from 'src/components/ui/to-bottom-btn/ToBottomBtn';
 
 interface ChatMessagesSectionProps {
   isMobileScreen?: boolean;
@@ -14,6 +14,7 @@ const ChatMessagesSection: FC<ChatMessagesSectionProps> = ({
   const ComponentTag = isMobileScreen ? 'section' : 'div';
   /* const [messagesArray, setMessagesArray] = useState([]); */
   const endRef = useRef<HTMLDivElement>(null);
+  const chatMessagesRef = useRef<HTMLDivElement>(null);
 
   const devMessagesArray = [
     {
@@ -418,10 +419,14 @@ const ChatMessagesSection: FC<ChatMessagesSectionProps> = ({
 
   useLayoutEffect(() => {
     endRef.current?.scrollIntoView({ behavior: 'auto' });
-  }, [devMessagesArray]);
+  }, []);
 
   return (
-    <ComponentTag className={styles['chat-messages']}>
+    <ComponentTag
+      className={styles['chat-messages']}
+      ref={chatMessagesRef}
+      id="chat-messages"
+    >
       <div
         className={
           isMobileScreen
@@ -456,6 +461,7 @@ const ChatMessagesSection: FC<ChatMessagesSectionProps> = ({
           )}
         </div>
         <div ref={endRef}></div>
+        <ToBottomBtn chatMessagesRef={chatMessagesRef} endRef={endRef} />
       </div>
     </ComponentTag>
   );

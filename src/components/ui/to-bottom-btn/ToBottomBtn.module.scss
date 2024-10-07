@@ -1,0 +1,50 @@
+@import 'src/assets/css/_mixins.scss';
+
+.to-bottom-button {
+  position: absolute;
+  right: 16px;
+  bottom: calc(56px + 16px);
+  /* 56px = .chat-footer height */
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border: 1px solid var(--base-grey-whisper);
+  border-radius: 999px;
+  box-shadow: 0 1px 4px 0 rgba(0, 0, 0, 0.25);
+  background: var(--base-white);
+  transform: translateY(8px);
+  opacity: 0;
+  pointer-events: none;
+  transition: all 0.2s ease;
+  @include tablet {
+    right: 8px;
+    bottom: calc(56px + 8px);
+    transform: translateY(4px);
+  }
+  &:hover {
+    .to-bottom-button__arrow-icon {
+      path {
+        fill: var(--base-accent-blue);
+      }
+    }
+  }
+
+  &__arrow-icon {
+    min-height: 24px;
+    min-width: 24px;
+    transform: rotate(90deg);
+    path {
+      transition: all 0.15s ease;
+      fill: var(--base-grey);
+    }
+  }
+
+  &.active {
+    transform: translateY(0px);
+    opacity: 1;
+    pointer-events: all;
+  }
+}

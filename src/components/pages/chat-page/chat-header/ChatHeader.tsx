@@ -13,17 +13,21 @@ const ChatHeader: FC<ChatHeaderProps> = ({ isMobileScreen }) => {
   const ComponentTag = isMobileScreen ? 'header' : 'div';
 
   return (
-    <ComponentTag className={styles['top-bar']}>
+    <ComponentTag className={styles['chat-header']}>
       <div
         className={
           isMobileScreen ? 'container' : 'container container--max-width-unset'
         }
       >
-        <div className={styles['top-bar__content']}>
-          <button className={styles['top-bar__back-btn']}>
-            <LeftChevronSvg className={styles['top-bar__left-chevron-svg']} />
+        <div className={styles['chat-header__content']}>
+          <button className={styles['chat-header__back-btn']}>
+            <LeftChevronSvg
+              className={styles['chat-header__left-chevron-svg']}
+            />
           </button>
-          <span className={styles['top-bar__chat-name']}>{'Павел Дуров'}</span>
+          <span className={styles['chat-header__chat-name']}>
+            {'Павел Дуров'}
+          </span>
           <AvatarImage AvatarImg={userAvatarImg} />
         </div>
       </div>

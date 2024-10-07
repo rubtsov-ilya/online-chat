@@ -3,17 +3,19 @@
 .chat-messages {
   height: 100%;
   overflow-y: auto;
-  box-shadow: 0 1px 0 0 rgba(0, 0, 0, 0.08), -1px 0 0 0 rgba(0, 0, 0, 0.08);
-
+  box-shadow:
+    0 1px 0 0 rgba(0, 0, 0, 0.08),
+    -1px 0 0 0 rgba(0, 0, 0, 0.08);
 
   @media screen and (min-width: 991px) {
-    @include scrollbar
+    @include scrollbar;
   }
   /* 56px = height ChatsHeader / class = .header */
   &__content {
     display: flex;
     flex-direction: column;
     padding-bottom: 8px;
+    position: relative;
     &--no-messages {
       height: 100%;
       align-items: center;
