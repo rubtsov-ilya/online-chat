@@ -3,19 +3,25 @@ import ArrowCircleSvg from 'src/assets/images/icons/24x24-icons/Left arrow circl
 
 import styles from './MessageInputWrapper.module.scss';
 import AttachMenu from '../attach-menu/AttachMenu';
+import { AttachedItemType } from 'src/interfaces/AttachedItem.interface';
 
 interface MessageInputWrapperProps {
   isMobileScreen: boolean;
+  setAttachedItems: React.Dispatch<React.SetStateAction<AttachedItemType[]>>;
 }
 
 const MessageInputWrapper: FC<MessageInputWrapperProps> = ({
   isMobileScreen,
+  setAttachedItems,
 }) => {
   const [messageContent, setMessageContent] = useState<string>('');
 
   return (
     <div className={styles['message-input-wrapper']}>
-      <AttachMenu isMobileScreen={isMobileScreen} />
+      <AttachMenu
+        setAttachedItems={setAttachedItems}
+        isMobileScreen={isMobileScreen}
+      />
       <input
         type="text"
         onChange={(e: React.ChangeEvent<HTMLInputElement>) =>

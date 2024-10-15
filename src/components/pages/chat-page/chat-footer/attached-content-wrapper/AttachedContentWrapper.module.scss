@@ -6,8 +6,8 @@
   align-items: center;
   gap: 8px;
   overflow-x: auto;
-  /* overflow-y: hidden; */
   white-space: nowrap;
+  will-change: transform;
   @media screen and (min-width: 991px) {
     @include scrollbar;
     &::-webkit-scrollbar {
@@ -17,29 +17,33 @@
 
   &__item {
     position: relative;
-    height: 60px;
-    width: 90px;
     margin-bottom: 2px;
     flex-shrink: 0;
     user-select: none;
     border-radius: 4px;
     background-color: var(--base-grey-whisper);
-    &--file {
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      gap: 4px;
-      padding: 5px;
-      overflow: hidden;
-    }
+    overflow-y: hidden;
   }
 
   &__media {
-    border-radius: 4px;
-    height: 58px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 60px;
     width: 90px;
     object-fit: cover;
     object-position: center center;
+    border-radius: 4px;
+  }
+
+  &__file-wrapper {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    height: 60px;
+    width: 90px;
+    gap: 4px;
+    padding: 5px;
   }
 
   &__cross-btn {
@@ -86,4 +90,3 @@
     text-overflow: ellipsis;
   }
 }
-

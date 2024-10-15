@@ -3,14 +3,17 @@ import { FC, useState } from 'react';
 import styles from './ChatFooter.module.scss';
 import MessageInputWrapper from './message-input-wrapper/MessageInputWrapper';
 import AttachedContentWrapper from './attached-content-wrapper/AttachedContentWrapper';
+import { AttachedItemType } from 'src/interfaces/AttachedItem.interface';
 
 interface ChatFooterProps {
   isMobileScreen: boolean;
 }
 
 const ChatFooter: FC<ChatFooterProps> = ({ isMobileScreen }) => {
-  const [attachedItems, setAttachedItems] = useState([]);
+  const [attachedItems, setAttachedItems] = useState<AttachedItemType[]>([]);
   const ComponentTag = isMobileScreen ? 'footer' : 'div';
+
+  console.log(attachedItems);
 
   return (
     <ComponentTag className={styles['chat-footer']}>
@@ -20,8 +23,13 @@ const ChatFooter: FC<ChatFooterProps> = ({ isMobileScreen }) => {
         }
       >
         <div className={styles['chat-footer__content']}>
-          <AttachedContentWrapper />
-          <MessageInputWrapper isMobileScreen={isMobileScreen} />
+          {attachedItems.length > 0 && (
+            <AttachedContentWrapper attachedItems={attachedItems} />
+          )}
+          <MessageInputWrapper
+            setAttachedItems={setAttachedItems}
+            isMobileScreen={isMobileScreen}
+          />
         </div>
       </div>
     </ComponentTag>

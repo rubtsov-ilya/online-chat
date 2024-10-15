@@ -2,48 +2,48 @@ import { FC } from 'react';
 import styles from './AttachedContentWrapper.module.scss';
 import CrossSvg from 'src/assets/images/icons/24x24-icons/Close.svg?react';
 import FileSvg from 'src/assets/images/icons/24x24-icons/File.svg?react';
+import { AttachedItemType } from 'src/interfaces/AttachedItem.interface';
 
-const AttachedContentWrapper: FC = () => {
+interface AttachedContentWrapperProps {
+  attachedItems: AttachedItemType[];
+}
+
+const AttachedContentWrapper: FC<AttachedContentWrapperProps> = ({
+  attachedItems,
+}) => {
   return (
     <div className={styles['attached-content-wrapper']}>
-
-      <div className={styles['attached-content-wrapper__item']}>
-        <img
-          className={styles['attached-content-wrapper__media']}
-          src="https://img.freepik.com/premium-photo/trees-growing-forest_1048944-30368869.jpg?w=1380"
-        />
-        <button className={styles['attached-content-wrapper__cross-btn']}>
-          <CrossSvg
-            className={styles['attached-content-wrapper__cross-icon']}
-          />
-        </button>
-      </div>
-
-      <div className={styles['attached-content-wrapper__item']}>
-        <video
-          className={styles['attached-content-wrapper__media']}
-          src="https://i.imgur.com/v5DeFBo.mp4"
-        />
-        <button className={styles['attached-content-wrapper__cross-btn']}>
-          <CrossSvg
-            className={styles['attached-content-wrapper__cross-icon']}
-          />
-        </button>
-      </div>
-
-      <div
-        className={`${styles['attached-content-wrapper__item']} ${styles['attached-content-wrapper__item--file']}`}
-      >
-        <FileSvg className={styles['attached-content-wrapper__file-icon']} />
-        <span className={styles['attached-content-wrapper__file-name']}>
-          aasfasffsafaasf
-        </span>
-        <button className={styles['attached-content-wrapper__cross-btn']}>
-          <CrossSvg
-            className={`${styles['attached-content-wrapper__cross-icon']} ${styles['attached-content-wrapper__cross-icon--file']}`}
-          />
-        </button>
-      </div>
+      {attachedItems.map((item, index) => (
+        <div key={index} className={styles['attached-content-wrapper__item']}>
+          {'imgUrl' in item && (
+            <img
+              className={styles['attached-content-wrapper__media']}
+              src={item.imgUrl}
+            />
+          )}
+          {'videoUrl' in item && (
+            <video
+              className={styles['attached-content-wrapper__media']}
+              src={item.videoUrl}
+            />
+          )}
+          {'fileUrl' in item && (
+            <div className={styles['attached-content-wrapper__file-wrapper']}>
+              <FileSvg
+                className={styles['attached-content-wrapper__file-icon']}
+              />
+              <span className={styles['attached-content-wrapper__file-name']}>
+                {item.fileName}
+              </span>
+            </div>
+          )}
+          <button className={styles['attached-content-wrapper__cross-btn']}>
+            <CrossSvg
+              className={`${styles['attached-content-wrapper__cross-icon']} ${'fileUrl' in item ? styles['attached-content-wrapper__cross-icon--file'] : ''}`}
+            />
+          </button>
+        </div>
+      ))}
     </div>
   );
 };

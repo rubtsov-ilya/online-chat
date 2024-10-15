@@ -5,12 +5,17 @@ import MediaSvg from 'src/assets/images/icons/24x24-icons/Media.svg?react';
 import FileSvg from 'src/assets/images/icons/24x24-icons/File.svg?react';
 
 import AttachSvg from 'src/assets/images/icons/24x24-icons/Attach.svg?react';
+import { AttachedItemType } from 'src/interfaces/AttachedItem.interface';
 
 interface AttachBtnProps {
   isMobileScreen: boolean;
+  setAttachedItems: React.Dispatch<React.SetStateAction<AttachedItemType[]>>;
 }
 
-const AttachMenu: FC<AttachBtnProps> = ({ isMobileScreen }) => {
+const AttachMenu: FC<AttachBtnProps> = ({
+  isMobileScreen,
+  setAttachedItems,
+}) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const mediaInputRef = useRef<HTMLInputElement>(null);
   const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false);
@@ -90,18 +95,39 @@ const AttachMenu: FC<AttachBtnProps> = ({ isMobileScreen }) => {
           accept={acceptFormats}
           multiple
           style={{ display: 'none' }}
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-            console.log(e.target.files)
-          }
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+            const files = e.target.files;
+            if (files) {
+              const newItems = Array.from(files).map((file) => {
+                const fileType = file.type;
+                const url = URL.createObjectURL(file);
+                if (fileType.startsWith('image/')) {
+                  return { imgUrl: url };
+                } else if (fileType.startsWith('video/')) {
+                  return { videoUrl: url };
+                } else {
+                  return { fileUrl: url, fileName: file.name };
+                }
+              });
+              setAttachedItems((prevItems) => [...prevItems, ...newItems]);
+            }
+          }}
         />
         <input
           ref={fileInputRef}
           type="file"
           multiple
           style={{ display: 'none' }}
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-            console.log(e.target.files)
-          }
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+            const files = e.target.files;
+            if (files) {
+              const newItems = Array.from(files).map((file) => {
+                const url = URL.createObjectURL(file);
+                return { fileUrl: url, fileName: file.name };
+              });
+              setAttachedItems((prevItems) => [...prevItems, ...newItems]);
+            }
+          }}
         />
       </div>
       {isMenuOpen && (
