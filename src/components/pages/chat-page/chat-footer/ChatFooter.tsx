@@ -13,8 +13,6 @@ const ChatFooter: FC<ChatFooterProps> = ({ isMobileScreen }) => {
   const [attachedItems, setAttachedItems] = useState<AttachedItemType[]>([]);
   const ComponentTag = isMobileScreen ? 'footer' : 'div';
 
-  console.log(attachedItems);
-
   return (
     <ComponentTag className={styles['chat-footer']}>
       <div
@@ -24,9 +22,13 @@ const ChatFooter: FC<ChatFooterProps> = ({ isMobileScreen }) => {
       >
         <div className={styles['chat-footer__content']}>
           {attachedItems.length > 0 && (
-            <AttachedContentWrapper attachedItems={attachedItems} />
+            <AttachedContentWrapper
+              setAttachedItems={setAttachedItems}
+              attachedItems={attachedItems}
+            />
           )}
           <MessageInputWrapper
+            isAttachedItems={attachedItems.length > 0}
             setAttachedItems={setAttachedItems}
             isMobileScreen={isMobileScreen}
           />

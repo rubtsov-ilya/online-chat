@@ -3,12 +3,14 @@
 
   &__menu-wrapper {
     position: absolute;
-    bottom: calc(63px - 7px);
     bottom: 63px;
     /* bottom = .attach-btn height + (.attach-btn height - .message-input-wrapper__input height * 2 - 1px)*/
     left: -1px;
     z-index: 2;
     pointer-events: none;
+    &--bottom {
+      bottom: calc(63px - 7px);
+    }
   }
 
   &__menu {

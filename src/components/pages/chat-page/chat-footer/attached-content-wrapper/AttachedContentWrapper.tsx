@@ -6,10 +6,12 @@ import { AttachedItemType } from 'src/interfaces/AttachedItem.interface';
 
 interface AttachedContentWrapperProps {
   attachedItems: AttachedItemType[];
+  setAttachedItems: React.Dispatch<React.SetStateAction<AttachedItemType[]>>;
 }
 
 const AttachedContentWrapper: FC<AttachedContentWrapperProps> = ({
   attachedItems,
+  setAttachedItems,
 }) => {
   return (
     <div className={styles['attached-content-wrapper']}>
@@ -37,7 +39,14 @@ const AttachedContentWrapper: FC<AttachedContentWrapperProps> = ({
               </span>
             </div>
           )}
-          <button className={styles['attached-content-wrapper__cross-btn']}>
+          <button
+            onClick={() => {
+              setAttachedItems(
+                attachedItems.filter((filteredItem) => filteredItem !== item),
+              );
+            }}
+            className={styles['attached-content-wrapper__cross-btn']}
+          >
             <CrossSvg
               className={`${styles['attached-content-wrapper__cross-icon']} ${'fileUrl' in item ? styles['attached-content-wrapper__cross-icon--file'] : ''}`}
             />

@@ -8,11 +8,13 @@ import { AttachedItemType } from 'src/interfaces/AttachedItem.interface';
 interface MessageInputWrapperProps {
   isMobileScreen: boolean;
   setAttachedItems: React.Dispatch<React.SetStateAction<AttachedItemType[]>>;
+  isAttachedItems: boolean;
 }
 
 const MessageInputWrapper: FC<MessageInputWrapperProps> = ({
   isMobileScreen,
   setAttachedItems,
+  isAttachedItems,
 }) => {
   const [messageContent, setMessageContent] = useState<string>('');
 
@@ -20,6 +22,7 @@ const MessageInputWrapper: FC<MessageInputWrapperProps> = ({
     <div className={styles['message-input-wrapper']}>
       <AttachMenu
         setAttachedItems={setAttachedItems}
+        isAttachedItems={isAttachedItems}
         isMobileScreen={isMobileScreen}
       />
       <input

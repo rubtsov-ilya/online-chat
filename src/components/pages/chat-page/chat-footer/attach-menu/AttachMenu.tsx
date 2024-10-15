@@ -10,11 +10,13 @@ import { AttachedItemType } from 'src/interfaces/AttachedItem.interface';
 interface AttachBtnProps {
   isMobileScreen: boolean;
   setAttachedItems: React.Dispatch<React.SetStateAction<AttachedItemType[]>>;
+  isAttachedItems: boolean;
 }
 
 const AttachMenu: FC<AttachBtnProps> = ({
   isMobileScreen,
   setAttachedItems,
+  isAttachedItems,
 }) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const mediaInputRef = useRef<HTMLInputElement>(null);
@@ -61,7 +63,9 @@ const AttachMenu: FC<AttachBtnProps> = ({
             className={`${styles['attach-btn__icon']} ${isMenuOpen ? styles['active'] : ''}`}
           />
         </button>
-        <div className={`${styles['attach-menu__menu-wrapper']}`}>
+        <div
+          className={`${styles['attach-menu__menu-wrapper']} ${isAttachedItems ? styles['attach-menu__menu-wrapper--bottom'] : ''}`}
+        >
           <div
             className={`${styles['attach-menu__menu']} ${isMenuOpen ? styles['active'] : ''}`}
           >
