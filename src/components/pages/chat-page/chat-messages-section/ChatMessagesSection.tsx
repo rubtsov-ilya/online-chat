@@ -459,9 +459,11 @@ const ChatMessagesSection: FC<ChatMessagesSectionProps> = ({
               Нет сообщений
             </span>
           )}
+          <div className={styles['chat-messages__overlay-to-bottom-btn']}>
+            <ToBottomBtn chatMessagesRef={chatMessagesRef} endRef={endRef} />
+          </div>
         </div>
         <div ref={endRef}></div>
-        <ToBottomBtn chatMessagesRef={chatMessagesRef} endRef={endRef} />
       </div>
     </ComponentTag>
   );

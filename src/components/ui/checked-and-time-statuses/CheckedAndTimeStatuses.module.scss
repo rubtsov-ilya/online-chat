@@ -33,6 +33,7 @@
     font-size: 12px;
     color: var(--base-grey);
     width: 30px;
+    font-variant-numeric: tabular-nums;
     &--image {
       color: var(--light-white);
     }

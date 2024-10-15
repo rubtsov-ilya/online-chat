@@ -2,7 +2,7 @@ import { FC, useState } from 'react';
 import ArrowCircleSvg from 'src/assets/images/icons/24x24-icons/Left arrow circle.svg?react';
 
 import styles from './MessageInputWrapper.module.scss';
-import AttachMenu from '../attach-btn/AttachMenu';
+import AttachMenu from '../attach-menu/AttachMenu';
 
 interface MessageInputWrapperProps {
   isMobileScreen: boolean;
@@ -14,7 +14,7 @@ const MessageInputWrapper: FC<MessageInputWrapperProps> = ({
   const [messageContent, setMessageContent] = useState<string>('');
 
   return (
-    <>
+    <div className={styles['message-input-wrapper']}>
       <AttachMenu isMobileScreen={isMobileScreen} />
       <input
         type="text"
@@ -36,7 +36,7 @@ const MessageInputWrapper: FC<MessageInputWrapperProps> = ({
           }
         />
       </button>
-    </>
+    </div>
   );
 };
 

@@ -1,10 +1,10 @@
 @import 'src/assets/css/_mixins.scss';
 
 .to-bottom-button {
-  position: absolute;
-  right: 16px;
-  bottom: calc(56px + 16px);
-  /* 56px = .chat-footer height */
+  position: sticky;
+  top: calc(100% - 48px);
+    /* 48px =  .to-bottom-button height + 8px translate*/
+  left: 100%;
   z-index: 1;
   display: flex;
   align-items: center;

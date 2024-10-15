@@ -1,4 +1,8 @@
 .message-input-wrapper {
+  /* размер компонента образует .attach-btn height для отступов у скроллбара*/
+  display: flex;
+  align-items: center;
+  gap: 8px;
   &__input {
     width: 100%;
     height: 40px;

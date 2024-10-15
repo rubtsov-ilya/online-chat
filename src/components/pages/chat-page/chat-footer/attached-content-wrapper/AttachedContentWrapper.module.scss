@@ -1,0 +1,38 @@
+@import 'src/assets/css/_mixins.scss';
+
+.attached-content-wrapper {
+  padding-top: 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  overflow-x: auto;
+  white-space: nowrap;
+  @media screen and (min-width: 991px) {
+    @include scrollbar;
+    &::-webkit-scrollbar {
+      height: 9px;
+    }
+  }
+  &__item {
+    position: relative;
+    flex-shrink: 0;
+    user-select: none;
+    margin-bottom: 2px;
+    background-color: var(--base-grey-whisper);
+    border-radius: 4px;
+  }
+  &__image {
+    border-radius: 4px;
+    height: 60px;
+    width: 90px;
+    object-fit: cover;
+    object-position: center center;
+  }
+}
+/* 
+border-radius: 8px;
+padding: 2px 5px 1px 5px;
+background: var(--base-accent-red);
+display: flex;
+align-items: center;
+justify-content: center; */

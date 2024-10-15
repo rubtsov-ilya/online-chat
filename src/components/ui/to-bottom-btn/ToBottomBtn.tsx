@@ -61,14 +61,13 @@ const ToBottomBtn: FC<ToBottomBtnProps> = ({ endRef, chatMessagesRef }) => {
     }
   };
 
-  return createPortal(
+  return (
     <button
       className={`${styles['to-bottom-button']} ${isActive ? styles['active'] : ''}`}
       onClick={scrollToBottom}
     >
       <ArrowSvg className={styles['to-bottom-button__arrow-icon']} />
-    </button>,
-    document.getElementById('to-bottom-btn-wrapper') as HTMLDivElement,
+    </button>
   );
 };
 
