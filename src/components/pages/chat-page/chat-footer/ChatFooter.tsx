@@ -28,7 +28,7 @@ const ChatFooter: FC<ChatFooterProps> = ({ isMobileScreen }) => {
             />
           )}
           <MessageInputWrapper
-            isAttachedItems={attachedItems.length > 0}
+            attachedItems={attachedItems}
             setAttachedItems={setAttachedItems}
             isMobileScreen={isMobileScreen}
           />

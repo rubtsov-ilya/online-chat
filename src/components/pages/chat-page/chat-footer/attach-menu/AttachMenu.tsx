@@ -46,15 +46,13 @@ const AttachMenu: FC<AttachBtnProps> = ({
   const compressImage = async (file: File) => {
     const options = {
       maxSizeMB: 10, // Максимальный размер файла в мегабайтах
-      useWebWorker: true, // Использовать Web Worker для сжатия
+      useWebWorker: true, // Использование Web Worker для сжатия
       initialQuality: 0.97, // Начальное качество сжатия (97%)
-      alwaysKeepResolution: true, // Сохранять разрешение
+      alwaysKeepResolution: true, // Сохранять ширину и высоту изначальную
     };
 
     try {
       const compressedFile = await imageCompression(file, options);
-      console.log('file size до компрессии', file.size);
-      console.log('file size после компрессии', compressedFile.size);
       return compressedFile;
     } catch (error) {
       console.error('Ошибка сжатия изображения:', error);

@@ -8,13 +8,13 @@ import { AttachedItemType } from 'src/interfaces/AttachedItem.interface';
 interface MessageInputWrapperProps {
   isMobileScreen: boolean;
   setAttachedItems: React.Dispatch<React.SetStateAction<AttachedItemType[]>>;
-  isAttachedItems: boolean;
+  attachedItems: AttachedItemType[];
 }
 
 const MessageInputWrapper: FC<MessageInputWrapperProps> = ({
   isMobileScreen,
   setAttachedItems,
-  isAttachedItems,
+  attachedItems,
 }) => {
   const [messageContent, setMessageContent] = useState<string>('');
 
@@ -22,7 +22,7 @@ const MessageInputWrapper: FC<MessageInputWrapperProps> = ({
     <div className={styles['message-input-wrapper']}>
       <AttachMenu
         setAttachedItems={setAttachedItems}
-        isAttachedItems={isAttachedItems}
+        isAttachedItems={attachedItems.length > 0}
         isMobileScreen={isMobileScreen}
       />
       <input
@@ -34,12 +34,12 @@ const MessageInputWrapper: FC<MessageInputWrapperProps> = ({
         className={styles['message-input-wrapper__input']}
       />
       <button
-        disabled={messageContent.length === 0}
+        disabled={messageContent.length === 0 && attachedItems.length === 0}
         className={styles['message-input-wrapper__btn']}
       >
         <ArrowCircleSvg
           className={
-            !messageContent
+            messageContent.length === 0 && attachedItems.length === 0
               ? styles['message-input-wrapper__arrow-icon']
               : `${styles['message-input-wrapper__arrow-icon']} ${styles['active']}`
           }
