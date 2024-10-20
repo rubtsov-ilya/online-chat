@@ -7,6 +7,8 @@ import FileSvg from 'src/assets/images/icons/24x24-icons/File.svg?react';
 import AttachSvg from 'src/assets/images/icons/24x24-icons/Attach.svg?react';
 import { AttachedItemType } from 'src/interfaces/AttachedItem.interface';
 
+import imageCompression from 'browser-image-compression';
+
 interface AttachBtnProps {
   isMobileScreen: boolean;
   setAttachedItems: React.Dispatch<React.SetStateAction<AttachedItemType[]>>;
@@ -40,6 +42,25 @@ const AttachMenu: FC<AttachBtnProps> = ({
       }
     }
   }, [isOverlayHovered]);
+
+  const compressImage = async (file: File) => {
+    const options = {
+      maxSizeMB: 10, // Максимальный размер файла в мегабайтах
+      useWebWorker: true, // Использовать Web Worker для сжатия
+      initialQuality: 0.97, // Начальное качество сжатия (97%)
+      alwaysKeepResolution: true, // Сохранять разрешение
+    };
+
+    try {
+      const compressedFile = await imageCompression(file, options);
+      console.log('file size до компрессии', file.size);
+      console.log('file size после компрессии', compressedFile.size);
+      return compressedFile;
+    } catch (error) {
+      console.error('Ошибка сжатия изображения:', error);
+      return file;
+    }
+  };
 
   return (
     <>
@@ -99,20 +120,24 @@ const AttachMenu: FC<AttachBtnProps> = ({
           accept={acceptFormats}
           multiple
           style={{ display: 'none' }}
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+          onChange={async (e: React.ChangeEvent<HTMLInputElement>) => {
             const files = e.target.files;
             if (files) {
-              const newItems = Array.from(files).map((file) => {
-                const fileType = file.type;
-                const url = URL.createObjectURL(file);
-                if (fileType.startsWith('image/')) {
-                  return { imgUrl: url };
-                } else if (fileType.startsWith('video/')) {
-                  return { videoUrl: url };
-                } else {
-                  return { fileUrl: url, fileName: file.name };
-                }
-              });
+              const newItems = await Promise.all(
+                Array.from(files).map(async (file) => {
+                  if (file.type.startsWith('image/')) {
+                    const compressedFile = await compressImage(file);
+                    const url = URL.createObjectURL(compressedFile);
+                    return { imgUrl: url };
+                  } else if (file.type.startsWith('video/')) {
+                    const url = URL.createObjectURL(file);
+                    return { videoUrl: url };
+                  } else {
+                    const url = URL.createObjectURL(file);
+                    return { fileUrl: url, fileName: file.name };
+                  }
+                }),
+              );
               setAttachedItems((prevItems) => [...prevItems, ...newItems]);
             }
           }}
