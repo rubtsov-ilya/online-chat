@@ -168,7 +168,7 @@ const MessageInputWrapper: FC<MessageInputWrapperProps> = ({
 
   const addDateToMessageObject = async () => {
     const messageObjectWithoutDate = await createMessageObject();
-    /* получение даты в UTC +0 только после загрузки всех файлов в firebase*/
+    // получение даты в UTC +0 только после загрузки всех файлов в firebase, чтобы не было отстования даты после отправки
     const currentDateUTC = new Date();
     const messageDateUTC = new Date(
       Date.UTC(
