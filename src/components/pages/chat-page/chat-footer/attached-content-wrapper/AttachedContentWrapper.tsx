@@ -29,13 +29,13 @@ const AttachedContentWrapper: FC<AttachedContentWrapperProps> = ({
               src={item.videoUrl}
             />
           )}
-          {'fileUrl' in item && (
+          {'isFile' in item && (
             <div className={styles['attached-content-wrapper__file-wrapper']}>
               <FileSvg
                 className={styles['attached-content-wrapper__file-icon']}
               />
               <span className={styles['attached-content-wrapper__file-name']}>
-                {item.fileName}
+                {item.name}
               </span>
             </div>
           )}

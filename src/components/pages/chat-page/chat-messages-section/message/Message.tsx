@@ -156,6 +156,7 @@ const Message: FC = ({ messageData, isLastOfGroup, isFirstOfGroup }) => {
                     isChecked={messageData.isChecked}
                     time={messageData.messageDate}
                     isForImage={true}
+                    isOwn={messageData.isOwn}
                   />
                 </div>
               )}
@@ -176,6 +177,7 @@ const Message: FC = ({ messageData, isLastOfGroup, isFirstOfGroup }) => {
                 }
                 isCheckedStatus={messageData.isChecked}
                 timeStatus={messageData.messageDate}
+                isMessageOwn={messageData.isOwn}
               />
             ))}
           </div>
@@ -191,6 +193,7 @@ const Message: FC = ({ messageData, isLastOfGroup, isFirstOfGroup }) => {
                   <CheckedAndTimeStatuses
                     isChecked={messageData.isChecked}
                     time={messageData.messageDate}
+                    isOwn={messageData.isOwn}
                   />
                 </div>
               </div>

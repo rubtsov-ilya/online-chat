@@ -8,21 +8,23 @@ interface CheckedAndTimeStatusesProps {
   time: string;
   isChecked: boolean;
   isForImage?: boolean;
+  isOwn: boolean;
 }
 
 const CheckedAndTimeStatuses: FC<CheckedAndTimeStatusesProps> = ({
   time,
   isChecked,
   isForImage,
+  isOwn,
 }) => {
   return (
     <div className={styles['checked-and-time-statuses']}>
-      {isChecked && (
+      {isChecked && isOwn && (
         <CheckedStatusSvg
           className={`${styles['checked-and-time-statuses__checked-mark']} ${isForImage ? styles['checked-and-time-statuses__checked-mark--image'] : ''}`}
         />
       )}
-      {!isChecked && (
+      {!isChecked && isOwn && (
         <UncheckedStatusSvg
           className={`${styles['checked-and-time-statuses__unchecked-mark']} ${isForImage ? styles['checked-and-time-statuses__unchecked-mark--image'] : ''}`}
         />

@@ -10,6 +10,7 @@ interface MessageFileItemProps {
   isStatusesVisible?: boolean;
   isCheckedStatus?: boolean;
   timeStatus?: string;
+  isMessageOwn: boolean;
 }
 
 const MessageFileItem: FC<MessageFileItemProps> = ({
@@ -18,6 +19,7 @@ const MessageFileItem: FC<MessageFileItemProps> = ({
   isStatusesVisible,
   timeStatus,
   isCheckedStatus,
+  isMessageOwn,
 }) => {
   return (
     <div className={styles['file-item']}>
@@ -36,6 +38,7 @@ const MessageFileItem: FC<MessageFileItemProps> = ({
           <CheckedAndTimeStatuses
             isChecked={isCheckedStatus}
             time={timeStatus}
+            isOwn={isMessageOwn}
           />
         )}
       </div>

@@ -126,13 +126,13 @@ const AttachMenu: FC<AttachBtnProps> = ({
                   if (file.type.startsWith('image/')) {
                     const compressedFile = await compressImage(file);
                     const url = URL.createObjectURL(compressedFile);
-                    return { imgUrl: url };
+                    return { imgUrl: url, name: file.name, fileObject: file };
                   } else if (file.type.startsWith('video/')) {
                     const url = URL.createObjectURL(file);
-                    return { videoUrl: url };
+                    return { videoUrl: url, name: file.name, fileObject: file };
                   } else {
-                    const url = URL.createObjectURL(file);
-                    return { fileUrl: url, fileName: file.name };
+                    /* const url = URL.createObjectURL(file); */
+                    return { isFile: true, name: file.name, fileObject: file };
                   }
                 }),
               );
@@ -149,8 +149,8 @@ const AttachMenu: FC<AttachBtnProps> = ({
             const files = e.target.files;
             if (files) {
               const newItems = Array.from(files).map((file) => {
-                const url = URL.createObjectURL(file);
-                return { fileUrl: url, fileName: file.name };
+                /* const url = URL.createObjectURL(file); */
+                return { isFile: true, name: file.name, fileObject: file };
               });
               setAttachedItems((prevItems) => [...prevItems, ...newItems]);
             }

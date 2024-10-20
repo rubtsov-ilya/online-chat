@@ -4,14 +4,12 @@ interface IInitialState {
   email: null | string;
   token: null | string;
   uid: null | string;
-  uMockid: null | string;
 }
 
 const initialState: IInitialState = {
   email: null,
   token: null,
   uid: null,
-  uMockid: null,
 };
 
 const userSlice = createSlice({
@@ -25,13 +23,11 @@ const userSlice = createSlice({
       state.email = action.payload.email;
       state.token = action.payload.token;
       state.uid = action.payload.uid;
-      state.uMockid = action.payload.uMockid;
     },
     removeUser(state) {
       state.email = null;
       state.token = null;
       state.uid = null;
-      state.uMockid = null;
     },
   },
 });
