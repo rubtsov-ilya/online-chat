@@ -9,6 +9,13 @@ import { getDownloadURL, ref, uploadBytesResumable } from 'firebase/storage';
 import { firebaseStorage } from 'src/firebase';
 
 import { v4 as uuidv4 } from 'uuid';
+import {
+  IImgMedia,
+  IVideoMedia,
+  IFile,
+  addLoadingMessage,
+} from 'src/redux/slices/LoadingMessagesSlice';
+import { useDispatch } from 'react-redux';
 
 interface MessageInputWrapperProps {
   isMobileScreen: boolean;
@@ -23,6 +30,7 @@ const MessageInputWrapper: FC<MessageInputWrapperProps> = ({
 }) => {
   const [messageContent, setMessageContent] = useState<string>('');
   const { uid } = useAuth();
+  const dispatch = useDispatch();
 
   const firebaseStorageFileUpload = async (
     file: File | Blob,
@@ -58,8 +66,10 @@ const MessageInputWrapper: FC<MessageInputWrapperProps> = ({
 
   const createMessageObject = async (/* messageContent, attachedItems */) => {
     /* создание полноценного массива объектов загруженных с устройства  */
-
-    const newAttachedItems =
+    if (!uid) {
+      return;
+    }
+    const newAttachedItems: (IImgMedia | IVideoMedia | IFile)[] =
       attachedItems.length > 0
         ? await Promise.all(
             attachedItems.map(async (attachedItem) => {
@@ -74,7 +84,9 @@ const MessageInputWrapper: FC<MessageInputWrapperProps> = ({
                 const isSquare = img.width === img.height;
 
                 const firebaseStorageDownloadUrl =
-                  await firebaseStorageFileUpload(attachedItem.fileObject);
+                  (await firebaseStorageFileUpload(
+                    attachedItem.fileObject,
+                  )) as string;
 
                 return {
                   imgUrl: firebaseStorageDownloadUrl,
@@ -125,17 +137,19 @@ const MessageInputWrapper: FC<MessageInputWrapperProps> = ({
                     if (blob) {
                       resolve(blob);
                     }
-                  }, 'image/png'); // указать нужный формат (например, здесь '.png')
+                  }, 'image/png'); // указать нужный формат, здесь '.png'
                 });
 
                 const firebaseStorageDownloadUrl =
-                  await firebaseStorageFileUpload(attachedItem.fileObject);
+                  (await firebaseStorageFileUpload(
+                    attachedItem.fileObject,
+                  )) as string;
 
                 const firebaseStorageDownloadUrlPreview =
-                  await firebaseStorageFileUpload(
+                  (await firebaseStorageFileUpload(
                     videoPreview,
-                    attachedItem.name,
-                  );
+                    attachedItem.name, //передача имени, т.к. сам блоб не имеем названия
+                  )) as string;
 
                 return {
                   videoUrl: firebaseStorageDownloadUrl,
@@ -145,7 +159,9 @@ const MessageInputWrapper: FC<MessageInputWrapperProps> = ({
                 };
               } else {
                 const firebaseStorageDownloadUrl =
-                  await firebaseStorageFileUpload(attachedItem.fileObject);
+                  (await firebaseStorageFileUpload(
+                    attachedItem.fileObject,
+                  )) as string;
                 return {
                   fileUrl: firebaseStorageDownloadUrl,
                   fileName: attachedItem.name,
@@ -157,31 +173,27 @@ const MessageInputWrapper: FC<MessageInputWrapperProps> = ({
     return {
       messageText: messageContent,
       messageDateUTC: '',
+      messageId: uuidv4(),
       isChecked: false,
-      senderUid: uid, // определять isOwn сообщение или !isOwn
+      senderUid: uid, // определять isOwn сообщение или !isOvwn
       userAvatar:
         'получать из database и ставить сразу в user редакса в useAuth и тд',
-      media: newAttachedItems.filter((item) => !item.fileUrl),
-      files: newAttachedItems.filter((item) => item.fileUrl),
+      media: newAttachedItems.filter((item) => !('fileUrl' in item)) as (
+        | IImgMedia
+        | IVideoMedia
+      )[],
+      files: newAttachedItems.filter((item) => 'fileUrl' in item) as IFile[],
     };
   };
 
   const addDateToMessageObject = async () => {
     const messageObjectWithoutDate = await createMessageObject();
     // получение даты в UTC +0 только после загрузки всех файлов в firebase, чтобы не было отстования даты после отправки
-    const currentDateUTC = new Date();
-    const messageDateUTC = new Date(
-      Date.UTC(
-        currentDateUTC.getUTCFullYear(),
-        currentDateUTC.getUTCMonth(),
-        currentDateUTC.getUTCDate(),
-        currentDateUTC.getUTCHours(),
-        currentDateUTC.getUTCMinutes(),
-        currentDateUTC.getUTCSeconds(),
-      ),
-    ).toISOString();
 
-    messageObjectWithoutDate.messageDateUTC = messageDateUTC;
+    if (messageObjectWithoutDate != undefined) {
+      messageObjectWithoutDate.messageDateUTC = new Date().toISOString();
+      dispatch(addLoadingMessage(messageObjectWithoutDate));
+    }
   };
 
   return (

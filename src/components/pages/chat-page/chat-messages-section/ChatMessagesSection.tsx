@@ -3,6 +3,7 @@ import { FC, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import styles from './ChatMessagesSection.module.scss';
 import Message from './message/Message';
 import ToBottomBtn from 'src/components/ui/to-bottom-btn/ToBottomBtn';
+import useGetLoadingMessages from 'src/hooks/useGetLoadingMessages';
 
 interface ChatMessagesSectionProps {
   isMobileScreen?: boolean;
@@ -15,6 +16,8 @@ const ChatMessagesSection: FC<ChatMessagesSectionProps> = ({
   /* const [messagesArray, setMessagesArray] = useState([]); */
   const endRef = useRef<HTMLDivElement>(null);
   const chatMessagesRef = useRef<HTMLDivElement>(null);
+  const { loadingMessagesArray } = useGetLoadingMessages();
+  console.log(loadingMessagesArray);
 
   const devMessagesArray = [
     {
@@ -367,55 +370,6 @@ const ChatMessagesSection: FC<ChatMessagesSectionProps> = ({
       ],
     },
   ];
-
-  /*   useLayoutEffect(() => {
-    let ignore = false;
-
-    const loadImages = async (message) => {
-      if (message.images.length > 0) {
-        const imageData: {
-          imgUrl: string;
-          isHorizontal: boolean;
-          isSquare: boolean;
-        }[] = await Promise.all(
-          message.images.map(async (img) => {
-            const image = new Image();
-            image.src = img;
-            await new Promise((resolve) => {
-              image.onload = resolve;
-            });
-            return {
-              img,
-              isHorizontal:
-                image.width > image.height || image.width === image.height,
-              isSquare: image.width === image.height,
-            };
-          }),
-        );
-        return {
-          ...message,
-          media: imageData,
-        };
-      } else {
-        return {
-          ...message,
-        };
-      }
-    };
-
-    const loadMessages = async () => {
-      if (devMessagesArray && !ignore) {
-        const newArray = await Promise.all(devMessagesArray.map(loadImages));
-        setMessagesArray(newArray);
-      }
-    };
-
-    loadMessages();
-
-    return () => {
-      ignore = true;
-    };
-  }, []); */
 
   useLayoutEffect(() => {
     endRef.current?.scrollIntoView({ behavior: 'auto' });
