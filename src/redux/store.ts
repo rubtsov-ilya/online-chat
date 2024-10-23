@@ -34,8 +34,19 @@ export const store = configureStore({
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
       serializableCheck: {
-        ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
+        ignoredActions: [
+          FLUSH,
+          REHYDRATE,
+          PAUSE,
+          PERSIST,
+          PURGE,
+          REGISTER,
+          'messagesArray/addLoadingMessage',
+          'messagesArray/updateProgressKeyInMessage',
+        ],
+        ignoredPaths: ['messagesArray.messagesArray'], // убрать ошибку сериализации состояния из-за File в объекте
       },
-    }).concat(shopApi.middleware),
+    }),
 });
+
 export const persistor = persistStore(store);

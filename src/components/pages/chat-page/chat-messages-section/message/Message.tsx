@@ -8,9 +8,10 @@ import MessageFileItem from '../message-file-item/MessageFileItem';
 import CheckedAndTimeStatuses from 'src/components/ui/checked-and-time-statuses/CheckedAndTimeStatuses';
 import { IMessage } from 'src/interfaces/Message.interface';
 import useAuth from 'src/hooks/useAuth';
+import { ILoadingMessage } from 'src/interfaces/LoadingMessage.interface';
 
 interface MessageProps {
-  messageData: IMessage;
+  messageData: IMessage | ILoadingMessage;
   isLastOfGroup: boolean;
   isFirstOfGroup: boolean;
 }
@@ -33,7 +34,8 @@ const Message: FC<MessageProps> = ({
         {messageData.media.length > 0 && (
           <div className={styles['message__album']}>
             {messageData?.media.map(
-              ({ imgUrl, videoUrl, isHorizontal, isSquare }, index: number) => {
+              /* ({ imgUrl, videoUrl, isHorizontal, isSquare }, index: number) => { */
+              (messageItemData, index: number) => {
                 const isArrayLengthOdd = messageData.media.length % 2 !== 0;
                 /* isArrayLengthOdd = если нечётная длина массива, тогда true */
                 const isOdd = index % 2 !== 0;
@@ -58,92 +60,92 @@ const Message: FC<MessageProps> = ({
                     : isArrayLengthOdd && isLast
                       ? '100%'
                       : !isOdd &&
-                          isSquare &&
+                          messageItemData.isSquare &&
                           messageData.media.length > 1 &&
                           nextIsSquare
                         ? '50%'
                         : isOdd &&
-                            isSquare &&
+                            messageItemData.isSquare &&
                             messageData.media.length > 1 &&
                             prevIsSquare
                           ? '50%'
                           : messageData.media.length > 1 &&
                               !isOdd &&
-                              isSquare &&
+                              messageItemData.isSquare &&
                               nextIsHorizontal &&
                               !nextIsSquare
                             ? '33.33%'
                             : messageData.media.length > 1 &&
                                 isOdd &&
-                                isSquare &&
+                                messageItemData.isSquare &&
                                 prevIsHorizontal &&
                                 !prevIsSquare
                               ? '33.33%'
                               : messageData.media.length > 1 &&
                                   !isOdd &&
                                   nextIsSquare &&
-                                  isHorizontal &&
-                                  !isSquare
+                                  messageItemData.isHorizontal &&
+                                  !messageItemData.isSquare
                                 ? '66.66%'
                                 : messageData.media.length > 1 &&
                                     isOdd &&
                                     prevIsSquare &&
-                                    isHorizontal &&
-                                    !isSquare
+                                    messageItemData.isHorizontal &&
+                                    !messageItemData.isSquare
                                   ? '66.66%'
                                   : isOdd &&
                                       prevIsHorizontal &&
-                                      isHorizontal &&
+                                      messageItemData.isHorizontal &&
                                       !isArrayLengthOdd &&
                                       messageData.media.length === 2
                                     ? '100%'
                                     : !isOdd &&
                                         nextIsHorizontal &&
-                                        isHorizontal &&
+                                        messageItemData.isHorizontal &&
                                         !isArrayLengthOdd &&
                                         messageData.media.length === 2
                                       ? '100%'
                                       : isOdd &&
                                           prevIsHorizontal &&
-                                          isHorizontal &&
+                                          messageItemData.isHorizontal &&
                                           messageData.media.length > 2
                                         ? '50%'
                                         : !isOdd &&
                                             nextIsHorizontal &&
-                                            isHorizontal &&
+                                            messageItemData.isHorizontal &&
                                             messageData.media.length > 2
                                           ? '50%'
                                           : messageData.media.length > 1 &&
                                               !isOdd &&
-                                              isHorizontal &&
+                                              messageItemData.isHorizontal &&
                                               !nextIsHorizontal
                                             ? '66.66%'
                                             : messageData.media.length > 1 &&
                                                 isOdd &&
-                                                isHorizontal &&
+                                                messageItemData.isHorizontal &&
                                                 !prevIsHorizontal
                                               ? '66.66%'
                                               : messageData.media.length > 1 &&
                                                   !isOdd &&
-                                                  !isHorizontal &&
+                                                  !messageItemData.isHorizontal &&
                                                   nextIsHorizontal
                                                 ? '33.33%'
                                                 : messageData.media.length >
                                                       1 &&
                                                     isOdd &&
-                                                    !isHorizontal &&
+                                                    !messageItemData.isHorizontal &&
                                                     prevIsHorizontal
                                                   ? '33.33%'
                                                   : messageData.media.length >
                                                         1 &&
                                                       isOdd &&
-                                                      !isHorizontal &&
+                                                      !messageItemData.isHorizontal &&
                                                       !prevIsHorizontal
                                                     ? '50%'
                                                     : messageData.media.length >
                                                           1 &&
                                                         !isOdd &&
-                                                        !isHorizontal &&
+                                                        !messageItemData.isHorizontal &&
                                                         !nextIsHorizontal
                                                       ? '50%'
                                                       : '100%';
@@ -152,8 +154,21 @@ const Message: FC<MessageProps> = ({
                   <MessageMediaItem
                     key={index}
                     width={width}
-                    imgUrl={imgUrl}
-                    videoUrl={videoUrl}
+                    progress={
+                      'progress' in messageItemData
+                        ? messageItemData.progress
+                        : undefined
+                    }
+                    imgUrl={
+                      'imgUrl' in messageItemData
+                        ? messageItemData.imgUrl
+                        : undefined
+                    }
+                    videoUrl={
+                      'videoUrl' in messageItemData
+                        ? messageItemData.videoUrl
+                        : undefined
+                    }
                     messageData={messageData}
                     index={index}
                   />

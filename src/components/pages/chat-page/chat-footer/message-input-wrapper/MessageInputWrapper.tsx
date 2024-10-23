@@ -15,7 +15,17 @@ import {
   IImgMedia,
   IVideoMedia,
 } from 'src/interfaces/Message.interface';
-import { addLoadingMessage } from 'src/redux/slices/MessagesArraySlice';
+import {
+  addLoadingMessage,
+  updateProgressKeyInMessage,
+  updateProgressPreviewKeyInMessage,
+} from 'src/redux/slices/MessagesArraySlice';
+import {
+  ILoadingFile,
+  ILoadingImgMedia,
+  ILoadingMessage,
+  ILoadingVideoMedia,
+} from 'src/interfaces/LoadingMessage.interface';
 
 interface MessageInputWrapperProps {
   isMobileScreen: boolean;
@@ -34,6 +44,9 @@ const MessageInputWrapper: FC<MessageInputWrapperProps> = ({
 
   const firebaseStorageFileUpload = async (
     file: File | Blob,
+    filePath: 'media' | 'files',
+    messageId: string,
+    loadingId: string,
     fileName?: string,
   ) => {
     const storageRef = ref(
@@ -46,17 +59,37 @@ const MessageInputWrapper: FC<MessageInputWrapperProps> = ({
       uploadTask.on(
         'state_changed',
         (snapshot) => {
-          // отображение прогресса загрузки
-          const progress =
-            (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-          console.log(`Upload is ${progress}% done`);
+          /* отображение прогресса загрузки */
+          const progress = Math.floor(
+            (snapshot.bytesTransferred / snapshot.totalBytes) * 100,
+          );
+          /* если !fileName - значит это не превью для видео */
+          if (!fileName) {
+            dispatch(
+              updateProgressKeyInMessage({
+                messageId: messageId,
+                loadingId: loadingId,
+                progress: progress,
+                filePath: filePath,
+              }),
+            );
+          }
+          if (fileName) {
+            dispatch(
+              updateProgressPreviewKeyInMessage({
+                messageId: messageId,
+                loadingId: loadingId,
+                progress: progress,
+              }),
+            );
+          }
         },
         (error) => {
           console.log('Upload error:', error);
           reject(error);
         },
         async () => {
-          // Получение ссылки на загруженный файл
+          /* Получение ссылки на загруженный файл */
           const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
           resolve(downloadURL);
         },
@@ -64,50 +97,167 @@ const MessageInputWrapper: FC<MessageInputWrapperProps> = ({
     });
   };
 
-  const createMessageObject = async (/* messageContent, attachedItems */) => {
-    /* создание полноценного массива объектов загруженных с устройства  */
+  const createMessageObjectWithFirebaseUrl = async (
+    messageWithLocaleUrl: ILoadingMessage,
+  ) => {
     if (!uid) {
       return;
     }
-    const newAttachedItems: (IImgMedia | IVideoMedia | IFile)[] =
-      attachedItems.length > 0
-        ? await Promise.all(
-            attachedItems.map(async (attachedItem) => {
-              if ('imgUrl' in attachedItem) {
-                const img = new Image();
-                img.src = attachedItem.imgUrl;
-                await new Promise((resolve) => {
-                  img.onload = resolve;
-                });
-                const isHorizontal =
-                  img.width > img.height || img.width === img.height;
-                const isSquare = img.width === img.height;
 
+    const filesAndMediaArray = [
+      ...messageWithLocaleUrl.media,
+      ...messageWithLocaleUrl.files,
+    ];
+
+    const newFilesAndMediaArray: (IImgMedia | IVideoMedia | IFile)[] =
+      filesAndMediaArray.length > 0
+        ? await Promise.all(
+            filesAndMediaArray.map(async (fileOrMediaItem) => {
+              if ('imgUrl' in fileOrMediaItem) {
                 const firebaseStorageDownloadUrl =
                   (await firebaseStorageFileUpload(
-                    attachedItem.fileObject,
+                    fileOrMediaItem.fileObject,
+                    'media',
+                    messageWithLocaleUrl.messageId,
+                    fileOrMediaItem.loadingId,
                   )) as string;
 
                 return {
                   imgUrl: firebaseStorageDownloadUrl,
-                  isHorizontal,
-                  isSquare,
+                  isHorizontal: fileOrMediaItem.isHorizontal,
+                  isSquare: fileOrMediaItem.isSquare,
                 };
-              } else if ('videoUrl' in attachedItem) {
+              } else if ('videoUrl' in fileOrMediaItem) {
                 const video = document.createElement('video');
-                video.src = attachedItem.videoUrl;
+                video.src = fileOrMediaItem.videoUrl;
                 await new Promise((resolve) => {
                   video.onloadedmetadata = resolve;
                 });
 
-                // измерение горизонтальности и квадратности
-                const isHorizontal =
-                  video.videoWidth > video.videoHeight ||
-                  video.videoWidth === video.videoHeight;
-                const isSquare = video.videoWidth === video.videoHeight;
-
                 // создание canvas для работы с превью
                 const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                canvas.width = video.videoWidth;
+                canvas.height = video.videoHeight;
+
+                // ожидание загрузки видео до первого кадра
+                await new Promise((resolve, reject) => {
+                  video.currentTime = 0;
+                  video.onseeked = () => {
+                    resolve(null);
+                  };
+                  video.onerror = (err) => {
+                    reject(err);
+                  };
+                });
+
+                // отрисовка первого кадра в canvas
+
+                if (!ctx) {
+                  throw new Error('2D context не был создан');
+                }
+
+                ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+                // Создание превью через canvas
+                const videoPreview: Blob = await new Promise((resolve) => {
+                  canvas.toBlob((blob) => {
+                    if (blob) {
+                      resolve(blob);
+                    }
+                  }, 'image/png'); // указать нужный формат, здесь '.png'
+                });
+
+                const firebaseStorageDownloadUrl =
+                  (await firebaseStorageFileUpload(
+                    fileOrMediaItem.fileObject,
+                    'media',
+                    messageWithLocaleUrl.messageId,
+                    fileOrMediaItem.loadingId,
+                  )) as string;
+
+                const firebaseStorageDownloadUrlPreview =
+                  (await firebaseStorageFileUpload(
+                    videoPreview,
+                    'media',
+                    messageWithLocaleUrl.messageId,
+                    fileOrMediaItem.loadingId,
+                    fileOrMediaItem.videoName, //передача имени, т.к. сам блоб не имеем названия
+                  )) as string;
+
+                return {
+                  videoUrl: firebaseStorageDownloadUrl,
+                  videoPreview: firebaseStorageDownloadUrlPreview,
+                  isHorizontal: fileOrMediaItem.isHorizontal,
+                  isSquare: fileOrMediaItem.isSquare,
+                };
+              } else {
+                const firebaseStorageDownloadUrl =
+                  (await firebaseStorageFileUpload(
+                    fileOrMediaItem.fileObject,
+                    'files',
+                    messageWithLocaleUrl.messageId,
+                    fileOrMediaItem.loadingId,
+                  )) as string;
+                return {
+                  fileUrl: firebaseStorageDownloadUrl,
+                  fileName: fileOrMediaItem.fileName,
+                };
+              }
+            }),
+          )
+        : [];
+  };
+
+  const createMessageObjectWithLocaleUrl =
+    async (/* messageContent, attachedItems */) => {
+      /* создание полноценного массива объектов загруженных с устройства  */
+      const newAttachedItems: (
+        | ILoadingImgMedia
+        | ILoadingVideoMedia
+        | ILoadingFile
+      )[] =
+        attachedItems.length > 0
+          ? await Promise.all(
+              attachedItems.map(async (attachedItem) => {
+                if ('imgUrl' in attachedItem) {
+                  const img = new Image();
+                  img.src = attachedItem.imgUrl;
+                  await new Promise((resolve) => {
+                    img.onload = resolve;
+                  });
+                  const isHorizontal =
+                    img.width > img.height || img.width === img.height;
+                  const isSquare = img.width === img.height;
+
+                  /* const firebaseStorageDownloadUrl =
+                  (await firebaseStorageFileUpload(
+                    attachedItem.fileObject,
+                  )) as string; */
+
+                  return {
+                    imgUrl: attachedItem.imgUrl,
+                    isHorizontal,
+                    isSquare,
+                    fileObject: attachedItem.fileObject,
+                    progress: 0,
+                    loadingId: uuidv4(),
+                  };
+                } else if ('videoUrl' in attachedItem) {
+                  const video = document.createElement('video');
+                  video.src = attachedItem.videoUrl;
+                  await new Promise((resolve) => {
+                    video.onloadedmetadata = resolve;
+                  });
+
+                  // измерение горизонтальности и квадратности
+                  const isHorizontal =
+                    video.videoWidth > video.videoHeight ||
+                    video.videoWidth === video.videoHeight;
+                  const isSquare = video.videoWidth === video.videoHeight;
+
+                  // создание canvas для работы с превью
+                  /* const canvas = document.createElement('canvas');
                 const ctx = canvas.getContext('2d');
                 canvas.width = video.videoWidth;
                 canvas.height = video.videoHeight;
@@ -149,51 +299,76 @@ const MessageInputWrapper: FC<MessageInputWrapperProps> = ({
                   (await firebaseStorageFileUpload(
                     videoPreview,
                     attachedItem.name, //передача имени, т.к. сам блоб не имеем названия
-                  )) as string;
+                  )) as string; */
 
-                return {
-                  videoUrl: firebaseStorageDownloadUrl,
-                  isHorizontal,
-                  isSquare,
-                  videoPreview: firebaseStorageDownloadUrlPreview,
-                };
-              } else {
-                const firebaseStorageDownloadUrl =
+                  return {
+                    videoUrl: attachedItem.videoUrl,
+                    isHorizontal,
+                    isSquare,
+                    videoPreview: '',
+                    videoName: attachedItem.name,
+                    fileObject: attachedItem.fileObject,
+                    progress: 0,
+                    progressPreview: 0,
+                    loadingId: uuidv4(),
+                  };
+                } else {
+                  /* const firebaseStorageDownloadUrl =
                   (await firebaseStorageFileUpload(
                     attachedItem.fileObject,
-                  )) as string;
-                return {
-                  fileUrl: firebaseStorageDownloadUrl,
-                  fileName: attachedItem.name,
-                };
-              }
-            }),
-          )
-        : [];
-    return {
-      messageText: messageContent,
-      messageDateUTC: '',
-      messageId: uuidv4(),
-      isChecked: false,
-      senderUid: uid, // определять isOwn сообщение или !isOvwn
-      userAvatar:
-        'получать из database и ставить сразу в user редакса в useAuth и тд',
-      media: newAttachedItems.filter((item) => !('fileUrl' in item)) as (
-        | IImgMedia
-        | IVideoMedia
-      )[],
-      files: newAttachedItems.filter((item) => 'fileUrl' in item) as IFile[],
+                  )) as string; */
+                  return {
+                    fileUrl: '',
+                    fileName: attachedItem.name,
+                    fileObject: attachedItem.fileObject,
+                    progress: 0,
+                    loadingId: uuidv4(),
+                  };
+                }
+              }),
+            )
+          : [];
+      return {
+        messageText: messageContent,
+        messageDateUTC: '',
+        messageId: uuidv4(),
+        isChecked: false,
+        senderUid: uid!, // определять isOwn сообщение или !isOvwn
+        userAvatar:
+          'получать из database и ставить сразу в user редакса в useAuth и тд',
+        isLoading: true,
+        media: newAttachedItems.filter((item) => !('fileUrl' in item)) as (
+          | ILoadingImgMedia
+          | ILoadingVideoMedia
+        )[],
+        files: newAttachedItems.filter(
+          (item) => 'fileUrl' in item,
+        ) as ILoadingFile[],
+      };
     };
-  };
 
-  const addDateToMessageObject = async () => {
-    const messageObjectWithoutDate = await createMessageObject();
-    // получение даты в UTC +0 только после загрузки всех файлов в firebase, чтобы не было отстования даты после отправки
-
-    if (messageObjectWithoutDate != undefined) {
-      messageObjectWithoutDate.messageDateUTC = new Date().toISOString();
-      dispatch(addLoadingMessage(messageObjectWithoutDate));
+  const sendMessage = async () => {
+    if (!uid) {
+      return;
     }
+
+    const messageWithLocaleUrls: ILoadingMessage | undefined =
+      await createMessageObjectWithLocaleUrl();
+
+    if (messageWithLocaleUrls != undefined) {
+      dispatch(addLoadingMessage(messageWithLocaleUrls));
+      const messageWithFirebaseUrls = await createMessageObjectWithFirebaseUrl(
+        messageWithLocaleUrls,
+      );
+    }
+
+    /* добавление даты в UTC +0 только после загрузки всех файлов в firebase (прямо перед отправкой в фаербейз), чтобы не было отстования даты после отправки */
+    /* ещё зависит от того, выдатс ли ошибку фаербейз при отпадании интернета или нет, если нет, то он потом отправит задним числом, тогда дату придётся серверной функцией добавлять */
+    /* messageWithFirebaseUrls.messageDateUTC = new Date().toISOString(); */
+
+    /* поставить состояние загрузки false */
+
+    /* messageWithFirebaseUrls.isLoading = false; */
   };
 
   return (
@@ -214,7 +389,7 @@ const MessageInputWrapper: FC<MessageInputWrapperProps> = ({
       <button
         disabled={messageContent.length === 0 && attachedItems.length === 0}
         className={styles['message-input-wrapper__btn']}
-        onClick={addDateToMessageObject}
+        onClick={sendMessage}
       >
         <ArrowCircleSvg
           className={

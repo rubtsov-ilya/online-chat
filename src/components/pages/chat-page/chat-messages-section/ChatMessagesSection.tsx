@@ -1,9 +1,12 @@
-import { FC, useLayoutEffect, useRef } from 'react';
+import { FC, useLayoutEffect, useRef, useState } from 'react';
 
 import useGetMessagesFromRtk from 'src/hooks/useGetMessagesFromRtk';
 import styles from './ChatMessagesSection.module.scss';
 import Message from './message/Message';
 import ToBottomBtn from 'src/components/ui/to-bottom-btn/ToBottomBtn';
+import { addInitialMessagesArray } from 'src/redux/slices/MessagesArraySlice';
+import { useDispatch } from 'react-redux';
+import { IMessage } from 'src/interfaces/Message.interface';
 
 interface ChatMessagesSectionProps {
   isMobileScreen?: boolean;
@@ -16,10 +19,12 @@ const ChatMessagesSection: FC<ChatMessagesSectionProps> = ({
   /* const [messagesArray, setMessagesArray] = useState([]); */
   const endRef = useRef<HTMLDivElement>(null);
   const chatMessagesRef = useRef<HTMLDivElement>(null);
+  const [doScroll, setDoScroll] = useState<boolean>(false);
+  const dispatch = useDispatch();
   const { messagesArray } = useGetMessagesFromRtk();
-  console.log(messagesArray);
 
-  const devMessagesArray = [
+  /* запрос сообщений из фаербейз первый либо тут либо в юзэффекте */
+  const devMessagesArray: IMessage[] = [
     {
       messageText: 'sdasasdasdasdasdasddasdsdg',
       messageDateUTC: '2024-10-23T09:01:04.275Z',
@@ -28,6 +33,7 @@ const ChatMessagesSection: FC<ChatMessagesSectionProps> = ({
       senderUid: 'yp7vuU1DFuRnGlwa5m7IGUtV7GJ3',
       userAvatar:
         'https://img.freepik.com/free-photo/futuristic-cat-with-goggles_23-2150969291.jpg?t=st=1723732192~exp=1723735792~hmac=a4a2681fc1de61379eaa4e0c3fa697ded740bab5de9171e7678b25df7276ff80&w=826',
+      isLoading: false,
       media: [],
       files: [],
     },
@@ -39,6 +45,7 @@ const ChatMessagesSection: FC<ChatMessagesSectionProps> = ({
       senderUid: 'yp7vuU1DFuRnGlwa5m7IGUtV7GJ6',
       userAvatar:
         'https://img.freepik.com/free-photo/futuristic-cat-with-goggles_23-2150969291.jpg?t=st=1723732192~exp=1723735792~hmac=a4a2681fc1de61379eaa4e0c3fa697ded740bab5de9171e7678b25df7276ff80&w=826',
+      isLoading: false,
       media: [],
       files: [],
     },
@@ -51,6 +58,7 @@ const ChatMessagesSection: FC<ChatMessagesSectionProps> = ({
       senderUid: 'yp7vuU1DFuRnGlwa5m7IGUtV7GJ3',
       userAvatar:
         'https://img.freepik.com/free-photo/futuristic-cat-with-goggles_23-2150969291.jpg?t=st=1723732192~exp=1723735792~hmac=a4a2681fc1de61379eaa4e0c3fa697ded740bab5de9171e7678b25df7276ff80&w=826',
+      isLoading: false,
       media: [
         {
           imgUrl:
@@ -118,6 +126,7 @@ const ChatMessagesSection: FC<ChatMessagesSectionProps> = ({
       senderUid: 'yp7vuU1DFuRnGlwa5m7IGUtV7GJ3',
       userAvatar:
         'https://img.freepik.com/free-photo/futuristic-cat-with-goggles_23-2150969291.jpg?t=st=1723732192~exp=1723735792~hmac=a4a2681fc1de61379eaa4e0c3fa697ded740bab5de9171e7678b25df7276ff80&w=826',
+      isLoading: false,
       media: [
         {
           imgUrl:
@@ -137,6 +146,7 @@ const ChatMessagesSection: FC<ChatMessagesSectionProps> = ({
       senderUid: 'yp7vuU1DFuRnGlwa5m7IGUtV7GJ3',
       userAvatar:
         'https://img.freepik.com/free-photo/futuristic-cat-with-goggles_23-2150969291.jpg?t=st=1723732192~exp=1723735792~hmac=a4a2681fc1de61379eaa4e0c3fa697ded740bab5de9171e7678b25df7276ff80&w=826',
+      isLoading: false,
       media: [
         {
           imgUrl:
@@ -162,6 +172,7 @@ const ChatMessagesSection: FC<ChatMessagesSectionProps> = ({
       senderUid: 'yp7vuU1DFuRnGlwa5m7IGUtV7GJ3',
       userAvatar:
         'https://img.freepik.com/premium-photo/there-is-cat-that-is-looking-camera-flowers-generative-ai_1035438-4846.jpg?w=740',
+      isLoading: false,
       media: [
         {
           imgUrl:
@@ -187,6 +198,7 @@ const ChatMessagesSection: FC<ChatMessagesSectionProps> = ({
       senderUid: 'yp7vuU1DFuRnGlwa5m7IGUtV7GJ3',
       userAvatar:
         'https://img.freepik.com/premium-photo/there-is-cat-that-is-looking-camera-flowers-generative-ai_1035438-4846.jpg?w=740',
+      isLoading: false,
       media: [
         {
           imgUrl:
@@ -217,6 +229,7 @@ const ChatMessagesSection: FC<ChatMessagesSectionProps> = ({
       senderUid: 'yp7vuU1DFuRnGlwa5m7IGUtV7GJ3',
       userAvatar:
         'https://img.freepik.com/premium-photo/there-is-cat-that-is-looking-camera-flowers-generative-ai_1035438-4846.jpg?w=740',
+      isLoading: false,
       media: [],
       files: [],
     },
@@ -229,6 +242,7 @@ const ChatMessagesSection: FC<ChatMessagesSectionProps> = ({
       senderUid: 'yp7vuU1DFuRnGlwa5m7IGUtV7GJ6',
       userAvatar:
         'https://img.freepik.com/free-photo/futuristic-cat-with-goggles_23-2150969291.jpg?t=st=1723732192~exp=1723735792~hmac=a4a2681fc1de61379eaa4e0c3fa697ded740bab5de9171e7678b25df7276ff80&w=826',
+      isLoading: false,
       media: [],
       files: [],
     },
@@ -240,6 +254,7 @@ const ChatMessagesSection: FC<ChatMessagesSectionProps> = ({
       senderUid: 'yp7vuU1DFuRnGlwa5m7IGUtV7GJ6',
       userAvatar:
         'https://img.freepik.com/free-photo/futuristic-cat-with-goggles_23-2150969291.jpg?t=st=1723732192~exp=1723735792~hmac=a4a2681fc1de61379eaa4e0c3fa697ded740bab5de9171e7678b25df7276ff80&w=826',
+      isLoading: false,
       media: [
         {
           imgUrl:
@@ -270,6 +285,7 @@ const ChatMessagesSection: FC<ChatMessagesSectionProps> = ({
       senderUid: 'yp7vuU1DFuRnGlwa5m7IGUtV7GJ6',
       userAvatar:
         'https://img.freepik.com/free-photo/futuristic-cat-with-goggles_23-2150969291.jpg?t=st=1723732192~exp=1723735792~hmac=a4a2681fc1de61379eaa4e0c3fa697ded740bab5de9171e7678b25df7276ff80&w=826',
+      isLoading: false,
       media: [
         {
           imgUrl:
@@ -295,6 +311,7 @@ const ChatMessagesSection: FC<ChatMessagesSectionProps> = ({
       senderUid: 'yp7vuU1DFuRnGlwa5m7IGUtV7GJ6',
       userAvatar:
         'https://img.freepik.com/free-photo/futuristic-cat-with-goggles_23-2150969291.jpg?t=st=1723732192~exp=1723735792~hmac=a4a2681fc1de61379eaa4e0c3fa697ded740bab5de9171e7678b25df7276ff80&w=826',
+      isLoading: false,
       media: [],
       files: [],
     },
@@ -306,6 +323,7 @@ const ChatMessagesSection: FC<ChatMessagesSectionProps> = ({
       senderUid: 'yp7vuU1DFuRnGlwa5m7IGUtV7GJ6',
       userAvatar:
         'https://img.freepik.com/free-photo/futuristic-cat-with-goggles_23-2150969291.jpg?t=st=1723732192~exp=1723735792~hmac=a4a2681fc1de61379eaa4e0c3fa697ded740bab5de9171e7678b25df7276ff80&w=826',
+      isLoading: false,
       media: [
         {
           imgUrl:
@@ -330,6 +348,7 @@ const ChatMessagesSection: FC<ChatMessagesSectionProps> = ({
       senderUid: 'yp7vuU1DFuRnGlwa5m7IGUtV7GJ6',
       userAvatar:
         'https://img.freepik.com/free-photo/futuristic-cat-with-goggles_23-2150969291.jpg?t=st=1723732192~exp=1723735792~hmac=a4a2681fc1de61379eaa4e0c3fa697ded740bab5de9171e7678b25df7276ff80&w=826',
+      isLoading: false,
       media: [
         {
           imgUrl:
@@ -353,6 +372,7 @@ const ChatMessagesSection: FC<ChatMessagesSectionProps> = ({
       senderUid: 'yp7vuU1DFuRnGlwa5m7IGUtV7GJ6',
       userAvatar:
         'https://img.freepik.com/free-photo/futuristic-cat-with-goggles_23-2150969291.jpg?t=st=1723732192~exp=1723735792~hmac=a4a2681fc1de61379eaa4e0c3fa697ded740bab5de9171e7678b25df7276ff80&w=826',
+      isLoading: false,
       media: [
         {
           videoUrl: 'https://i.imgur.com/v5DeFBo.mp4',
@@ -377,6 +397,7 @@ const ChatMessagesSection: FC<ChatMessagesSectionProps> = ({
       senderUid: 'yp7vuU1DFuRnGlwa5m7IGUtV7GJ6',
       userAvatar:
         'https://img.freepik.com/free-photo/futuristic-cat-with-goggles_23-2150969291.jpg?t=st=1723732192~exp=1723735792~hmac=a4a2681fc1de61379eaa4e0c3fa697ded740bab5de9171e7678b25df7276ff80&w=826',
+      isLoading: false,
       media: [],
       files: [
         {
@@ -391,9 +412,20 @@ const ChatMessagesSection: FC<ChatMessagesSectionProps> = ({
     },
   ];
 
+  console.log(messagesArray);
+
   useLayoutEffect(() => {
-    endRef.current?.scrollIntoView({ behavior: 'auto' });
+    /* первый запрос для установки initialstate в rtk */
+    dispatch(addInitialMessagesArray(devMessagesArray));
+    setDoScroll(true);
+    return () => {};
   }, []);
+
+  useLayoutEffect(() => {
+    /*  скролл вниз секции */
+    endRef.current?.scrollIntoView({ behavior: 'auto' });
+    return () => {};
+  }, [doScroll]);
 
   return (
     <ComponentTag
@@ -409,28 +441,28 @@ const ChatMessagesSection: FC<ChatMessagesSectionProps> = ({
         }
       >
         <div
-          className={`${styles['chat-messages__content']} ${devMessagesArray.length === 0 ? styles['chat-messages__content--no-messages'] : ''}`}
+          className={`${styles['chat-messages__content']} ${messagesArray.length === 0 ? styles['chat-messages__content--no-messages'] : ''}`}
         >
-          {devMessagesArray.length > 0 &&
-            devMessagesArray.map((messageData, index) => {
+          {messagesArray.length > 0 &&
+            messagesArray.map((messageData, index) => {
               return (
                 <Message
                   key={index}
                   messageData={messageData}
                   isLastOfGroup={
-                    index === devMessagesArray.length - 1 ||
+                    index === messagesArray.length - 1 ||
                     messageData.senderUid !==
-                      devMessagesArray[index + 1]?.senderUid
+                      messagesArray[index + 1]?.senderUid
                   }
                   isFirstOfGroup={
                     index === 0 ||
                     messageData.senderUid !==
-                      devMessagesArray[index - 1]?.senderUid
+                      messagesArray[index - 1]?.senderUid
                   }
                 />
               );
             })}
-          {devMessagesArray.length === 0 && (
+          {messagesArray.length === 0 && (
             <span className={styles['chat-messages__no-messages']}>
               Нет сообщений
             </span>

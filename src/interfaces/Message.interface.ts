@@ -23,6 +23,7 @@ export interface IMessage {
   isChecked: boolean;
   senderUid: string;
   userAvatar: string;
+  isLoading: boolean;
   media: (IImgMedia | IVideoMedia)[];
   files: IFile[];
 }

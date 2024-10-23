@@ -11,6 +11,7 @@ interface MessageMediaItemProps {
   videoUrl?: string;
   messageData: IMessage;
   index: number;
+  progress: number | undefined;
 }
 
 const MessageMediaItem: FC<MessageMediaItemProps> = ({
@@ -18,6 +19,7 @@ const MessageMediaItem: FC<MessageMediaItemProps> = ({
   imgUrl,
   videoUrl,
   messageData,
+  progress,
   index,
 }) => {
   const { toggleBodyLock } = useBodyLock();
@@ -73,6 +75,7 @@ const MessageMediaItem: FC<MessageMediaItemProps> = ({
           media={messageData.media}
         />
       )}
+      {progress && <p>{progress}</p>}
     </div>
   );
 };
