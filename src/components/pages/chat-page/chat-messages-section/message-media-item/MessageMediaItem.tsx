@@ -3,12 +3,13 @@ import styles from './MessageMediaItem.module.scss';
 import ModalGallery from 'src/components/ui/modal-gallery/ModalGallery';
 import useBodyLock from 'src/hooks/useBodyLock';
 import PlaySvg from 'src/assets/images/icons/misc/Play.svg?react';
+import { IMessage } from 'src/interfaces/Message.interface';
 
 interface MessageMediaItemProps {
   width: '100%' | '50%' | '33.33%' | '66.66%';
   imgUrl?: string;
   videoUrl?: string;
-  messageData: any;
+  messageData: IMessage;
   index: number;
 }
 

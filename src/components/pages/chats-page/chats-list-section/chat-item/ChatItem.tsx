@@ -10,7 +10,7 @@ interface ChatItemProps {}
 const ChatItem: FC<ChatItemProps> = ({}) => {
   const userData = {
     lastMessage: 'The weather will be perfect for the stuses isisisisisi sas a',
-    messageDate: '10:16',
+    messageDateUTC: '2024-10-23T07:16:04.275Z',
     counter: 14,
     userName: 'Антон Арбузов',
   };
@@ -37,7 +37,10 @@ const ChatItem: FC<ChatItemProps> = ({}) => {
               {userData.counter}
             </span>
           </div>
-          <CheckedAndTimeStatuses isChecked={true} time={'10:16'} />
+          <CheckedAndTimeStatuses
+            isChecked={true}
+            time={userData.messageDateUTC}
+          />
         </div>
       </div>
     </>

@@ -1,35 +1,8 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { IMessage } from 'src/interfaces/Message.interface';
 
-export interface IImgMedia {
-  imgUrl: string;
-  isHorizontal: boolean;
-  isSquare: boolean;
-}
-
-export interface IVideoMedia {
-  isHorizontal: boolean;
-  isSquare: boolean;
-  videoUrl: string;
-  videoPreview: string;
-}
-
-export interface IFile {
-  fileUrl: string;
-  fileName: string;
-}
-
-export interface ILoadingMessage {
-  messageText: string;
-  messageDateUTC: string;
-  messageId: string;
-  isChecked: boolean;
-  senderUid: string;
-  userAvatar: string;
-  media: (IImgMedia | IVideoMedia)[];
-  files: IFile[];
-}
 interface IInitialState {
-  loadingMessagesArray: ILoadingMessage[];
+  loadingMessagesArray: IMessage[];
 }
 
 const initialState: IInitialState = {
@@ -43,7 +16,7 @@ const loadingMessagesSlice = createSlice({
     selectLoadingMessage: (state) => state,
   },
   reducers: {
-    addLoadingMessage(state, action: PayloadAction<ILoadingMessage>) {
+    addLoadingMessage(state, action: PayloadAction<IMessage>) {
       state.loadingMessagesArray = [
         ...state.loadingMessagesArray,
         action.payload,
@@ -51,7 +24,7 @@ const loadingMessagesSlice = createSlice({
     },
     removeLoadingMessage(state, action) {
       state.loadingMessagesArray = state.loadingMessagesArray.filter(
-        (item: ILoadingMessage) => item != action.payload,
+        (item: IMessage) => item != action.payload,
       );
     },
   },

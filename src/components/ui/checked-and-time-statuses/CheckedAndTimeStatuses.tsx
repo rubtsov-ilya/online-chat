@@ -17,6 +17,8 @@ const CheckedAndTimeStatuses: FC<CheckedAndTimeStatusesProps> = ({
   isForImage,
   isOwn,
 }) => {
+  const timeDate = new Date(time);
+  const formattedTime = `${timeDate.getHours().toString().padStart(2, '0')}:${timeDate.getMinutes().toString().padStart(2, '0')}`;
   return (
     <div className={styles['checked-and-time-statuses']}>
       {isChecked && isOwn && (
@@ -32,7 +34,7 @@ const CheckedAndTimeStatuses: FC<CheckedAndTimeStatusesProps> = ({
       <span
         className={`${styles['checked-and-time-statuses__timestamp']} ${isForImage ? styles['checked-and-time-statuses__timestamp--image'] : ''}`}
       >
-        {time}
+        {formattedTime}
       </span>
     </div>
   );

@@ -1,4 +1,4 @@
-import { FC, useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { FC, useLayoutEffect, useRef } from 'react';
 
 import styles from './ChatMessagesSection.module.scss';
 import Message from './message/Message';
@@ -22,9 +22,10 @@ const ChatMessagesSection: FC<ChatMessagesSectionProps> = ({
   const devMessagesArray = [
     {
       messageText: 'sdasasdasdasdasdasddasdsdg',
-      messageDate: '10:18',
+      messageDateUTC: '2024-10-23T09:01:04.275Z',
+      messageId: '7320616e-a5ac-4d55-bf99-cf8f4cbbb44f',
       isChecked: false,
-      isOwn: true,
+      senderUid: 'yp7vuU1DFuRnGlwa5m7IGUtV7GJ3',
       userAvatar:
         'https://img.freepik.com/free-photo/futuristic-cat-with-goggles_23-2150969291.jpg?t=st=1723732192~exp=1723735792~hmac=a4a2681fc1de61379eaa4e0c3fa697ded740bab5de9171e7678b25df7276ff80&w=826',
       media: [],
@@ -32,9 +33,10 @@ const ChatMessagesSection: FC<ChatMessagesSectionProps> = ({
     },
     {
       messageText: 'sdsdg',
-      messageDate: '10:18',
+      messageDateUTC: '2024-10-23T09:02:04.275Z',
+      messageId: '2f44f109-7661-485c-bb23-ef5068e2bcd9',
       isChecked: false,
-      isOwn: false,
+      senderUid: 'yp7vuU1DFuRnGlwa5m7IGUtV7GJ6',
       userAvatar:
         'https://img.freepik.com/free-photo/futuristic-cat-with-goggles_23-2150969291.jpg?t=st=1723732192~exp=1723735792~hmac=a4a2681fc1de61379eaa4e0c3fa697ded740bab5de9171e7678b25df7276ff80&w=826',
       media: [],
@@ -43,9 +45,10 @@ const ChatMessagesSection: FC<ChatMessagesSectionProps> = ({
     {
       messageText:
         'Lorem Ipsum - это текст-"рыба", часто используемый вasffsfasfasfa asf f asf фы ывп укр оа печати и вэб-дизайне. Lorem Ipsum является стандартной "рыбой" для текстов на латинице с начала XVI века. оапппп fgswtst аармсмти пофвфаы цйццаа фыафыаафыаыsf ',
-      messageDate: '10:16',
+      messageDateUTC: '2024-10-23T09:03:04.275Z',
+      messageId: 'ee2a85a2-f7e3-4430-908a-599f2b88901b',
       isChecked: true,
-      isOwn: true,
+      senderUid: 'yp7vuU1DFuRnGlwa5m7IGUtV7GJ3',
       userAvatar:
         'https://img.freepik.com/free-photo/futuristic-cat-with-goggles_23-2150969291.jpg?t=st=1723732192~exp=1723735792~hmac=a4a2681fc1de61379eaa4e0c3fa697ded740bab5de9171e7678b25df7276ff80&w=826',
       media: [
@@ -109,9 +112,10 @@ const ChatMessagesSection: FC<ChatMessagesSectionProps> = ({
     {
       messageText:
         'Lorem Ipsum - это текст-"рыба", часто используемый вasffsfasfasfa asf f asf фы ывп укр оа печати и вэб-дизайне. Lorem Ipsum является стандартной "рыбой" для текстов на латинице с начала XVI века. оапппп fgswtst аармсмти пофвфаы цйццаа фыафыаафыаыsf ',
-      messageDate: '10:16',
+      messageDateUTC: '2024-10-23T09:03:04.275Z',
+      messageId: '4a985e4f-21c7-4a66-869b-5d4fc3d6d0fc',
       isChecked: true,
-      isOwn: true,
+      senderUid: 'yp7vuU1DFuRnGlwa5m7IGUtV7GJ3',
       userAvatar:
         'https://img.freepik.com/free-photo/futuristic-cat-with-goggles_23-2150969291.jpg?t=st=1723732192~exp=1723735792~hmac=a4a2681fc1de61379eaa4e0c3fa697ded740bab5de9171e7678b25df7276ff80&w=826',
       media: [
@@ -127,9 +131,10 @@ const ChatMessagesSection: FC<ChatMessagesSectionProps> = ({
     {
       messageText:
         'Lorem Ipsum - это текст-"рыба", часто используемый вasffsfasfasfa asf f asf фы ывп укр оа печати и вэб-дизайне. Lorem Ipsum является стандартной "рыбой" для текстов на латинице с начала XVI века. оапппп fgswtst аармсмти пофвфаы цйццаа фыафыаафыаыsf ',
-      messageDate: '10:16',
+      messageDateUTC: '2024-10-23T09:04:04.275Z',
+      messageId: 'cd625728-6a3f-4528-a6f1-546f1f81df26',
       isChecked: true,
-      isOwn: true,
+      senderUid: 'yp7vuU1DFuRnGlwa5m7IGUtV7GJ3',
       userAvatar:
         'https://img.freepik.com/free-photo/futuristic-cat-with-goggles_23-2150969291.jpg?t=st=1723732192~exp=1723735792~hmac=a4a2681fc1de61379eaa4e0c3fa697ded740bab5de9171e7678b25df7276ff80&w=826',
       media: [
@@ -151,9 +156,10 @@ const ChatMessagesSection: FC<ChatMessagesSectionProps> = ({
     {
       messageText:
         'Lorem Ipsum - это текст-"рыбой "рыбой" для текстов на латинице с начала XVI века. оапппп fgswtst аармсмти пофвфаы цйццаа фыафыаафыаыsf ',
-      messageDate: '10:17',
+      messageDateUTC: '2024-10-23T09:05:04.275Z',
+      messageId: '28af7d4a-af65-4640-92be-6873e72e7689',
       isChecked: true,
-      isOwn: true,
+      senderUid: 'yp7vuU1DFuRnGlwa5m7IGUtV7GJ3',
       userAvatar:
         'https://img.freepik.com/premium-photo/there-is-cat-that-is-looking-camera-flowers-generative-ai_1035438-4846.jpg?w=740',
       media: [
@@ -175,9 +181,10 @@ const ChatMessagesSection: FC<ChatMessagesSectionProps> = ({
     {
       messageText:
         'Lorem Ipsum - это текст-"рыбой "рыбой" для текстов на латинице с начала XVI века. оапппп fgswtst аармсмти пофвфаы цйццаа фыафыаафыаыsf ',
-      messageDate: '10:17',
+      messageDateUTC: '2024-10-23T09:06:04.275Z',
+      messageId: 'fecb7b57-3361-4d67-9456-30eec3f1980c',
       isChecked: true,
-      isOwn: true,
+      senderUid: 'yp7vuU1DFuRnGlwa5m7IGUtV7GJ3',
       userAvatar:
         'https://img.freepik.com/premium-photo/there-is-cat-that-is-looking-camera-flowers-generative-ai_1035438-4846.jpg?w=740',
       media: [
@@ -204,9 +211,10 @@ const ChatMessagesSection: FC<ChatMessagesSectionProps> = ({
     {
       messageText:
         'Lorem Ipsum - это текст-"рыбой "рыбой" для текстов на латиницеаы цйццаа фыафыаафыаыsf ',
-      messageDate: '10:17',
+      messageDateUTC: '2024-10-23T09:07:04.275Z',
+      messageId: '93bbffa4-90b0-4a31-8dbd-8fe86f76f08a',
       isChecked: true,
-      isOwn: true,
+      senderUid: 'yp7vuU1DFuRnGlwa5m7IGUtV7GJ3',
       userAvatar:
         'https://img.freepik.com/premium-photo/there-is-cat-that-is-looking-camera-flowers-generative-ai_1035438-4846.jpg?w=740',
       media: [],
@@ -215,9 +223,10 @@ const ChatMessagesSection: FC<ChatMessagesSectionProps> = ({
     {
       messageText:
         'Lorem Ipsum - это текст-"рыба", часто используемый вasffsfasfasfa asf f asf фы ывп укр оа печати и вэб-дизайне. Lorem Ipsum является стандартной "рыбой" для текстов на латинице с начала XVI века. оапппп fgswtst аармсмти пофвфаы цйццаа фыафыаафыаыsf ',
-      messageDate: '10:18',
+      messageDateUTC: '2024-10-23T09:07:04.275Z',
+      messageId: 'd6ec6240-80b9-4317-8ebb-ea2f2d6da78c',
       isChecked: true,
-      isOwn: false,
+      senderUid: 'yp7vuU1DFuRnGlwa5m7IGUtV7GJ6',
       userAvatar:
         'https://img.freepik.com/free-photo/futuristic-cat-with-goggles_23-2150969291.jpg?t=st=1723732192~exp=1723735792~hmac=a4a2681fc1de61379eaa4e0c3fa697ded740bab5de9171e7678b25df7276ff80&w=826',
       media: [],
@@ -225,9 +234,10 @@ const ChatMessagesSection: FC<ChatMessagesSectionProps> = ({
     },
     {
       messageText: '',
-      messageDate: '10:18',
+      messageDateUTC: '2024-10-23T09:07:04.275Z',
+      messageId: '3d3cf30e-1adb-4ed2-b585-866000ef70e3',
       isChecked: false,
-      isOwn: false,
+      senderUid: 'yp7vuU1DFuRnGlwa5m7IGUtV7GJ6',
       userAvatar:
         'https://img.freepik.com/free-photo/futuristic-cat-with-goggles_23-2150969291.jpg?t=st=1723732192~exp=1723735792~hmac=a4a2681fc1de61379eaa4e0c3fa697ded740bab5de9171e7678b25df7276ff80&w=826',
       media: [
@@ -254,9 +264,10 @@ const ChatMessagesSection: FC<ChatMessagesSectionProps> = ({
     },
     {
       messageText: '',
-      messageDate: '10:18',
+      messageDateUTC: '2024-10-23T09:09:04.275Z',
+      messageId: '8df26386-978b-4be7-b484-4fc9d1edd231',
       isChecked: false,
-      isOwn: false,
+      senderUid: 'yp7vuU1DFuRnGlwa5m7IGUtV7GJ6',
       userAvatar:
         'https://img.freepik.com/free-photo/futuristic-cat-with-goggles_23-2150969291.jpg?t=st=1723732192~exp=1723735792~hmac=a4a2681fc1de61379eaa4e0c3fa697ded740bab5de9171e7678b25df7276ff80&w=826',
       media: [
@@ -278,9 +289,10 @@ const ChatMessagesSection: FC<ChatMessagesSectionProps> = ({
     {
       messageText:
         'Lorem Ipsum - это текст-"рыба", часто используемый https://www.npmjs.com/package/linkify-react и https://web.telegram.org/a/',
-      messageDate: '10:18',
+      messageDateUTC: '2024-10-23T09:10:04.275Z',
+      messageId: '8c9480a9-5e6b-4940-bd71-e180a7764329',
       isChecked: true,
-      isOwn: false,
+      senderUid: 'yp7vuU1DFuRnGlwa5m7IGUtV7GJ6',
       userAvatar:
         'https://img.freepik.com/free-photo/futuristic-cat-with-goggles_23-2150969291.jpg?t=st=1723732192~exp=1723735792~hmac=a4a2681fc1de61379eaa4e0c3fa697ded740bab5de9171e7678b25df7276ff80&w=826',
       media: [],
@@ -288,9 +300,10 @@ const ChatMessagesSection: FC<ChatMessagesSectionProps> = ({
     },
     {
       messageText: '',
-      messageDate: '10:18',
+      messageDateUTC: '2024-10-23T09:12:04.275Z',
+      messageId: '6f664af4-6aa8-4f48-b24b-5457ff5fa083',
       isChecked: true,
-      isOwn: false,
+      senderUid: 'yp7vuU1DFuRnGlwa5m7IGUtV7GJ6',
       userAvatar:
         'https://img.freepik.com/free-photo/futuristic-cat-with-goggles_23-2150969291.jpg?t=st=1723732192~exp=1723735792~hmac=a4a2681fc1de61379eaa4e0c3fa697ded740bab5de9171e7678b25df7276ff80&w=826',
       media: [
@@ -302,6 +315,7 @@ const ChatMessagesSection: FC<ChatMessagesSectionProps> = ({
         },
         {
           videoUrl: 'https://i.imgur.com/8yEqycg.mp4',
+          videoPreview: 'https://i.imgur.com/8yEqycg.mp4',
           isHorizontal: false,
           isSquare: false,
         },
@@ -310,9 +324,10 @@ const ChatMessagesSection: FC<ChatMessagesSectionProps> = ({
     },
     {
       messageText: '',
-      messageDate: '10:18',
+      messageDateUTC: '2024-10-23T09:13:04.275Z',
+      messageId: '66354598-bba7-4ae7-9940-9aba88f93cac',
       isChecked: true,
-      isOwn: false,
+      senderUid: 'yp7vuU1DFuRnGlwa5m7IGUtV7GJ6',
       userAvatar:
         'https://img.freepik.com/free-photo/futuristic-cat-with-goggles_23-2150969291.jpg?t=st=1723732192~exp=1723735792~hmac=a4a2681fc1de61379eaa4e0c3fa697ded740bab5de9171e7678b25df7276ff80&w=826',
       media: [
@@ -324,20 +339,24 @@ const ChatMessagesSection: FC<ChatMessagesSectionProps> = ({
         },
       ],
       files: [
-        { fileUrl: 'https://i.imgur.com/8yEqycg.mp4', fileName: 'file.txt' },
+        {
+          fileUrl: 'https://i.imgur.com/8yEqycg.mp4',
+          fileName: 'file.txt',
+        },
       ],
     },
     {
       messageText: '',
-      messageDate: '10:18',
+      messageDateUTC: '2024-10-23T10:01:04.275Z',
+      messageId: '909e395c-6ac2-4900-a56a-b2766609cc60',
       isChecked: true,
-      isOwn: false,
+      senderUid: 'yp7vuU1DFuRnGlwa5m7IGUtV7GJ6',
       userAvatar:
         'https://img.freepik.com/free-photo/futuristic-cat-with-goggles_23-2150969291.jpg?t=st=1723732192~exp=1723735792~hmac=a4a2681fc1de61379eaa4e0c3fa697ded740bab5de9171e7678b25df7276ff80&w=826',
       media: [
         {
           videoUrl: 'https://i.imgur.com/v5DeFBo.mp4',
-          preview: 'here',
+          videoPreview: 'https://i.imgur.com/v5DeFBo.mp4',
           isHorizontal: true,
           isSquare: false,
         },
@@ -352,9 +371,10 @@ const ChatMessagesSection: FC<ChatMessagesSectionProps> = ({
     },
     {
       messageText: '',
-      messageDate: '10:18',
+      messageDateUTC: '2024-10-23T10:03:04.275Z',
+      messageId: '9ec08cd0-7be2-488d-8bfd-a5a0b6d165e0',
       isChecked: true,
-      isOwn: false,
+      senderUid: 'yp7vuU1DFuRnGlwa5m7IGUtV7GJ6',
       userAvatar:
         'https://img.freepik.com/free-photo/futuristic-cat-with-goggles_23-2150969291.jpg?t=st=1723732192~exp=1723735792~hmac=a4a2681fc1de61379eaa4e0c3fa697ded740bab5de9171e7678b25df7276ff80&w=826',
       media: [],
@@ -399,11 +419,13 @@ const ChatMessagesSection: FC<ChatMessagesSectionProps> = ({
                   messageData={messageData}
                   isLastOfGroup={
                     index === devMessagesArray.length - 1 ||
-                    messageData.isOwn !== devMessagesArray[index + 1]?.isOwn
+                    messageData.senderUid !==
+                      devMessagesArray[index + 1]?.senderUid
                   }
                   isFirstOfGroup={
                     index === 0 ||
-                    messageData.isOwn !== devMessagesArray[index - 1]?.isOwn
+                    messageData.senderUid !==
+                      devMessagesArray[index - 1]?.senderUid
                   }
                 />
               );

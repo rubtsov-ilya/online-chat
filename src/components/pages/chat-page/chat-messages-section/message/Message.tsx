@@ -6,17 +6,29 @@ import Linkify from 'linkify-react';
 import MessageMediaItem from '../message-media-item/MessageMediaItem';
 import MessageFileItem from '../message-file-item/MessageFileItem';
 import CheckedAndTimeStatuses from 'src/components/ui/checked-and-time-statuses/CheckedAndTimeStatuses';
+import { IMessage } from 'src/interfaces/Message.interface';
+import useAuth from 'src/hooks/useAuth';
 
-/* interface MessageProps {} */
+interface MessageProps {
+  messageData: IMessage;
+  isLastOfGroup: boolean;
+  isFirstOfGroup: boolean;
+}
 
-const Message: FC = ({ messageData, isLastOfGroup, isFirstOfGroup }) => {
+const Message: FC<MessageProps> = ({
+  messageData,
+  isLastOfGroup,
+  isFirstOfGroup,
+}) => {
+  const { uid } = useAuth();
+
   return (
     <div className={styles['message']}>
-      {isLastOfGroup && !messageData.isOwn && (
+      {isLastOfGroup && uid && messageData.senderUid != uid && (
         <AvatarImage AvatarImg={messageData.userAvatar} isLittle={true} />
       )}
       <div
-        className={`${styles['message__wrapper']} ${messageData.isOwn ? styles['own'] : ''} ${isLastOfGroup ? `${styles['border']} ${styles['margin-left']}` : ''} ${isFirstOfGroup ? styles['margin-top'] : ''}`}
+        className={`${styles['message__wrapper']} ${messageData.senderUid === uid ? styles['own'] : ''} ${isLastOfGroup ? `${styles['border']} ${styles['margin-left']}` : ''} ${isFirstOfGroup ? styles['margin-top'] : ''}`}
       >
         {messageData.media.length > 0 && (
           <div className={styles['message__album']}>
@@ -154,9 +166,9 @@ const Message: FC = ({ messageData, isLastOfGroup, isFirstOfGroup }) => {
                 <div className={styles['message__image-info-wrapper']}>
                   <CheckedAndTimeStatuses
                     isChecked={messageData.isChecked}
-                    time={messageData.messageDate}
+                    time={messageData.messageDateUTC}
                     isForImage={true}
-                    isOwn={messageData.isOwn}
+                    isOwn={messageData.senderUid === uid}
                   />
                 </div>
               )}
@@ -176,8 +188,8 @@ const Message: FC = ({ messageData, isLastOfGroup, isFirstOfGroup }) => {
                   messageData.files.length - 1 === index
                 }
                 isCheckedStatus={messageData.isChecked}
-                timeStatus={messageData.messageDate}
-                isMessageOwn={messageData.isOwn}
+                timeStatus={messageData.messageDateUTC}
+                isMessageOwn={messageData.senderUid === uid}
               />
             ))}
           </div>
@@ -192,8 +204,8 @@ const Message: FC = ({ messageData, isLastOfGroup, isFirstOfGroup }) => {
                 <div className={styles['message__text-info-wrapper']}>
                   <CheckedAndTimeStatuses
                     isChecked={messageData.isChecked}
-                    time={messageData.messageDate}
-                    isOwn={messageData.isOwn}
+                    time={messageData.messageDateUTC}
+                    isOwn={messageData.senderUid === uid}
                   />
                 </div>
               </div>
