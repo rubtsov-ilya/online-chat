@@ -13,7 +13,7 @@ import storage from 'redux-persist/lib/storage';
 
 import { shopApi } from './shopApi';
 import userReducer from './slices/UserSlice';
-import loadingMessagesReducer from './slices/LoadingMessagesSlice';
+import messagesArrayReducer from './slices/MessagesArraySlice';
 
 const persistConfig = {
   key: 'root',
@@ -24,7 +24,7 @@ const persistConfig = {
 const rootReduser = combineReducers({
   [shopApi.reducerPath]: shopApi.reducer,
   user: userReducer,
-  loadingMessages: loadingMessagesReducer,
+  messagesArray: messagesArrayReducer,
 });
 
 const persistedReducer = persistReducer(persistConfig, rootReduser);

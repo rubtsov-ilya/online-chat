@@ -1,9 +1,9 @@
 import { FC, useLayoutEffect, useRef } from 'react';
 
+import useGetMessagesFromRtk from 'src/hooks/useGetMessagesFromRtk';
 import styles from './ChatMessagesSection.module.scss';
 import Message from './message/Message';
 import ToBottomBtn from 'src/components/ui/to-bottom-btn/ToBottomBtn';
-import useGetLoadingMessages from 'src/hooks/useGetLoadingMessages';
 
 interface ChatMessagesSectionProps {
   isMobileScreen?: boolean;
@@ -16,8 +16,8 @@ const ChatMessagesSection: FC<ChatMessagesSectionProps> = ({
   /* const [messagesArray, setMessagesArray] = useState([]); */
   const endRef = useRef<HTMLDivElement>(null);
   const chatMessagesRef = useRef<HTMLDivElement>(null);
-  const { loadingMessagesArray } = useGetLoadingMessages();
-  console.log(loadingMessagesArray);
+  const { messagesArray } = useGetMessagesFromRtk();
+  console.log(messagesArray);
 
   const devMessagesArray = [
     {

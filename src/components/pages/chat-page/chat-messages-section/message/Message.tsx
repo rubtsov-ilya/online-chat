@@ -23,7 +23,7 @@ const Message: FC<MessageProps> = ({
   const { uid } = useAuth();
 
   return (
-    <div className={styles['message']}>
+    <div className={styles['message']} id={messageData.messageId}>
       {isLastOfGroup && uid && messageData.senderUid != uid && (
         <AvatarImage AvatarImg={messageData.userAvatar} isLittle={true} />
       )}

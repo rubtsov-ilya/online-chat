@@ -9,13 +9,13 @@ import { getDownloadURL, ref, uploadBytesResumable } from 'firebase/storage';
 import { firebaseStorage } from 'src/firebase';
 
 import { v4 as uuidv4 } from 'uuid';
-import { addLoadingMessage } from 'src/redux/slices/LoadingMessagesSlice';
 import { useDispatch } from 'react-redux';
 import {
   IFile,
   IImgMedia,
   IVideoMedia,
 } from 'src/interfaces/Message.interface';
+import { addLoadingMessage } from 'src/redux/slices/MessagesArraySlice';
 
 interface MessageInputWrapperProps {
   isMobileScreen: boolean;
