@@ -4,6 +4,7 @@ import ModalGallery from 'src/components/ui/modal-gallery/ModalGallery';
 import useBodyLock from 'src/hooks/useBodyLock';
 import PlaySvg from 'src/assets/images/icons/misc/Play.svg?react';
 import { IMessage } from 'src/interfaces/Message.interface';
+import CircularLoadingProgressbar from 'src/components/ui/circular-loading-progressbar/CircularLoadingProgressbar';
 
 interface MessageMediaItemProps {
   width: '100%' | '50%' | '33.33%' | '66.66%';
@@ -44,13 +45,16 @@ const MessageMediaItem: FC<MessageMediaItemProps> = ({
   return (
     <div style={{ width }} className={styles['media-item-wrapper']}>
       {imgUrl && (
-        <img
-          loading="lazy"
-          onClick={onItemClick}
-          src={imgUrl}
-          alt=""
-          className={styles['media-item']}
-        />
+        <>
+          <img
+            loading="lazy"
+            onClick={onItemClick}
+            src={imgUrl}
+            alt=""
+            className={styles['media-item']}
+          />
+          <CircularLoadingProgressbar />
+        </>
       )}
       {videoUrl && (
         <>
@@ -63,9 +67,11 @@ const MessageMediaItem: FC<MessageMediaItemProps> = ({
             <source src={videoUrl} type="video/webm" />
             <source src={videoUrl} type="video/ogg" />
           </video>
-          <div className={styles['media-item__play-icon-wrapper']}>
-            <PlaySvg className={styles['media-item__play-icon']} />
-          </div>
+          {!progress && (
+            <div className={styles['media-item__play-icon-wrapper']}>
+              <PlaySvg className={styles['media-item__play-icon']} />
+            </div>
+          )}
         </>
       )}
       {messageData.media.length > 0 && isModalOpen && (

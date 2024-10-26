@@ -1,0 +1,31 @@
+@import 'src/assets/css/_mixins.scss';
+
+.circular-progressbar-wrapper {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 55px;
+  height: 55px;
+  padding: 3px;
+  border-radius: 9999px;
+  background-color: var(--light-overlay-dark);
+  animation: rotate 3s linear infinite; /* Время анимации и бесконечный цикл */
+  @include phone {
+    width: 45px;
+    height: 45px;
+  }
+}
+
+@keyframes rotate {
+  0% {
+    transform: translate(-50%, -50%) rotate(0deg);
+  }
+  100% {
+    transform: translate(-50%, -50%) rotate(360deg);
+  }
+}
+
