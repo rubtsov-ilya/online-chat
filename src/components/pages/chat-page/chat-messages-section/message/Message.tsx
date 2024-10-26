@@ -9,19 +9,46 @@ import CheckedAndTimeStatuses from 'src/components/ui/checked-and-time-statuses/
 import { IMessage } from 'src/interfaces/Message.interface';
 import useAuth from 'src/hooks/useAuth';
 import { ILoadingMessage } from 'src/interfaces/LoadingMessage.interface';
+import {
+  IUploadTaskWithRef,
+  IUploadTasksRef,
+} from 'src/interfaces/UploadTasks.interface';
+import { deleteObject } from 'firebase/storage';
 
 interface MessageProps {
   messageData: IMessage | ILoadingMessage;
   isLastOfGroup: boolean;
   isFirstOfGroup: boolean;
+  uploadTasksRef: React.MutableRefObject<IUploadTasksRef>;
 }
 
 const Message: FC<MessageProps> = ({
   messageData,
   isLastOfGroup,
   isFirstOfGroup,
+  uploadTasksRef,
 }) => {
   const { uid } = useAuth();
+
+  const cancelUploadsForMessage = (messageId: string) => {
+    if (uploadTasksRef.current[messageId]) {
+      /* Отмена загрузки каждого файла */
+      Object.values(uploadTasksRef.current[messageId]).forEach(
+        ({ task, fileRef }: IUploadTaskWithRef) => {
+          /* отмена загрузки в Firebase storage */
+          task.cancel();
+          /* Удаление файлов загруженных из Firebase Storage при прерывании загрузки */
+          deleteObject(fileRef)
+            .then(() => {})
+            .catch((error) => {
+              console.error('Ошибка при удалении файла: ', error);
+            });
+        },
+      );
+      /* Удаление рефов загрузки для данного сообщения */
+      delete uploadTasksRef.current[messageId];
+    }
+  };
 
   return (
     <div className={styles['message']} id={messageData.messageId}>
@@ -31,6 +58,9 @@ const Message: FC<MessageProps> = ({
       <div
         className={`${styles['message__wrapper']} ${messageData.senderUid === uid ? styles['own'] : ''} ${isLastOfGroup ? `${styles['border']} ${styles['margin-left']}` : ''} ${isFirstOfGroup ? styles['margin-top'] : ''}`}
       >
+        <button onClick={() => cancelUploadsForMessage(messageData.messageId)}>
+          xxxx
+        </button>
         {messageData.media.length > 0 && (
           <div className={styles['message__album']}>
             {messageData?.media.map(

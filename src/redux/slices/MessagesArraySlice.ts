@@ -18,10 +18,19 @@ const messagesArraySlice = createSlice({
   },
   reducers: {
     addInitialMessagesArray(state, action: PayloadAction<IMessage[]>) {
-      state.messagesArray = action.payload;
+      state.messagesArray = action.payload.map((item) => ({
+        ...item,
+        messageDateUTC: `${new Date(item.messageDateUTC)}`,
+      }));
     },
     addLoadingMessage(state, action: PayloadAction<ILoadingMessage>) {
-      state.messagesArray = [...state.messagesArray, action.payload];
+      state.messagesArray = [
+        ...state.messagesArray,
+        {
+          ...action.payload,
+          messageDateUTC: `${new Date(action.payload.messageDateUTC)}`,
+        },
+      ];
     },
     removeLoadingMessage(state, action) {
       state.messagesArray = state.messagesArray.filter(

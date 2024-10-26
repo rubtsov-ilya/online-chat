@@ -7,13 +7,16 @@ import ToBottomBtn from 'src/components/ui/to-bottom-btn/ToBottomBtn';
 import { addInitialMessagesArray } from 'src/redux/slices/MessagesArraySlice';
 import { useDispatch } from 'react-redux';
 import { IMessage } from 'src/interfaces/Message.interface';
+import { IUploadTasksRef } from 'src/interfaces/UploadTasks.interface';
 
 interface ChatMessagesSectionProps {
   isMobileScreen?: boolean;
+  uploadTasksRef: React.MutableRefObject<IUploadTasksRef>;
 }
 
 const ChatMessagesSection: FC<ChatMessagesSectionProps> = ({
   isMobileScreen,
+  uploadTasksRef,
 }) => {
   const ComponentTag = isMobileScreen ? 'section' : 'div';
   /* const [messagesArray, setMessagesArray] = useState([]); */
@@ -330,12 +333,14 @@ const ChatMessagesSection: FC<ChatMessagesSectionProps> = ({
             'https://img.freepik.com/free-photo/beautiful-kitten-with-colorful-clouds_23-2150752964.jpg?size=626&ext=jpg&ga=GA1.1.2008272138.1723680000&semt=ais_hybrid',
           isHorizontal: false,
           isSquare: false,
+          progress: 50,
         },
         {
           videoUrl: 'https://i.imgur.com/8yEqycg.mp4',
           videoPreview: 'https://i.imgur.com/8yEqycg.mp4',
           isHorizontal: false,
           isSquare: false,
+          progress: 50,
         },
       ],
       files: [],
@@ -355,12 +360,14 @@ const ChatMessagesSection: FC<ChatMessagesSectionProps> = ({
             'https://img.freepik.com/free-photo/cute-kitten-playing-in-autumn-forest-surrounded-by-colorful-leaves-generated-by-artificial-intelligence_25030-63162.jpg?w=1380&t=st=1723726321~exp=1723726921~hmac=cdf9e98345c44adc4544d5e0a7ef3ed68e10491a00cb165f3955d9cc85099382',
           isHorizontal: true,
           isSquare: false,
+          progress: 50,
         },
       ],
       files: [
         {
           fileUrl: 'https://i.imgur.com/8yEqycg.mp4',
           fileName: 'file.txt',
+          progress: 50,
         },
       ],
     },
@@ -379,12 +386,14 @@ const ChatMessagesSection: FC<ChatMessagesSectionProps> = ({
           videoPreview: 'https://i.imgur.com/v5DeFBo.mp4',
           isHorizontal: true,
           isSquare: false,
+          progress: 50,
         },
         {
           imgUrl:
             'https://img.freepik.com/free-photo/cute-kitten-playing-in-autumn-forest-surrounded-by-colorful-leaves-generated-by-artificial-intelligence_25030-63162.jpg?w=1380&t=st=1723726321~exp=1723726921~hmac=cdf9e98345c44adc4544d5e0a7ef3ed68e10491a00cb165f3955d9cc85099382',
           isHorizontal: true,
           isSquare: false,
+          progress: 50,
         },
       ],
       files: [],
@@ -407,6 +416,7 @@ const ChatMessagesSection: FC<ChatMessagesSectionProps> = ({
         {
           fileUrl: 'https://i.imgur.com/8yEqycg.mp4',
           fileName: 'ASDASDSFASFASFASFASF.docx',
+          progress: 50,
         },
       ],
     },
@@ -448,6 +458,7 @@ const ChatMessagesSection: FC<ChatMessagesSectionProps> = ({
               return (
                 <Message
                   key={index}
+                  uploadTasksRef={uploadTasksRef}
                   messageData={messageData}
                   isLastOfGroup={
                     index === messagesArray.length - 1 ||

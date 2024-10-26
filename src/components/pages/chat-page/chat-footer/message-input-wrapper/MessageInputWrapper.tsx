@@ -26,17 +26,20 @@ import {
   ILoadingMessage,
   ILoadingVideoMedia,
 } from 'src/interfaces/LoadingMessage.interface';
+import { IUploadTasksRef } from 'src/interfaces/UploadTasks.interface';
 
 interface MessageInputWrapperProps {
   isMobileScreen: boolean;
   setAttachedItems: React.Dispatch<React.SetStateAction<AttachedItemType[]>>;
   attachedItems: AttachedItemType[];
+  uploadTasksRef: React.MutableRefObject<IUploadTasksRef>;
 }
 
 const MessageInputWrapper: FC<MessageInputWrapperProps> = ({
   isMobileScreen,
   setAttachedItems,
   attachedItems,
+  uploadTasksRef,
 }) => {
   const [messageContent, setMessageContent] = useState<string>('');
   const { uid } = useAuth();
@@ -54,6 +57,15 @@ const MessageInputWrapper: FC<MessageInputWrapperProps> = ({
       `users_uploads/${'name' in file ? `${uuidv4()}_${file.name}` : `preview_${uuidv4()}_${fileName}`}`,
     );
     const uploadTask = uploadBytesResumable(storageRef, file);
+
+    /* сохранение задачи и референса к файлу */
+    if (!uploadTasksRef.current[messageId]) {
+      uploadTasksRef.current[messageId] = {};
+    }
+    uploadTasksRef.current[messageId][loadingId] = {
+      task: uploadTask,
+      fileRef: storageRef,
+    };
 
     return new Promise((resolve, reject) => {
       uploadTask.on(
@@ -103,6 +115,8 @@ const MessageInputWrapper: FC<MessageInputWrapperProps> = ({
     if (!uid) {
       return;
     }
+
+    delete uploadTasksRef.current[messageWithLocaleUrl.messageId];
 
     const filesAndMediaArray = [
       ...messageWithLocaleUrl.media,
@@ -207,6 +221,17 @@ const MessageInputWrapper: FC<MessageInputWrapperProps> = ({
             }),
           )
         : [];
+    return {
+      ...messageWithLocaleUrl,
+      isLoading: false,
+      media: newFilesAndMediaArray.filter((item) => !('fileUrl' in item)) as (
+        | IImgMedia
+        | IVideoMedia
+      )[],
+      files: newFilesAndMediaArray.filter(
+        (item) => 'fileUrl' in item,
+      ) as IFile[],
+    };
   };
 
   const createMessageObjectWithLocaleUrl =
@@ -230,11 +255,6 @@ const MessageInputWrapper: FC<MessageInputWrapperProps> = ({
                     img.width > img.height || img.width === img.height;
                   const isSquare = img.width === img.height;
 
-                  /* const firebaseStorageDownloadUrl =
-                  (await firebaseStorageFileUpload(
-                    attachedItem.fileObject,
-                  )) as string; */
-
                   return {
                     imgUrl: attachedItem.imgUrl,
                     isHorizontal,
@@ -256,51 +276,6 @@ const MessageInputWrapper: FC<MessageInputWrapperProps> = ({
                     video.videoWidth === video.videoHeight;
                   const isSquare = video.videoWidth === video.videoHeight;
 
-                  // создание canvas для работы с превью
-                  /* const canvas = document.createElement('canvas');
-                const ctx = canvas.getContext('2d');
-                canvas.width = video.videoWidth;
-                canvas.height = video.videoHeight;
-
-                // ожидание загрузки видео до первого кадра
-                await new Promise((resolve, reject) => {
-                  video.currentTime = 0;
-                  video.onseeked = () => {
-                    resolve(null);
-                  };
-                  video.onerror = (err) => {
-                    reject(err);
-                  };
-                });
-
-                // отрисовка первого кадра в canvas
-
-                if (!ctx) {
-                  throw new Error('2D context не был создан');
-                }
-
-                ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-
-                // Создание превью через canvas
-                const videoPreview: Blob = await new Promise((resolve) => {
-                  canvas.toBlob((blob) => {
-                    if (blob) {
-                      resolve(blob);
-                    }
-                  }, 'image/png'); // указать нужный формат, здесь '.png'
-                });
-
-                const firebaseStorageDownloadUrl =
-                  (await firebaseStorageFileUpload(
-                    attachedItem.fileObject,
-                  )) as string;
-
-                const firebaseStorageDownloadUrlPreview =
-                  (await firebaseStorageFileUpload(
-                    videoPreview,
-                    attachedItem.name, //передача имени, т.к. сам блоб не имеем названия
-                  )) as string; */
-
                   return {
                     videoUrl: attachedItem.videoUrl,
                     isHorizontal,
@@ -313,10 +288,7 @@ const MessageInputWrapper: FC<MessageInputWrapperProps> = ({
                     loadingId: uuidv4(),
                   };
                 } else {
-                  /* const firebaseStorageDownloadUrl =
-                  (await firebaseStorageFileUpload(
-                    attachedItem.fileObject,
-                  )) as string; */
+                  /* файлы */
                   return {
                     fileUrl: '',
                     fileName: attachedItem.name,
@@ -330,10 +302,10 @@ const MessageInputWrapper: FC<MessageInputWrapperProps> = ({
           : [];
       return {
         messageText: messageContent,
-        messageDateUTC: '',
+        messageDateUTC: new Date().toISOString(),
         messageId: uuidv4(),
         isChecked: false,
-        senderUid: uid!, // определять isOwn сообщение или !isOvwn
+        senderUid: uid!,
         userAvatar:
           'получать из database и ставить сразу в user редакса в useAuth и тд',
         isLoading: true,
@@ -360,15 +332,8 @@ const MessageInputWrapper: FC<MessageInputWrapperProps> = ({
       const messageWithFirebaseUrls = await createMessageObjectWithFirebaseUrl(
         messageWithLocaleUrls,
       );
+      console.log(messageWithFirebaseUrls);
     }
-
-    /* добавление даты в UTC +0 только после загрузки всех файлов в firebase (прямо перед отправкой в фаербейз), чтобы не было отстования даты после отправки */
-    /* ещё зависит от того, выдатс ли ошибку фаербейз при отпадании интернета или нет, если нет, то он потом отправит задним числом, тогда дату придётся серверной функцией добавлять */
-    /* messageWithFirebaseUrls.messageDateUTC = new Date().toISOString(); */
-
-    /* поставить состояние загрузки false */
-
-    /* messageWithFirebaseUrls.isLoading = false; */
   };
 
   return (
@@ -399,7 +364,6 @@ const MessageInputWrapper: FC<MessageInputWrapperProps> = ({
           }
         />
       </button>
-      {/* {first && <img src={first} alt="" />} */}
     </div>
   );
 };
