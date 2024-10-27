@@ -13,19 +13,23 @@
   padding: 3px;
   border-radius: 9999px;
   background-color: var(--light-overlay-dark);
-  animation: rotate 3s linear infinite; /* Время анимации и бесконечный цикл */
+  
   @include phone {
     width: 45px;
     height: 45px;
   }
 }
 
+.circular-progressbar {
+  animation: rotate 3s linear infinite; /* Время анимации и бесконечный цикл */
+}
+
 @keyframes rotate {
   0% {
-    transform: translate(-50%, -50%) rotate(0deg);
+    transform: rotate(0deg);
   }
   100% {
-    transform: translate(-50%, -50%) rotate(360deg);
+    transform: rotate(360deg);
   }
 }
 

@@ -1,14 +1,20 @@
+import { FC } from 'react';
 import styles from './CircularLoadingProgressbar.module.scss';
 import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
 import 'react-circular-progressbar/dist/styles.css';
 
-const CircularLoadingProgressbar = () => {
-  const percentage = 56;
+interface CircularLoadingProgressbarProps {
+  progress: number;
+}
+
+const CircularLoadingProgressbar: FC<CircularLoadingProgressbarProps> = ({
+  progress,
+}) => {
   return (
     <div className={styles['circular-progressbar-wrapper']}>
       <CircularProgressbar
         className={styles['circular-progressbar']}
-        value={percentage}
+        value={progress === 0 ? 1 : progress}
         styles={buildStyles({
           // Rotation of path and trail, in number of turns (0-1)
           /* rotation: 0.25, */

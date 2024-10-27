@@ -1,4 +1,4 @@
-import { FC, useLayoutEffect, useRef, useState } from 'react';
+import { FC, useEffect, useLayoutEffect, useRef, useState } from 'react';
 
 import useGetMessagesFromRtk from 'src/hooks/useGetMessagesFromRtk';
 import styles from './ChatMessagesSection.module.scss';
@@ -8,6 +8,7 @@ import { addInitialMessagesArray } from 'src/redux/slices/MessagesArraySlice';
 import { useDispatch } from 'react-redux';
 import { IMessage } from 'src/interfaces/Message.interface';
 import { IUploadTasksRef } from 'src/interfaces/UploadTasks.interface';
+import useAuth from 'src/hooks/useAuth';
 
 interface ChatMessagesSectionProps {
   isMobileScreen?: boolean;
@@ -20,6 +21,7 @@ const ChatMessagesSection: FC<ChatMessagesSectionProps> = ({
 }) => {
   const ComponentTag = isMobileScreen ? 'section' : 'div';
   /* const [messagesArray, setMessagesArray] = useState([]); */
+  const { uid } = useAuth();
   const endRef = useRef<HTMLDivElement>(null);
   const chatMessagesRef = useRef<HTMLDivElement>(null);
   const [doScroll, setDoScroll] = useState<boolean>(false);
@@ -220,6 +222,7 @@ const ChatMessagesSection: FC<ChatMessagesSectionProps> = ({
         {
           fileUrl: 'https://i.imgur.com/8yEqycg.mp4',
           fileName: 'Anton-1337.pdf',
+          fileSize: 1000,
         },
       ],
     },
@@ -337,7 +340,8 @@ const ChatMessagesSection: FC<ChatMessagesSectionProps> = ({
         },
         {
           videoUrl: 'https://i.imgur.com/8yEqycg.mp4',
-          videoPreview: 'https://i.imgur.com/8yEqycg.mp4',
+          videoPreview:
+            'https://img.freepik.com/free-photo/cute-kitten-playing-in-autumn-forest-surrounded-by-colorful-leaves-generated-by-artificial-intelligence_25030-63162.jpg?w=1380&t=st=1723726321~exp=1723726921~hmac=cdf9e98345c44adc4544d5e0a7ef3ed68e10491a00cb165f3955d9cc85099382',
           isHorizontal: false,
           isSquare: false,
           progress: 50,
@@ -368,6 +372,7 @@ const ChatMessagesSection: FC<ChatMessagesSectionProps> = ({
           fileUrl: 'https://i.imgur.com/8yEqycg.mp4',
           fileName: 'file.txt',
           progress: 50,
+          fileSize: 1201,
         },
       ],
     },
@@ -383,17 +388,18 @@ const ChatMessagesSection: FC<ChatMessagesSectionProps> = ({
       media: [
         {
           videoUrl: 'https://i.imgur.com/v5DeFBo.mp4',
-          videoPreview: 'https://i.imgur.com/v5DeFBo.mp4',
+          videoPreview: '',
           isHorizontal: true,
           isSquare: false,
-          progress: 50,
+          progress: 10,
+          progressPreview: 100,
         },
         {
           imgUrl:
             'https://img.freepik.com/free-photo/cute-kitten-playing-in-autumn-forest-surrounded-by-colorful-leaves-generated-by-artificial-intelligence_25030-63162.jpg?w=1380&t=st=1723726321~exp=1723726921~hmac=cdf9e98345c44adc4544d5e0a7ef3ed68e10491a00cb165f3955d9cc85099382',
           isHorizontal: true,
           isSquare: false,
-          progress: 50,
+          progress: 0,
         },
       ],
       files: [],
@@ -412,11 +418,13 @@ const ChatMessagesSection: FC<ChatMessagesSectionProps> = ({
         {
           fileUrl: 'https://i.imgur.com/8yEqycg.mp4',
           fileName: 'Anton-1337.pdf',
+          fileSize: 130,
         },
         {
           fileUrl: 'https://i.imgur.com/8yEqycg.mp4',
-          fileName: 'ASDASDSFASFASFASFASF.docx',
+          fileName: 'ASDASDSFASFASFAS2112512asf5125125125125FASF.docx',
           progress: 50,
+          fileSize: 10301,
         },
       ],
     },
@@ -436,6 +444,32 @@ const ChatMessagesSection: FC<ChatMessagesSectionProps> = ({
     endRef.current?.scrollIntoView({ behavior: 'auto' });
     return () => {};
   }, [doScroll]);
+
+  const scrollToBottom = () => {
+    if (chatMessagesRef.current) {
+      const chatMessagesCurrent = chatMessagesRef.current;
+      const animationLength = 80;
+      const scrollCoefficient = 2.8;
+      const { scrollTop, clientHeight, scrollHeight } = chatMessagesCurrent;
+      if (scrollHeight - scrollTop > clientHeight * scrollCoefficient) {
+        const scrollPosition = scrollHeight - clientHeight - animationLength;
+        chatMessagesCurrent.scrollTo({ top: scrollPosition, behavior: 'auto' });
+        endRef.current?.scrollIntoView({ behavior: 'smooth' });
+      } else {
+        endRef.current?.scrollIntoView({ behavior: 'smooth' });
+      }
+    }
+  };
+
+  useEffect(() => {
+    /* прокрутка секции вниз при отправке смс со стороны пользователя */
+    if (messagesArray.length > 0) {
+      if (messagesArray[messagesArray.length - 1].senderUid === uid) {
+        scrollToBottom();
+      }
+    }
+    return () => {};
+  }, [messagesArray.length]);
 
   return (
     <ComponentTag
@@ -458,6 +492,7 @@ const ChatMessagesSection: FC<ChatMessagesSectionProps> = ({
               return (
                 <Message
                   key={index}
+                  uid={uid}
                   uploadTasksRef={uploadTasksRef}
                   messageData={messageData}
                   isLastOfGroup={
@@ -479,7 +514,10 @@ const ChatMessagesSection: FC<ChatMessagesSectionProps> = ({
             </span>
           )}
           <div className={styles['chat-messages__overlay-to-bottom-btn']}>
-            <ToBottomBtn chatMessagesRef={chatMessagesRef} endRef={endRef} />
+            <ToBottomBtn
+              scrollToBottom={scrollToBottom}
+              chatMessagesRef={chatMessagesRef}
+            />
           </div>
         </div>
         <div ref={endRef}></div>

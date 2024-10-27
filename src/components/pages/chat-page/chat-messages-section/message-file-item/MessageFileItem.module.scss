@@ -2,6 +2,7 @@
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
+  gap: 4px;
   min-width: 248px;
   height: 56px;
   padding: 8px;
@@ -35,6 +36,7 @@
     color: var(--base-black);
     overflow: hidden;
     text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
   &__size {
@@ -42,6 +44,7 @@
     font-weight: 400;
     font-size: 12px;
     color: var(--base-grey);
+    white-space: nowrap;
   }
 
   &__right-wrapper {

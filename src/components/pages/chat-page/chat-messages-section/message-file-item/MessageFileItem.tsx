@@ -7,6 +7,7 @@ import CheckedAndTimeStatuses from 'src/components/ui/checked-and-time-statuses/
 interface MessageFileItemProps {
   fileUrl: string;
   fileName: string;
+  fileSize: number;
   isStatusesVisible?: boolean;
   isCheckedStatus?: boolean;
   timeStatus?: string;
@@ -16,6 +17,7 @@ interface MessageFileItemProps {
 const MessageFileItem: FC<MessageFileItemProps> = ({
   fileUrl,
   fileName,
+  fileSize,
   isStatusesVisible,
   timeStatus,
   isCheckedStatus,
@@ -27,13 +29,19 @@ const MessageFileItem: FC<MessageFileItemProps> = ({
         <FileSvg className={styles['file-item__file-icon']} />
         <div className={styles['file-item__info-wrapper']}>
           <span className={styles['file-item__name']}>{fileName}</span>
-          <span className={styles['file-item__size']}>{`${'123'} KB`}</span>
+          <span className={styles['file-item__size']}>{`${fileSize} KB`}</span>
         </div>
       </div>
       <div className={styles['file-item__right-wrapper']}>
-        <button className={styles['file-item__download-btn']}>
+        <a
+          href={fileUrl}
+          aria-label="Download"
+          download
+          rel="noreferrer"
+          className={styles['file-item__download-btn']}
+        >
           <DownloadSvg className={styles['file-item__download-icon']} />
-        </button>
+        </a>
         {isStatusesVisible && isCheckedStatus && timeStatus && (
           <CheckedAndTimeStatuses
             isChecked={isCheckedStatus}

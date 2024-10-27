@@ -216,6 +216,7 @@ const MessageInputWrapper: FC<MessageInputWrapperProps> = ({
                 return {
                   fileUrl: firebaseStorageDownloadUrl,
                   fileName: fileOrMediaItem.fileName,
+                  fileSize: fileOrMediaItem.fileSize,
                 };
               }
             }),
@@ -234,104 +235,115 @@ const MessageInputWrapper: FC<MessageInputWrapperProps> = ({
     };
   };
 
-  const createMessageObjectWithLocaleUrl =
-    async (/* messageContent, attachedItems */) => {
-      /* создание полноценного массива объектов загруженных с устройства  */
-      const newAttachedItems: (
+  const createMessageObjectWithLocaleUrl = async (
+    messageContentLocale: string,
+    attachedItemsLocale: AttachedItemType[],
+  ) => {
+    /* создание полноценного массива объектов загруженных с устройства  */
+    const newAttachedItems: (
+      | ILoadingImgMedia
+      | ILoadingVideoMedia
+      | ILoadingFile
+    )[] =
+      attachedItemsLocale.length > 0
+        ? await Promise.all(
+            attachedItemsLocale.map(async (attachedItem) => {
+              if ('imgUrl' in attachedItem) {
+                const img = new Image();
+                img.src = attachedItem.imgUrl;
+                await new Promise((resolve) => {
+                  img.onload = resolve;
+                });
+                const isHorizontal =
+                  img.width > img.height || img.width === img.height;
+                const isSquare = img.width === img.height;
+
+                return {
+                  imgUrl: attachedItem.imgUrl,
+                  isHorizontal,
+                  isSquare,
+                  fileObject: attachedItem.fileObject,
+                  progress: 0,
+                  loadingId: uuidv4(),
+                };
+              } else if ('videoUrl' in attachedItem) {
+                const video = document.createElement('video');
+                video.src = attachedItem.videoUrl;
+                await new Promise((resolve) => {
+                  video.onloadedmetadata = resolve;
+                });
+
+                // измерение горизонтальности и квадратности
+                const isHorizontal =
+                  video.videoWidth > video.videoHeight ||
+                  video.videoWidth === video.videoHeight;
+                const isSquare = video.videoWidth === video.videoHeight;
+
+                return {
+                  videoUrl: attachedItem.videoUrl,
+                  isHorizontal,
+                  isSquare,
+                  videoPreview: '',
+                  videoName: attachedItem.name,
+                  fileObject: attachedItem.fileObject,
+                  progress: 0,
+                  progressPreview: 0,
+                  loadingId: uuidv4(),
+                };
+              } else {
+                /* файлы */
+                return {
+                  fileUrl: '',
+                  fileName: attachedItem.name,
+                  fileSize: Math.round(attachedItem.fileObject.size / 1024), // KB - Килобайты
+                  fileObject: attachedItem.fileObject,
+                  progress: 0,
+                  loadingId: uuidv4(),
+                };
+              }
+            }),
+          )
+        : [];
+    return {
+      messageText: messageContentLocale,
+      messageDateUTC: new Date().toISOString(),
+      messageId: uuidv4(),
+      isChecked: false,
+      senderUid: uid!,
+      userAvatar:
+        'получать из database и ставить сразу в user редакса в useAuth и тд',
+      isLoading: true,
+      media: newAttachedItems.filter((item) => !('fileUrl' in item)) as (
         | ILoadingImgMedia
         | ILoadingVideoMedia
-        | ILoadingFile
-      )[] =
-        attachedItems.length > 0
-          ? await Promise.all(
-              attachedItems.map(async (attachedItem) => {
-                if ('imgUrl' in attachedItem) {
-                  const img = new Image();
-                  img.src = attachedItem.imgUrl;
-                  await new Promise((resolve) => {
-                    img.onload = resolve;
-                  });
-                  const isHorizontal =
-                    img.width > img.height || img.width === img.height;
-                  const isSquare = img.width === img.height;
-
-                  return {
-                    imgUrl: attachedItem.imgUrl,
-                    isHorizontal,
-                    isSquare,
-                    fileObject: attachedItem.fileObject,
-                    progress: 0,
-                    loadingId: uuidv4(),
-                  };
-                } else if ('videoUrl' in attachedItem) {
-                  const video = document.createElement('video');
-                  video.src = attachedItem.videoUrl;
-                  await new Promise((resolve) => {
-                    video.onloadedmetadata = resolve;
-                  });
-
-                  // измерение горизонтальности и квадратности
-                  const isHorizontal =
-                    video.videoWidth > video.videoHeight ||
-                    video.videoWidth === video.videoHeight;
-                  const isSquare = video.videoWidth === video.videoHeight;
-
-                  return {
-                    videoUrl: attachedItem.videoUrl,
-                    isHorizontal,
-                    isSquare,
-                    videoPreview: '',
-                    videoName: attachedItem.name,
-                    fileObject: attachedItem.fileObject,
-                    progress: 0,
-                    progressPreview: 0,
-                    loadingId: uuidv4(),
-                  };
-                } else {
-                  /* файлы */
-                  return {
-                    fileUrl: '',
-                    fileName: attachedItem.name,
-                    fileObject: attachedItem.fileObject,
-                    progress: 0,
-                    loadingId: uuidv4(),
-                  };
-                }
-              }),
-            )
-          : [];
-      return {
-        messageText: messageContent,
-        messageDateUTC: new Date().toISOString(),
-        messageId: uuidv4(),
-        isChecked: false,
-        senderUid: uid!,
-        userAvatar:
-          'получать из database и ставить сразу в user редакса в useAuth и тд',
-        isLoading: true,
-        media: newAttachedItems.filter((item) => !('fileUrl' in item)) as (
-          | ILoadingImgMedia
-          | ILoadingVideoMedia
-        )[],
-        files: newAttachedItems.filter(
-          (item) => 'fileUrl' in item,
-        ) as ILoadingFile[],
-      };
+      )[],
+      files: newAttachedItems.filter(
+        (item) => 'fileUrl' in item,
+      ) as ILoadingFile[],
     };
+  };
 
-  const sendMessage = async () => {
+  const sendMessage = async (
+    sendMessageContent: string,
+    sendAttachedItemsLocale: AttachedItemType[],
+  ) => {
     if (!uid) {
       return;
     }
 
     const messageWithLocaleUrls: ILoadingMessage | undefined =
-      await createMessageObjectWithLocaleUrl();
-
-    if (messageWithLocaleUrls != undefined) {
+      await createMessageObjectWithLocaleUrl(
+        sendMessageContent,
+        sendAttachedItemsLocale,
+      );
+    console.log(messageWithLocaleUrls);
+    if (messageWithLocaleUrls !== undefined) {
       dispatch(addLoadingMessage(messageWithLocaleUrls));
       const messageWithFirebaseUrls = await createMessageObjectWithFirebaseUrl(
         messageWithLocaleUrls,
       );
+
+      /* добавить дату отправки повторно перед отправкой */
       console.log(messageWithFirebaseUrls);
     }
   };
@@ -348,13 +360,18 @@ const MessageInputWrapper: FC<MessageInputWrapperProps> = ({
         onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
           setMessageContent(e.target.value)
         }
-        placeholder="Напишите сообщение..."
+        value={messageContent}
+        placeholder="Сообщение"
         className={styles['message-input-wrapper__input']}
       />
       <button
         disabled={messageContent.length === 0 && attachedItems.length === 0}
         className={styles['message-input-wrapper__btn']}
-        onClick={sendMessage}
+        onClick={() => {
+          sendMessage(messageContent, attachedItems);
+          setAttachedItems([]);
+          setMessageContent('');
+        }}
       >
         <ArrowCircleSvg
           className={

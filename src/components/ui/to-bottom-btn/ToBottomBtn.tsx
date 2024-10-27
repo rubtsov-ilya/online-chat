@@ -4,11 +4,14 @@ import styles from './ToBottomBtn.module.scss';
 import ArrowSvg from 'src/assets/images/icons/24x24-icons/Arrow Right.svg?react';
 
 interface ToBottomBtnProps {
-  endRef: React.RefObject<HTMLDivElement>;
   chatMessagesRef: React.RefObject<HTMLDivElement>;
+  scrollToBottom: () => void;
 }
 
-const ToBottomBtn: FC<ToBottomBtnProps> = ({ endRef, chatMessagesRef }) => {
+const ToBottomBtn: FC<ToBottomBtnProps> = ({
+  chatMessagesRef,
+  scrollToBottom,
+}) => {
   const [isActive, setIsActive] = useState<boolean>(false);
 
   useEffect(() => {
@@ -44,22 +47,6 @@ const ToBottomBtn: FC<ToBottomBtnProps> = ({ endRef, chatMessagesRef }) => {
       }
     };
   }, []);
-
-  const scrollToBottom = () => {
-    if (chatMessagesRef.current) {
-      const chatMessagesCurrent = chatMessagesRef.current;
-      const animationLength = 80;
-      const scrollCoefficient = 2.8;
-      const { scrollTop, clientHeight, scrollHeight } = chatMessagesCurrent;
-      if (scrollHeight - scrollTop > clientHeight * scrollCoefficient) {
-        const scrollPosition = scrollHeight - clientHeight - animationLength;
-        chatMessagesCurrent.scrollTo({ top: scrollPosition, behavior: 'auto' });
-        endRef.current?.scrollIntoView({ behavior: 'smooth' });
-      } else {
-        endRef.current?.scrollIntoView({ behavior: 'smooth' });
-      }
-    }
-  };
 
   return (
     <button

@@ -2,6 +2,7 @@
   display: flex;
   align-items: center;
   height: 16px;
+  user-select: none;
   &__checked-mark {
     min-width: 16px;
     min-height: 16px;

@@ -10,17 +10,21 @@ interface MessageMediaItemProps {
   width: '100%' | '50%' | '33.33%' | '66.66%';
   imgUrl?: string;
   videoUrl?: string;
+  videoPreview?: string;
   messageData: IMessage;
   index: number;
   progress: number | undefined;
+  progressPreview: number | undefined;
 }
 
 const MessageMediaItem: FC<MessageMediaItemProps> = ({
   width,
   imgUrl,
   videoUrl,
+  videoPreview,
   messageData,
   progress,
+  progressPreview,
   index,
 }) => {
   const { toggleBodyLock } = useBodyLock();
@@ -28,7 +32,7 @@ const MessageMediaItem: FC<MessageMediaItemProps> = ({
 
   const toggleModal = (timer?: number): void => {
     if (timer) {
-      /* задержка для анимации при закрытии окна */
+      /* задержка для отработки анимации при закрытии окна */
       toggleBodyLock();
       setTimeout(() => {
         setIsModalOpen((prev) => !prev);
@@ -44,19 +48,21 @@ const MessageMediaItem: FC<MessageMediaItemProps> = ({
 
   return (
     <div style={{ width }} className={styles['media-item-wrapper']}>
-      {imgUrl && (
+      {(imgUrl || (videoPreview && videoPreview.length > 0)) && (
         <>
           <img
             loading="lazy"
             onClick={onItemClick}
-            src={imgUrl}
+            src={imgUrl || videoPreview}
             alt=""
             className={styles['media-item']}
           />
-          <CircularLoadingProgressbar />
+          {progress !== undefined && progress < 100 && (
+            <CircularLoadingProgressbar progress={progress} />
+          )}
         </>
       )}
-      {videoUrl && (
+      {videoUrl && videoPreview?.length === 0 && (
         <>
           <video
             preload="metadata"
@@ -67,11 +73,17 @@ const MessageMediaItem: FC<MessageMediaItemProps> = ({
             <source src={videoUrl} type="video/webm" />
             <source src={videoUrl} type="video/ogg" />
           </video>
-          {!progress && (
+          {(progress === undefined ||
+            (progress === 100 && progressPreview === 100)) && (
             <div className={styles['media-item__play-icon-wrapper']}>
               <PlaySvg className={styles['media-item__play-icon']} />
             </div>
           )}
+          {progress !== undefined &&
+            progressPreview !== undefined &&
+            (progress < 100 || progressPreview < 100) && (
+              <CircularLoadingProgressbar progress={progress} />
+            )}
         </>
       )}
       {messageData.media.length > 0 && isModalOpen && (
@@ -81,7 +93,6 @@ const MessageMediaItem: FC<MessageMediaItemProps> = ({
           media={messageData.media}
         />
       )}
-      {progress && <p>{progress}</p>}
     </div>
   );
 };

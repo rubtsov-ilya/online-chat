@@ -14,6 +14,7 @@ export interface IVideoMedia {
 export interface IFile {
   fileUrl: string;
   fileName: string;
+  fileSize: number;
 }
 
 export interface IMessage {

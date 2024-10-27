@@ -20,16 +20,16 @@ interface MessageProps {
   isLastOfGroup: boolean;
   isFirstOfGroup: boolean;
   uploadTasksRef: React.MutableRefObject<IUploadTasksRef>;
+  uid: string | null;
 }
 
 const Message: FC<MessageProps> = ({
+  uid,
   messageData,
   isLastOfGroup,
   isFirstOfGroup,
   uploadTasksRef,
 }) => {
-  const { uid } = useAuth();
-
   const cancelUploadsForMessage = (messageId: string) => {
     if (uploadTasksRef.current[messageId]) {
       /* Отмена загрузки каждого файла */
@@ -199,6 +199,16 @@ const Message: FC<MessageProps> = ({
                         ? messageItemData.videoUrl
                         : undefined
                     }
+                    videoPreview={
+                      'videoPreview' in messageItemData
+                        ? messageItemData.videoPreview
+                        : undefined
+                    }
+                    progressPreview={
+                      'progressPreview' in messageItemData
+                        ? messageItemData.progressPreview
+                        : undefined
+                    }
                     messageData={messageData}
                     index={index}
                   />
@@ -228,6 +238,7 @@ const Message: FC<MessageProps> = ({
                 key={index}
                 fileUrl={file.fileUrl}
                 fileName={file.fileName}
+                fileSize={file.fileSize}
                 isStatusesVisible={
                   messageData.messageText.length === 0 &&
                   messageData.files.length - 1 === index

@@ -22,6 +22,7 @@ export interface ILoadingVideoMedia {
 export interface ILoadingFile {
   fileUrl: string;
   fileName: string;
+  fileSize: number;
   fileObject: File;
   progress: number;
   loadingId: string;
