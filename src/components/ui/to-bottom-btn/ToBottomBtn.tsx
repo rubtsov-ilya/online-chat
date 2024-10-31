@@ -1,4 +1,3 @@
-import { createPortal } from 'react-dom';
 import { FC, useEffect, useState } from 'react';
 import styles from './ToBottomBtn.module.scss';
 import ArrowSvg from 'src/assets/images/icons/24x24-icons/Arrow Right.svg?react';

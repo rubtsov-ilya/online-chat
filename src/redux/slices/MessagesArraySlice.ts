@@ -93,6 +93,20 @@ const messagesArraySlice = createSlice({
         }
       }
     },
+    updateIsCanceledKeyInMessage(
+      state,
+      action: PayloadAction<{
+        messageId: string;
+      }>,
+    ) {
+      const message = state.messagesArray.find(
+        (message) => message.messageId === action.payload.messageId,
+      ) as ILoadingMessage | undefined;
+      /* обновление для файлов из media */
+      if (message && message.isCanceled !== true) {
+        message.isCanceled = true;
+      }
+    },
   },
 });
 
@@ -102,6 +116,7 @@ export const {
   addInitialMessagesArray,
   updateProgressKeyInMessage,
   updateProgressPreviewKeyInMessage,
+  updateIsCanceledKeyInMessage,
 } = messagesArraySlice.actions;
 export const { selectMessagesArray } = messagesArraySlice.selectors;
 export default messagesArraySlice.reducer;

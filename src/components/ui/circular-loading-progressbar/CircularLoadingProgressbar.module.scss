@@ -1,6 +1,6 @@
 @import 'src/assets/css/_mixins.scss';
 
-.circular-progressbar-wrapper {
+.circular-progressbar-btn {
   position: absolute;
   top: 50%;
   left: 50%;
@@ -13,10 +13,45 @@
   padding: 3px;
   border-radius: 9999px;
   background-color: var(--light-overlay-dark);
+  cursor: pointer;
+  user-select: none;
   
   @include phone {
     width: 45px;
     height: 45px;
+  }
+
+  &--file {
+    width: 34px; // === .file-item____file-icon-wrapper width
+    height: 34px; // === .file-item____file-icon-wrapper width
+    padding: 2px;
+  }
+}
+
+.circular-progressbar-cross {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  &__icon {
+    min-width: 40px;
+    min-height: 40px;
+    @include phone {
+      min-width: 32px;
+      min-height: 32px;
+    }
+    path {
+      fill: rgb(255, 255, 255), /* === pathColor: */
+    }
+  }
+
+  &__icon--file {
+    min-width: 28px;
+    min-height: 28px;
   }
 }
 

@@ -17,7 +17,7 @@ const DarkThemeProvider: FC<DarkThemeProviderProps> = ({ children }) => {
   const bodyTag = document.querySelector('body') as HTMLBodyElement;
   const [isDarkTheme, setIsDarkTheme] = useState<boolean>(false);
 
-  useLayoutEffect(() => {
+  /* useLayoutEffect(() => {
     const isDeviceDarkTheme: boolean = window.matchMedia(
       '(prefers-color-scheme: dark)',
     ).matches;
@@ -31,7 +31,7 @@ const DarkThemeProvider: FC<DarkThemeProviderProps> = ({ children }) => {
     } else if (!theme && !isDeviceDarkTheme) {
       localStorage.setItem('theme', 'light');
     }
-  }, []);
+  }, []); */
 
   useEffect(() => {
     if (isDarkTheme) {

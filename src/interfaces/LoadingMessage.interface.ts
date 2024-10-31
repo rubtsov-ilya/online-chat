@@ -36,6 +36,8 @@ export interface ILoadingMessage {
   senderUid: string;
   userAvatar: string;
   isLoading: boolean;
+  isCanceled: boolean;
+  isEdited: boolean;
   media: (ILoadingImgMedia | ILoadingVideoMedia)[];
   files: ILoadingFile[];
 }

@@ -27,9 +27,7 @@ const ChatMessagesSection: FC<ChatMessagesSectionProps> = ({
   const [doScroll, setDoScroll] = useState<boolean>(false);
   const dispatch = useDispatch();
   const { messagesArray } = useGetMessagesFromRtk();
-
-  /* запрос сообщений из фаербейз первый либо тут либо в юзэффекте */
-  const devMessagesArray: IMessage[] = [
+  const devMessagesArrayInit: IMessage[] = [
     {
       messageText: 'sdasasdasdasdasdasddasdsdg',
       messageDateUTC: '2024-10-23T09:01:04.275Z',
@@ -39,6 +37,7 @@ const ChatMessagesSection: FC<ChatMessagesSectionProps> = ({
       userAvatar:
         'https://img.freepik.com/free-photo/futuristic-cat-with-goggles_23-2150969291.jpg?t=st=1723732192~exp=1723735792~hmac=a4a2681fc1de61379eaa4e0c3fa697ded740bab5de9171e7678b25df7276ff80&w=826',
       isLoading: false,
+      isEdited: false,
       media: [],
       files: [],
     },
@@ -51,6 +50,7 @@ const ChatMessagesSection: FC<ChatMessagesSectionProps> = ({
       userAvatar:
         'https://img.freepik.com/free-photo/futuristic-cat-with-goggles_23-2150969291.jpg?t=st=1723732192~exp=1723735792~hmac=a4a2681fc1de61379eaa4e0c3fa697ded740bab5de9171e7678b25df7276ff80&w=826',
       isLoading: false,
+      isEdited: false,
       media: [],
       files: [],
     },
@@ -64,6 +64,7 @@ const ChatMessagesSection: FC<ChatMessagesSectionProps> = ({
       userAvatar:
         'https://img.freepik.com/free-photo/futuristic-cat-with-goggles_23-2150969291.jpg?t=st=1723732192~exp=1723735792~hmac=a4a2681fc1de61379eaa4e0c3fa697ded740bab5de9171e7678b25df7276ff80&w=826',
       isLoading: false,
+      isEdited: false,
       media: [
         {
           imgUrl:
@@ -132,6 +133,7 @@ const ChatMessagesSection: FC<ChatMessagesSectionProps> = ({
       userAvatar:
         'https://img.freepik.com/free-photo/futuristic-cat-with-goggles_23-2150969291.jpg?t=st=1723732192~exp=1723735792~hmac=a4a2681fc1de61379eaa4e0c3fa697ded740bab5de9171e7678b25df7276ff80&w=826',
       isLoading: false,
+      isEdited: false,
       media: [
         {
           imgUrl:
@@ -152,6 +154,7 @@ const ChatMessagesSection: FC<ChatMessagesSectionProps> = ({
       userAvatar:
         'https://img.freepik.com/free-photo/futuristic-cat-with-goggles_23-2150969291.jpg?t=st=1723732192~exp=1723735792~hmac=a4a2681fc1de61379eaa4e0c3fa697ded740bab5de9171e7678b25df7276ff80&w=826',
       isLoading: false,
+      isEdited: false,
       media: [
         {
           imgUrl:
@@ -178,6 +181,7 @@ const ChatMessagesSection: FC<ChatMessagesSectionProps> = ({
       userAvatar:
         'https://img.freepik.com/premium-photo/there-is-cat-that-is-looking-camera-flowers-generative-ai_1035438-4846.jpg?w=740',
       isLoading: false,
+      isEdited: false,
       media: [
         {
           imgUrl:
@@ -204,6 +208,7 @@ const ChatMessagesSection: FC<ChatMessagesSectionProps> = ({
       userAvatar:
         'https://img.freepik.com/premium-photo/there-is-cat-that-is-looking-camera-flowers-generative-ai_1035438-4846.jpg?w=740',
       isLoading: false,
+      isEdited: false,
       media: [
         {
           imgUrl:
@@ -236,6 +241,7 @@ const ChatMessagesSection: FC<ChatMessagesSectionProps> = ({
       userAvatar:
         'https://img.freepik.com/premium-photo/there-is-cat-that-is-looking-camera-flowers-generative-ai_1035438-4846.jpg?w=740',
       isLoading: false,
+      isEdited: false,
       media: [],
       files: [],
     },
@@ -249,6 +255,7 @@ const ChatMessagesSection: FC<ChatMessagesSectionProps> = ({
       userAvatar:
         'https://img.freepik.com/free-photo/futuristic-cat-with-goggles_23-2150969291.jpg?t=st=1723732192~exp=1723735792~hmac=a4a2681fc1de61379eaa4e0c3fa697ded740bab5de9171e7678b25df7276ff80&w=826',
       isLoading: false,
+      isEdited: false,
       media: [],
       files: [],
     },
@@ -261,6 +268,7 @@ const ChatMessagesSection: FC<ChatMessagesSectionProps> = ({
       userAvatar:
         'https://img.freepik.com/free-photo/futuristic-cat-with-goggles_23-2150969291.jpg?t=st=1723732192~exp=1723735792~hmac=a4a2681fc1de61379eaa4e0c3fa697ded740bab5de9171e7678b25df7276ff80&w=826',
       isLoading: false,
+      isEdited: false,
       media: [
         {
           imgUrl:
@@ -292,6 +300,7 @@ const ChatMessagesSection: FC<ChatMessagesSectionProps> = ({
       userAvatar:
         'https://img.freepik.com/free-photo/futuristic-cat-with-goggles_23-2150969291.jpg?t=st=1723732192~exp=1723735792~hmac=a4a2681fc1de61379eaa4e0c3fa697ded740bab5de9171e7678b25df7276ff80&w=826',
       isLoading: false,
+      isEdited: false,
       media: [
         {
           imgUrl:
@@ -318,6 +327,7 @@ const ChatMessagesSection: FC<ChatMessagesSectionProps> = ({
       userAvatar:
         'https://img.freepik.com/free-photo/futuristic-cat-with-goggles_23-2150969291.jpg?t=st=1723732192~exp=1723735792~hmac=a4a2681fc1de61379eaa4e0c3fa697ded740bab5de9171e7678b25df7276ff80&w=826',
       isLoading: false,
+      isEdited: false,
       media: [],
       files: [],
     },
@@ -358,6 +368,7 @@ const ChatMessagesSection: FC<ChatMessagesSectionProps> = ({
       userAvatar:
         'https://img.freepik.com/free-photo/futuristic-cat-with-goggles_23-2150969291.jpg?t=st=1723732192~exp=1723735792~hmac=a4a2681fc1de61379eaa4e0c3fa697ded740bab5de9171e7678b25df7276ff80&w=826',
       isLoading: false,
+      isEdited: false,
       media: [
         {
           imgUrl:
@@ -385,6 +396,7 @@ const ChatMessagesSection: FC<ChatMessagesSectionProps> = ({
       userAvatar:
         'https://img.freepik.com/free-photo/futuristic-cat-with-goggles_23-2150969291.jpg?t=st=1723732192~exp=1723735792~hmac=a4a2681fc1de61379eaa4e0c3fa697ded740bab5de9171e7678b25df7276ff80&w=826',
       isLoading: false,
+      isEdited: false,
       media: [
         {
           videoUrl: 'https://i.imgur.com/v5DeFBo.mp4',
@@ -413,6 +425,7 @@ const ChatMessagesSection: FC<ChatMessagesSectionProps> = ({
       userAvatar:
         'https://img.freepik.com/free-photo/futuristic-cat-with-goggles_23-2150969291.jpg?t=st=1723732192~exp=1723735792~hmac=a4a2681fc1de61379eaa4e0c3fa697ded740bab5de9171e7678b25df7276ff80&w=826',
       isLoading: false,
+      isEdited: false,
       media: [],
       files: [
         {
@@ -423,12 +436,16 @@ const ChatMessagesSection: FC<ChatMessagesSectionProps> = ({
         {
           fileUrl: 'https://i.imgur.com/8yEqycg.mp4',
           fileName: 'ASDASDSFASFASFAS2112512asf5125125125125FASF.docx',
-          progress: 50,
+          progress: 30,
           fileSize: 10301,
         },
       ],
     },
   ];
+  const [devMessagesArray, setDevMessagesArray] =
+    useState(devMessagesArrayInit);
+
+  /* запрос сообщений из фаербейз первый либо тут либо в юзэффекте */
 
   console.log(messagesArray);
 
@@ -438,6 +455,35 @@ const ChatMessagesSection: FC<ChatMessagesSectionProps> = ({
     setDoScroll(true);
     return () => {};
   }, []);
+
+  const first = () => {
+    // Проверяем, что массив имеет как минимум 2 элемента для доступа к предпоследнему элементу
+    if (devMessagesArray.length < 2) return;
+
+    // Создаем новый массив, копируя все элементы devMessagesArray
+    const updatedDevMessagesArray = devMessagesArray.map((item, index) =>
+      index === devMessagesArray.length - 2
+        ? {
+            ...item,
+            messageText:
+              'Lorem Ipsum - это текст-"рыба", часто используемый https://www.npmjs.com/package/linkify-react и https://web.telegram.org/a/',
+            messageDateUTC: '2024-10-23T09:10:04.275Z',
+            messageId: '8c9480a9-5e6b-4940-bd71-e180a7764329',
+            isChecked: true,
+            senderUid: 'yp7vuU1DFuRnGlwa5m7IGUtV7GJ6',
+            userAvatar:
+              'https://img.freepik.com/free-photo/futuristic-cat-with-goggles_23-2150969291.jpg?t=st=1723732192~exp=1723735792~hmac=a4a2681fc1de61379eaa4e0c3fa697ded740bab5de9171e7678b25df7276ff80&w=826',
+            isLoading: false,
+            isEdited: false,
+            media: [],
+            files: [],
+          }
+        : item,
+    );
+
+    // Устанавливаем обновленный массив
+    setDevMessagesArray(updatedDevMessagesArray);
+  };
 
   useLayoutEffect(() => {
     /*  скролл вниз секции */
@@ -521,6 +567,7 @@ const ChatMessagesSection: FC<ChatMessagesSectionProps> = ({
           </div>
         </div>
         <div ref={endRef}></div>
+        <button onClick={first}>fffffffffffff</button>
       </div>
     </ComponentTag>
   );

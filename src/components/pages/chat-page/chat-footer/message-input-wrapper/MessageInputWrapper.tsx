@@ -17,6 +17,7 @@ import {
 } from 'src/interfaces/Message.interface';
 import {
   addLoadingMessage,
+  updateIsCanceledKeyInMessage,
   updateProgressKeyInMessage,
   updateProgressPreviewKeyInMessage,
 } from 'src/redux/slices/MessagesArraySlice';
@@ -98,6 +99,7 @@ const MessageInputWrapper: FC<MessageInputWrapperProps> = ({
         },
         (error) => {
           console.log('Upload error:', error);
+          dispatch(updateIsCanceledKeyInMessage({ messageId: messageId }));
           reject(error);
         },
         async () => {
@@ -223,7 +225,13 @@ const MessageInputWrapper: FC<MessageInputWrapperProps> = ({
           )
         : [];
     return {
-      ...messageWithLocaleUrl,
+      messageText: messageWithLocaleUrl.messageText,
+      messageDateUTC: messageWithLocaleUrl.messageDateUTC,
+      messageId: messageWithLocaleUrl.messageId,
+      isChecked: messageWithLocaleUrl.isChecked,
+      senderUid: messageWithLocaleUrl.senderUid,
+      userAvatar: messageWithLocaleUrl.userAvatar,
+      isEdited: false,
       isLoading: false,
       media: newFilesAndMediaArray.filter((item) => !('fileUrl' in item)) as (
         | IImgMedia
@@ -313,6 +321,8 @@ const MessageInputWrapper: FC<MessageInputWrapperProps> = ({
       userAvatar:
         'получать из database и ставить сразу в user редакса в useAuth и тд',
       isLoading: true,
+      isCanceled: false,
+      isEdited: false,
       media: newAttachedItems.filter((item) => !('fileUrl' in item)) as (
         | ILoadingImgMedia
         | ILoadingVideoMedia
@@ -339,12 +349,12 @@ const MessageInputWrapper: FC<MessageInputWrapperProps> = ({
     console.log(messageWithLocaleUrls);
     if (messageWithLocaleUrls !== undefined) {
       dispatch(addLoadingMessage(messageWithLocaleUrls));
-      const messageWithFirebaseUrls = await createMessageObjectWithFirebaseUrl(
+      /* const messageWithFirebaseUrls = await createMessageObjectWithFirebaseUrl(
         messageWithLocaleUrls,
-      );
+      ); */
 
       /* добавить дату отправки повторно перед отправкой */
-      console.log(messageWithFirebaseUrls);
+      /* console.log(messageWithFirebaseUrls); */
     }
   };
 

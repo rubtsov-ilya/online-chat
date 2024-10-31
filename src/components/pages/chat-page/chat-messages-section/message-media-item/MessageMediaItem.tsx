@@ -15,6 +15,7 @@ interface MessageMediaItemProps {
   index: number;
   progress: number | undefined;
   progressPreview: number | undefined;
+  cancelUploads: () => void;
 }
 
 const MessageMediaItem: FC<MessageMediaItemProps> = ({
@@ -26,6 +27,7 @@ const MessageMediaItem: FC<MessageMediaItemProps> = ({
   progress,
   progressPreview,
   index,
+  cancelUploads,
 }) => {
   const { toggleBodyLock } = useBodyLock();
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
@@ -58,7 +60,10 @@ const MessageMediaItem: FC<MessageMediaItemProps> = ({
             className={styles['media-item']}
           />
           {progress !== undefined && progress < 100 && (
-            <CircularLoadingProgressbar progress={progress} />
+            <CircularLoadingProgressbar
+              progress={progress}
+              cancelUploads={cancelUploads}
+            />
           )}
         </>
       )}
@@ -82,7 +87,10 @@ const MessageMediaItem: FC<MessageMediaItemProps> = ({
           {progress !== undefined &&
             progressPreview !== undefined &&
             (progress < 100 || progressPreview < 100) && (
-              <CircularLoadingProgressbar progress={progress} />
+              <CircularLoadingProgressbar
+                progress={progress}
+                cancelUploads={cancelUploads}
+              />
             )}
         </>
       )}

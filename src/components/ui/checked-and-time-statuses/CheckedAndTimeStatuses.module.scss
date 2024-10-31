@@ -1,9 +1,10 @@
 .checked-and-time-statuses {
   display: flex;
   align-items: center;
+  gap: 1px;
   height: 16px;
   user-select: none;
-  &__checked-mark {
+  &__checked-icon {
     min-width: 16px;
     min-height: 16px;
     path {
@@ -16,7 +17,32 @@
     }
   }
 
-  &__unchecked-mark {
+  &__unchecked-icon {
+    min-width: 16px;
+    min-height: 16px;
+    path {
+      fill: var(--base-grey);
+    }
+    &--image {
+      path {
+        fill: var(--light-white);
+      }
+    }
+  }
+
+  &__error-icon {
+    width: 16px;
+    height: 16px;
+    min-width: 16px;
+    min-height: 16px;
+    path {
+      fill: var(--base-accent-red);
+    }
+  }
+
+  &__loading-icon {
+    width: 16px;
+    height: 16px;
     min-width: 16px;
     min-height: 16px;
     path {

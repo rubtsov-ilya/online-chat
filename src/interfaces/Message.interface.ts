@@ -22,9 +22,10 @@ export interface IMessage {
   messageDateUTC: string;
   messageId: string;
   isChecked: boolean;
+  isLoading: boolean;
+  isEdited: boolean;
   senderUid: string;
   userAvatar: string;
-  isLoading: boolean;
   media: (IImgMedia | IVideoMedia)[];
   files: IFile[];
 }
