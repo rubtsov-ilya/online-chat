@@ -9,6 +9,7 @@ import { getDownloadURL, ref, uploadBytesResumable } from 'firebase/storage';
 import { firebaseStorage } from 'src/firebase';
 
 import { v4 as uuidv4 } from 'uuid';
+import imageCompression from 'browser-image-compression';
 import { useDispatch } from 'react-redux';
 import {
   IFile,
@@ -358,6 +359,23 @@ const MessageInputWrapper: FC<MessageInputWrapperProps> = ({
     }
   };
 
+  const compressImage = async (file: File) => {
+    const options = {
+      maxSizeMB: 10, // Максимальный размер файла в мегабайтах
+      useWebWorker: true, // Использование Web Worker для сжатия
+      initialQuality: 0.97, // Начальное качество сжатия (97%)
+      alwaysKeepResolution: true, // Сохранять ширину и высоту изначальную
+    };
+
+    try {
+      const compressedFile = await imageCompression(file, options);
+      return compressedFile;
+    } catch (error) {
+      console.error('Ошибка сжатия изображения:', error);
+      return file;
+    }
+  };
+
   return (
     <div className={styles['message-input-wrapper']}>
       <AttachMenu
@@ -370,6 +388,35 @@ const MessageInputWrapper: FC<MessageInputWrapperProps> = ({
         onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
           setMessageContent(e.target.value)
         }
+        onPasteCapture={async (e: React.ClipboardEvent<HTMLInputElement>) => {
+          const items = e.clipboardData.items;
+          const newItems = await Promise.all(
+            Array.from(items).map(async (item) => {
+              if (item.kind === 'file' && item.type.startsWith('image/')) {
+                const file = item.getAsFile();
+                if (file) {
+                  const compressedFile = await compressImage(file);
+                  const url = URL.createObjectURL(compressedFile);
+                  return {
+                    imgUrl: url,
+                    name: file.name,
+                    fileObject: file,
+                  };
+                }
+              }
+              return null; // Возвращаем null для несуществующих файлов
+            }),
+          );
+
+          // Фильтруем массив, убирая все null значения
+          const filteredItems = newItems.filter(
+            (item) => item !== null,
+          ) as AttachedItemType[];
+
+          if (filteredItems.length > 0) {
+            setAttachedItems((prevItems) => [...prevItems, ...filteredItems]);
+          }
+        }}
         value={messageContent}
         placeholder="Сообщение"
         className={styles['message-input-wrapper__input']}
