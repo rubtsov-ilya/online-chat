@@ -120,7 +120,6 @@ const AttachMenu: FC<AttachBtnProps> = ({
           style={{ display: 'none' }}
           onChange={async (e: React.ChangeEvent<HTMLInputElement>) => {
             const files = e.target.files;
-            console.log(files)
             if (files) {
               const newItems = await Promise.all(
                 Array.from(files).map(async (file) => {

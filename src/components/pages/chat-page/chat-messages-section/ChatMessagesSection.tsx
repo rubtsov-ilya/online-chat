@@ -9,6 +9,9 @@ import { useDispatch } from 'react-redux';
 import { IMessage } from 'src/interfaces/Message.interface';
 import { IUploadTasksRef } from 'src/interfaces/UploadTasks.interface';
 import useAuth from 'src/hooks/useAuth';
+import MessageStickyDate from './message-sticky-date/MessageStickyDate';
+import MessageDateGroup from './message-date-group/MessageDateGroup';
+import { ILoadingMessage } from 'src/interfaces/LoadingMessage.interface';
 
 interface ChatMessagesSectionProps {
   isMobileScreen?: boolean;
@@ -30,7 +33,7 @@ const ChatMessagesSection: FC<ChatMessagesSectionProps> = ({
   const devMessagesArrayInit: IMessage[] = [
     {
       messageText: 'sdasasdasdasdasdasddasdsdg',
-      messageDateUTC: '2024-10-23T09:01:04.275Z',
+      messageDateUTC: '2024-10-20T09:01:04.275Z',
       messageId: '7320616e-a5ac-4d55-bf99-cf8f4cbbb44f',
       isChecked: false,
       senderUid: 'yp7vuU1DFuRnGlwa5m7IGUtV7GJ3',
@@ -43,7 +46,7 @@ const ChatMessagesSection: FC<ChatMessagesSectionProps> = ({
     },
     {
       messageText: 'sdsdg',
-      messageDateUTC: '2024-10-23T09:02:04.275Z',
+      messageDateUTC: '2024-10-20T09:02:04.275Z',
       messageId: '2f44f109-7661-485c-bb23-ef5068e2bcd9',
       isChecked: false,
       senderUid: 'yp7vuU1DFuRnGlwa5m7IGUtV7GJ6',
@@ -57,7 +60,7 @@ const ChatMessagesSection: FC<ChatMessagesSectionProps> = ({
     {
       messageText:
         'Lorem Ipsum - это текст-"рыба", часто используемый вasffsfasfasfa asf f asf фы ывп укр оа печати и вэб-дизайне. Lorem Ipsum является стандартной "рыбой" для текстов на латинице с начала XVI века. оапппп fgswtst аармсмти пофвфаы цйццаа фыафыаафыаыsf ',
-      messageDateUTC: '2024-10-23T09:03:04.275Z',
+      messageDateUTC: '2024-10-20T09:03:04.275Z',
       messageId: 'ee2a85a2-f7e3-4430-908a-599f2b88901b',
       isChecked: true,
       senderUid: 'yp7vuU1DFuRnGlwa5m7IGUtV7GJ3',
@@ -126,7 +129,7 @@ const ChatMessagesSection: FC<ChatMessagesSectionProps> = ({
     {
       messageText:
         'Lorem Ipsum - это текст-"рыба", часто используемый вasffsfasfasfa asf f asf фы ывп укр оа печати и вэб-дизайне. Lorem Ipsum является стандартной "рыбой" для текстов на латинице с начала XVI века. оапппп fgswtst аармсмти пофвфаы цйццаа фыафыаафыаыsf ',
-      messageDateUTC: '2024-10-23T09:03:04.275Z',
+      messageDateUTC: '2024-10-21T09:03:04.275Z',
       messageId: '4a985e4f-21c7-4a66-869b-5d4fc3d6d0fc',
       isChecked: true,
       senderUid: 'yp7vuU1DFuRnGlwa5m7IGUtV7GJ3',
@@ -147,7 +150,7 @@ const ChatMessagesSection: FC<ChatMessagesSectionProps> = ({
     {
       messageText:
         'Lorem Ipsum - это текст-"рыба", часто используемый вasffsfasfasfa asf f asf фы ывп укр оа печати и вэб-дизайне. Lorem Ipsum является стандартной "рыбой" для текстов на латинице с начала XVI века. оапппп fgswtst аармсмти пофвфаы цйццаа фыафыаафыаыsf ',
-      messageDateUTC: '2024-10-23T09:04:04.275Z',
+      messageDateUTC: '2024-10-21T09:04:04.275Z',
       messageId: 'cd625728-6a3f-4528-a6f1-546f1f81df26',
       isChecked: true,
       senderUid: 'yp7vuU1DFuRnGlwa5m7IGUtV7GJ3',
@@ -174,7 +177,7 @@ const ChatMessagesSection: FC<ChatMessagesSectionProps> = ({
     {
       messageText:
         'Lorem Ipsum - это текст-"рыбой "рыбой" для текстов на латинице с начала XVI века. оапппп fgswtst аармсмти пофвфаы цйццаа фыафыаафыаыsf ',
-      messageDateUTC: '2024-10-23T09:05:04.275Z',
+      messageDateUTC: '2024-10-22T09:05:04.275Z',
       messageId: '28af7d4a-af65-4640-92be-6873e72e7689',
       isChecked: true,
       senderUid: 'yp7vuU1DFuRnGlwa5m7IGUtV7GJ3',
@@ -201,7 +204,7 @@ const ChatMessagesSection: FC<ChatMessagesSectionProps> = ({
     {
       messageText:
         'Lorem Ipsum - это текст-"рыбой "рыбой" для текстов на латинице с начала XVI века. оапппп fgswtst аармсмти пофвфаы цйццаа фыафыаафыаыsf ',
-      messageDateUTC: '2024-10-23T09:06:04.275Z',
+      messageDateUTC: '2024-10-22T09:06:04.275Z',
       messageId: 'fecb7b57-3361-4d67-9456-30eec3f1980c',
       isChecked: true,
       senderUid: 'yp7vuU1DFuRnGlwa5m7IGUtV7GJ3',
@@ -418,7 +421,7 @@ const ChatMessagesSection: FC<ChatMessagesSectionProps> = ({
     },
     {
       messageText: '',
-      messageDateUTC: '2024-10-23T10:03:04.275Z',
+      messageDateUTC: '2024-10-24T10:03:04.275Z',
       messageId: '9ec08cd0-7be2-488d-8bfd-a5a0b6d165e0',
       isChecked: true,
       senderUid: 'yp7vuU1DFuRnGlwa5m7IGUtV7GJ6',
@@ -456,6 +459,7 @@ const ChatMessagesSection: FC<ChatMessagesSectionProps> = ({
     return () => {};
   }, []);
 
+  /* ТЕСТОВАЯ ФУНКЦИЯ, ЕЁ НАДО УДАЛИТЬ */
   const first = () => {
     // Проверяем, что массив имеет как минимум 2 элемента для доступа к предпоследнему элементу
     if (devMessagesArray.length < 2) return;
@@ -534,26 +538,29 @@ const ChatMessagesSection: FC<ChatMessagesSectionProps> = ({
           className={`${styles['chat-messages__content']} ${messagesArray.length === 0 ? styles['chat-messages__content--no-messages'] : ''}`}
         >
           {messagesArray.length > 0 &&
-            messagesArray.map((messageData, index) => {
-              return (
-                <Message
-                  key={index}
-                  uid={uid}
-                  uploadTasksRef={uploadTasksRef}
-                  messageData={messageData}
-                  isLastOfGroup={
-                    index === messagesArray.length - 1 ||
-                    messageData.senderUid !==
-                      messagesArray[index + 1]?.senderUid
+            Object.entries(
+              messagesArray.reduce(
+                (acc, message) => {
+                  const dateKey = new Date(
+                    message.messageDateUTC,
+                  ).toLocaleDateString();
+                  if (!acc[dateKey]) {
+                    acc[dateKey] = []; // Инициализируем новый массив, если такой даты еще нет
                   }
-                  isFirstOfGroup={
-                    index === 0 ||
-                    messageData.senderUid !==
-                      messagesArray[index - 1]?.senderUid
-                  }
-                />
-              );
-            })}
+                  acc[dateKey].push(message); // Добавляем сообщение к соответствующему массиву
+                  return acc; // Возвращаем аккумулированный объект
+                },
+                {} as Record<string, (IMessage | ILoadingMessage)[]>,
+              ),
+            ).map(([date, messages]) => (
+              <MessageDateGroup
+                key={date}
+                messagesArray={messages}
+                uid={uid}
+                uploadTasksRef={uploadTasksRef}
+                chatMessagesRef={chatMessagesRef}
+              />
+            ))}
           {messagesArray.length === 0 && (
             <span className={styles['chat-messages__no-messages']}>
               Нет сообщений
