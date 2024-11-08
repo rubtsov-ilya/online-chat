@@ -3,7 +3,7 @@
 .to-bottom-button {
   position: sticky;
   top: calc(100% - 48px);
-    /* 48px =  .to-bottom-button height + 8px translate*/
+    /* 48px =  .to-bottom-button height + 8px translateY*/
   left: 100%;
   z-index: 1;
   display: flex;

@@ -1,0 +1,52 @@
+.drag-n-drop-zone {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  width: 100%;
+  height: 100%;
+  z-index: 2;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.1s ease;
+  /* background-color: #00000099;
+  backdrop-filter: blur(2px); */
+  &--active {
+    pointer-events: auto;
+    opacity: 1;
+  }
+
+  &__drop-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 50%;
+    background-color: var(--base-white);
+    border: 1px solid var(--base-grey-whisper);
+    box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    color: var(--base-grey);
+    transition: color 0.15s ease;
+    &--active {
+      color: var(--base-accent-blue);
+    }
+  }
+
+  &__top-span {
+    font-size: 20px;
+
+  }
+
+  &__bottom-span {
+    font-size: 16px;
+
+  }
+}

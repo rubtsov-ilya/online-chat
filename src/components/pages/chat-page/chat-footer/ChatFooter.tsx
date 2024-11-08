@@ -5,15 +5,20 @@ import MessageInputWrapper from './message-input-wrapper/MessageInputWrapper';
 import AttachedContentWrapper from './attached-content-wrapper/AttachedContentWrapper';
 import { AttachedItemType } from 'src/interfaces/AttachedItem.interface';
 import { IUploadTasksRef } from 'src/interfaces/UploadTasks.interface';
+import DragNDropZone from './drag-n-drop-zone/DragNDropZone';
 
 interface ChatFooterProps {
   isMobileScreen: boolean;
   uploadTasksRef: React.MutableRefObject<IUploadTasksRef>;
+  isDrag: boolean;
+  setIsDrag: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const ChatFooter: FC<ChatFooterProps> = ({
   isMobileScreen,
   uploadTasksRef,
+  isDrag,
+  setIsDrag,
 }) => {
   const [attachedItems, setAttachedItems] = useState<AttachedItemType[]>([]);
   const ComponentTag = isMobileScreen ? 'footer' : 'div';
@@ -40,6 +45,13 @@ const ChatFooter: FC<ChatFooterProps> = ({
           />
         </div>
       </div>
+      {!isMobileScreen && (
+        <DragNDropZone
+          setAttachedItems={setAttachedItems}
+          isDrag={isDrag}
+          setIsDrag={setIsDrag}
+        />
+      )}
     </ComponentTag>
   );
 };

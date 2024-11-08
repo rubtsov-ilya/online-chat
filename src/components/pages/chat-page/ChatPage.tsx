@@ -1,4 +1,4 @@
-import { FC, useRef } from 'react';
+import { FC, useRef, useState } from 'react';
 import { useMediaQuery } from 'react-responsive';
 
 import styles from './ChatPage.module.scss';
@@ -11,15 +11,25 @@ const ChatPage: FC = () => {
   const isMobileScreen = useMediaQuery({ query: '(max-width: 991px)' });
   const ComponentTag = isMobileScreen ? 'main' : 'section';
   const uploadTasksRef = useRef<IUploadTasksRef>({});
+  const [isDrag, setIsDrag] = useState<boolean>(false);
+
+  const onDragEnter = (event: React.DragEvent) => {
+    if (!isMobileScreen) {
+      event.preventDefault();
+      setIsDrag(true);
+    }
+  };
 
   return (
-    <ComponentTag className={styles['main']}>
+    <ComponentTag onDragEnter={onDragEnter} className={styles['main']}>
       <ChatHeader isMobileScreen={isMobileScreen} />
       <ChatMessagesSection
         uploadTasksRef={uploadTasksRef}
         isMobileScreen={isMobileScreen}
       />
       <ChatFooter
+        isDrag={isDrag}
+        setIsDrag={setIsDrag}
         uploadTasksRef={uploadTasksRef}
         isMobileScreen={isMobileScreen}
       />
