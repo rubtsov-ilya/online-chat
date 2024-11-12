@@ -1,17 +1,79 @@
 @import 'src/assets/css/_mixins.scss';
 .chat-item {
-  display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
+  position: relative;
   height: 64px;
-  padding: 12px 8px;
-  border-radius: 10px;
-  transition: background-color 0.2s ease;
-  @include tablet {
-    border-radius: 0px;
+  overflow: hidden;
+  user-select: none;
+  z-index: 0;
+  &--active {
+    z-index: 2;
   }
-  &:hover {
-    background-color: rgb(245, 245, 245);
+  &__background {
+    padding: 20px 16px;
+    height: 100%;
+    background: var(--base-white-smoke);
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 16px;
+  }
+
+  &__background-btn {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 24px;
+    height: 24px;
+  }
+
+  &__user-ban-icon {
+    min-width: 24px;
+    min-height: 24px;
+    pointer-events: none;
+    path {
+      fill: var(--base-black);
+    }
+  }
+
+  &__delete-icon {
+    min-width: 24px;
+    min-height: 24px;
+    pointer-events: none;
+    path {
+      fill: var(--base-accent-red);
+    }
+  }
+
+  &__foreground {
+    position: absolute;
+    top: 0;
+    left: 0px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    height: 100%;
+    width: 100%;
+    padding: 12px 8px;
+    background-color: var(--base-white-snow);
+    transition: all 0.2s ease;
+    will-change: transform;
+    &:hover {
+      background-color: rgb(245, 245, 245);
+    }
+    @include tablet {
+      &:hover {
+        background-color: var(--base-white-snow);
+      }
+    }
+    &--active {
+      left: -96px;
+      &:hover {
+        background-color: var(--base-white-snow);
+      }
+    }
+    &--hover {
+      background-color: rgb(245, 245, 245);
+    }
   }
 
   &__left-wrapper {
@@ -75,5 +137,14 @@
     text-align: center;
     color: var(--base-white);
     user-select: none;
+  }
+
+  &__overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    z-index: 1;
   }
 }

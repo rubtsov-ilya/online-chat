@@ -6,7 +6,7 @@ import EmptyChatsWrapper from './empty-chats-wrapper/EmptyChatsWrapper';
 import ChatItem from './chat-item/ChatItem';
 
 interface ChatsListSectionProps {
-  isMobileScreen?: boolean;
+  isMobileScreen: boolean;
 }
 
 const ChatsListSection: FC<ChatsListSectionProps> = ({ isMobileScreen }) => {
@@ -24,21 +24,21 @@ const ChatsListSection: FC<ChatsListSectionProps> = ({ isMobileScreen }) => {
               <div className={styles['chats-list__search-wrapper']}>
                 <Search />
               </div>
-              <ChatItem />
-              <ChatItem />
-              <ChatItem />
-              <ChatItem />
-              <ChatItem />
-              <ChatItem />
-              <ChatItem />
-              <ChatItem />
-              <ChatItem />
-              <ChatItem />
-              <ChatItem />
-              <ChatItem />
-              <ChatItem />
-              <ChatItem />
-              <ChatItem />
+              <ChatItem isMobileScreen={isMobileScreen} />
+              <ChatItem isMobileScreen={isMobileScreen} />
+              <ChatItem isMobileScreen={isMobileScreen} />
+              <ChatItem isMobileScreen={isMobileScreen} />
+              <ChatItem isMobileScreen={isMobileScreen} />
+              <ChatItem isMobileScreen={isMobileScreen} />
+              <ChatItem isMobileScreen={isMobileScreen} />
+              <ChatItem isMobileScreen={isMobileScreen} />
+              <ChatItem isMobileScreen={isMobileScreen} />
+              <ChatItem isMobileScreen={isMobileScreen} />
+              <ChatItem isMobileScreen={isMobileScreen} />
+              <ChatItem isMobileScreen={isMobileScreen} />
+              <ChatItem isMobileScreen={isMobileScreen} />
+              <ChatItem isMobileScreen={isMobileScreen} />
+              <ChatItem isMobileScreen={isMobileScreen} />
             </>
           )}
         </div>
