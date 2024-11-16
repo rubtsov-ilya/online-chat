@@ -9,9 +9,10 @@ import CheckedAndTimeStatuses from 'src/components/ui/checked-and-time-statuses/
 
 interface ChatItemProps {
   isMobileScreen: boolean;
+  chatsListRef: React.RefObject<HTMLDivElement>;
 }
 
-const ChatItem: FC<ChatItemProps> = ({ isMobileScreen }) => {
+const ChatItem: FC<ChatItemProps> = ({ isMobileScreen, chatsListRef }) => {
   const [isActive, setIsActive] = useState<boolean>(false);
   const [isHover, setIsHover] = useState<boolean>(false);
   const longPressTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -34,15 +35,11 @@ const ChatItem: FC<ChatItemProps> = ({ isMobileScreen }) => {
     };
 
     const chatItemCurrent = chatItemRef?.current;
+    const chatsListCurrent = chatsListRef?.current;
 
     if (isActive && chatItemCurrent) {
-      if (isMobileScreen) {
-        window.addEventListener('wheel', onScroll, {
-          passive: false,
-        });
-        window.addEventListener('touchmove', onScroll, {
-          passive: false,
-        });
+      if (isMobileScreen && chatsListCurrent) {
+        chatsListCurrent.style.overflow = 'hidden';
       } else {
         chatItemCurrent.addEventListener('wheel', onScroll, {
           passive: false,
@@ -51,15 +48,19 @@ const ChatItem: FC<ChatItemProps> = ({ isMobileScreen }) => {
           passive: false,
         });
       }
-    } else if (!isActive && chatItemCurrent) {
-      chatItemCurrent.removeEventListener('wheel', onScroll);
-      chatItemCurrent.removeEventListener('touchmove', onScroll);
+    }
+    if (!isActive && chatItemCurrent) {
+      if (isMobileScreen && chatsListCurrent) {
+        chatsListCurrent.style.overflow = '';
+      } else {
+        chatItemCurrent.removeEventListener('wheel', onScroll);
+        chatItemCurrent.removeEventListener('touchmove', onScroll);
+      }
     }
     return () => {
       if (chatItemCurrent) {
-        if (isMobileScreen) {
-          window.removeEventListener('wheel', onScroll);
-          window.removeEventListener('touchmove', onScroll);
+        if (isMobileScreen && chatsListCurrent) {
+          chatsListCurrent.style.overflow = '';
         } else {
           chatItemCurrent.removeEventListener('wheel', onScroll);
           chatItemCurrent.removeEventListener('touchmove', onScroll);
@@ -88,7 +89,6 @@ const ChatItem: FC<ChatItemProps> = ({ isMobileScreen }) => {
     if (!isHover) return;
 
     const timer = setTimeout(() => {
-      console.log('first');
       setIsHover(false);
     }, 200);
 
@@ -135,12 +135,13 @@ const ChatItem: FC<ChatItemProps> = ({ isMobileScreen }) => {
           onContextMenu={(e) => {
             if (isMobileScreen) {
               e.preventDefault();
-              setIsHover(true);
             }
           }}
           onTouchStart={(e: React.TouchEvent) => {
-            if (isMobileScreen) {
-              setIsHover(true);
+            if (isMobileScreen && !isActive) {
+              if (!isHover) {
+                setIsHover(true);
+              }
               initialTouchYRef.current = e.touches[0].clientY;
               longPressTimerRef.current = setTimeout(() => {
                 setIsActive(true);
@@ -198,9 +199,21 @@ const ChatItem: FC<ChatItemProps> = ({ isMobileScreen }) => {
         <div
           onContextMenu={(e) => {
             e.preventDefault();
+            if (isMobileScreen) {
+              if (isHover) {
+                setIsHover(false);
+              }
+            }
             setIsActive((prev) => !prev);
           }}
-          onClick={() => setIsActive((prev) => !prev)}
+          onClick={() => {
+            if (isMobileScreen) {
+              if (isHover) {
+                setIsHover(false);
+              }
+            }
+            setIsActive((prev) => !prev);
+          }}
           className={styles['chat-item__overlay']}
         />
       )}
