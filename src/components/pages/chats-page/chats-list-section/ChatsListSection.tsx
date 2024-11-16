@@ -25,23 +25,74 @@ const ChatsListSection: FC<ChatsListSectionProps> = ({ isMobileScreen }) => {
               <div className={styles['chats-list__search-wrapper']}>
                 <Search />
               </div>
-              <ChatItem chatsListRef={chatsListRef} isMobileScreen={isMobileScreen} />
-              <ChatItem chatsListRef={chatsListRef} isMobileScreen={isMobileScreen} />
-              <ChatItem chatsListRef={chatsListRef} isMobileScreen={isMobileScreen} />
-              <ChatItem chatsListRef={chatsListRef} isMobileScreen={isMobileScreen} />
-              <ChatItem chatsListRef={chatsListRef} isMobileScreen={isMobileScreen} />
-              <ChatItem chatsListRef={chatsListRef} isMobileScreen={isMobileScreen} />
-              <ChatItem chatsListRef={chatsListRef} isMobileScreen={isMobileScreen} />
-              <ChatItem chatsListRef={chatsListRef} isMobileScreen={isMobileScreen} />
-              <ChatItem chatsListRef={chatsListRef} isMobileScreen={isMobileScreen} />
-              <ChatItem chatsListRef={chatsListRef} isMobileScreen={isMobileScreen} />
-              <ChatItem chatsListRef={chatsListRef} isMobileScreen={isMobileScreen} />
-              <ChatItem chatsListRef={chatsListRef} isMobileScreen={isMobileScreen} />
-              <ChatItem chatsListRef={chatsListRef} isMobileScreen={isMobileScreen} />
-              <ChatItem chatsListRef={chatsListRef} isMobileScreen={isMobileScreen} />
-              <ChatItem chatsListRef={chatsListRef} isMobileScreen={isMobileScreen} />
-              <ChatItem chatsListRef={chatsListRef} isMobileScreen={isMobileScreen} />
-              <ChatItem chatsListRef={chatsListRef} isMobileScreen={isMobileScreen} />
+              <ChatItem
+                chatsListRef={chatsListRef}
+                isMobileScreen={isMobileScreen}
+              />
+              <ChatItem
+                chatsListRef={chatsListRef}
+                isMobileScreen={isMobileScreen}
+              />
+              <ChatItem
+                chatsListRef={chatsListRef}
+                isMobileScreen={isMobileScreen}
+              />
+              <ChatItem
+                chatsListRef={chatsListRef}
+                isMobileScreen={isMobileScreen}
+              />
+              <ChatItem
+                chatsListRef={chatsListRef}
+                isMobileScreen={isMobileScreen}
+              />
+              <ChatItem
+                chatsListRef={chatsListRef}
+                isMobileScreen={isMobileScreen}
+              />
+              <ChatItem
+                chatsListRef={chatsListRef}
+                isMobileScreen={isMobileScreen}
+              />
+              <ChatItem
+                chatsListRef={chatsListRef}
+                isMobileScreen={isMobileScreen}
+              />
+              <ChatItem
+                chatsListRef={chatsListRef}
+                isMobileScreen={isMobileScreen}
+              />
+              <ChatItem
+                chatsListRef={chatsListRef}
+                isMobileScreen={isMobileScreen}
+              />
+              <ChatItem
+                chatsListRef={chatsListRef}
+                isMobileScreen={isMobileScreen}
+              />
+              <ChatItem
+                chatsListRef={chatsListRef}
+                isMobileScreen={isMobileScreen}
+              />
+              <ChatItem
+                chatsListRef={chatsListRef}
+                isMobileScreen={isMobileScreen}
+              />
+              <ChatItem
+                chatsListRef={chatsListRef}
+                isMobileScreen={isMobileScreen}
+              />
+              <ChatItem
+                chatsListRef={chatsListRef}
+                isMobileScreen={isMobileScreen}
+              />
+              <ChatItem
+                chatsListRef={chatsListRef}
+                isMobileScreen={isMobileScreen}
+              />
+              <ChatItem
+                chatsListRef={chatsListRef}
+                isMobileScreen={isMobileScreen}
+              />
             </>
           )}
         </div>

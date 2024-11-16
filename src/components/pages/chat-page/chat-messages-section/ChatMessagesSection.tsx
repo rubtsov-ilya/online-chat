@@ -25,11 +25,11 @@ const ChatMessagesSection: FC<ChatMessagesSectionProps> = ({
   const ComponentTag = isMobileScreen ? 'section' : 'div';
   /* const [messagesArray, setMessagesArray] = useState([]); */
   const { uid } = useAuth();
+  const { messagesArray } = useGetMessagesFromRtk();
   const endRef = useRef<HTMLDivElement>(null);
   const chatMessagesRef = useRef<HTMLDivElement>(null);
   const [doScroll, setDoScroll] = useState<boolean>(false);
   const dispatch = useDispatch();
-  const { messagesArray } = useGetMessagesFromRtk();
   const devMessagesArrayInit: IMessage[] = [
     {
       messageText: 'sdasasdasdasdasdasddasdsdg',
@@ -459,7 +459,7 @@ const ChatMessagesSection: FC<ChatMessagesSectionProps> = ({
     return () => {};
   }, []);
 
-  /* ТЕСТОВАЯ ФУНКЦИЯ, ЕЁ НАДО УДАЛИТЬ */
+  /* ТЕСТОВАЯ ФУНКЦИЯ, ЕЁ НАДО УДАЛИТЬ. Изменяет сообщение, чтобы проверить синхронизацию статусов нужных*/
   const first = () => {
     // Проверяем, что массив имеет как минимум 2 элемента для доступа к предпоследнему элементу
     if (devMessagesArray.length < 2) return;

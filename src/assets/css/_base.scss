@@ -1,39 +1,41 @@
-html, body {
-font-family: var(--font-family);
-color: var(--base-black);
-background-color: var(--base-white-snow);
+html,
+body {
+  font-family: var(--font-family);
+  color: var(--base-black);
+  background-color: var(--base-white-snow);
+  -webkit-tap-highlight-color: transparent
 }
 
 body.lock {
-overflow: hidden;
+  overflow: hidden;
 }
 
 .container {
-max-width: 1166px;
-padding: 0 8px;
-margin: 0 auto;
-flex-grow: 1;
+  max-width: 1166px;
+  padding: 0 8px;
+  margin: 0 auto;
+  flex-grow: 1;
 
-&--height {
-  height: 100%;
-}
+  &--height {
+    height: 100%;
+  }
 
-&--no-padding {
-  padding: 0;
-}
+  &--no-padding {
+    padding: 0;
+  }
 
-&--max-width-unset {
-  max-width: unset;
-}
-// @include tablet {
-//   padding: 0 39px;
-// }
-//
-// @include mobile {
-//   padding: 0 31px;
-// }
+  &--max-width-unset {
+    max-width: unset;
+  }
+  // @include tablet {
+  //   padding: 0 39px;
+  // }
+  //
+  // @include mobile {
+  //   padding: 0 31px;
+  // }
 }
 
 .none {
-display: none !important;
+  display: none !important;
 }

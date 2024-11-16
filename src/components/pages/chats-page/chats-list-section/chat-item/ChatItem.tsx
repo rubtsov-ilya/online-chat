@@ -6,6 +6,8 @@ import DeleteSvg from 'src/assets/images/icons/24x24-icons/Delete.svg?react';
 
 import styles from './ChatItem.module.scss';
 import CheckedAndTimeStatuses from 'src/components/ui/checked-and-time-statuses/CheckedAndTimeStatuses';
+import useBodyLock from 'src/hooks/useBodyLock';
+import ModalActionConfirm from 'src/components/ui/modal-action-confirm/ModalActionConfirm';
 
 interface ChatItemProps {
   isMobileScreen: boolean;
@@ -13,6 +15,8 @@ interface ChatItemProps {
 }
 
 const ChatItem: FC<ChatItemProps> = ({ isMobileScreen, chatsListRef }) => {
+  const { toggleBodyLock } = useBodyLock();
+  const [modalOpen, setModalOpen] = useState<'ban' | 'delete' | false>(false);
   const [isActive, setIsActive] = useState<boolean>(false);
   const [isHover, setIsHover] = useState<boolean>(false);
   const longPressTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -111,6 +115,22 @@ const ChatItem: FC<ChatItemProps> = ({ isMobileScreen, chatsListRef }) => {
     }
   };
 
+  const toggleModal = (
+    state: false | 'ban' | 'delete',
+    timer?: number,
+  ): void => {
+    if (timer) {
+      /* задержка для отработки анимации при закрытии окна */
+      toggleBodyLock();
+      setTimeout(() => {
+        setModalOpen(state);
+      }, timer);
+    } else {
+      setModalOpen(state);
+      toggleBodyLock();
+    }
+  };
+
   return (
     <>
       <div
@@ -124,10 +144,26 @@ const ChatItem: FC<ChatItemProps> = ({ isMobileScreen, chatsListRef }) => {
         ref={chatItemRef}
       >
         <div className={styles['chat-item__background']}>
-          <button className={styles['chat-item__background-btn']}>
+          <button
+            onClick={() => toggleModal('ban')}
+            onContextMenu={(e) => {
+              if (isMobileScreen) {
+                e.preventDefault();
+              }
+            }}
+            className={styles['chat-item__background-btn']}
+          >
             <UserBanSvg className={styles['chat-item__user-ban-icon']} />
           </button>
-          <button className={styles['chat-item__background-btn']}>
+          <button
+            onClick={() => toggleModal('delete')}
+            onContextMenu={(e) => {
+              if (isMobileScreen) {
+                e.preventDefault();
+              }
+            }}
+            className={styles['chat-item__background-btn']}
+          >
             <DeleteSvg className={styles['chat-item__delete-icon']} />
           </button>
         </div>
@@ -217,6 +253,7 @@ const ChatItem: FC<ChatItemProps> = ({ isMobileScreen, chatsListRef }) => {
           className={styles['chat-item__overlay']}
         />
       )}
+      {modalOpen && <ModalActionConfirm toggleModal={toggleModal} />}
     </>
   );
 };

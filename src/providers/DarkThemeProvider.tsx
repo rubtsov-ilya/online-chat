@@ -1,10 +1,4 @@
-import React, {
-  FC,
-  createContext,
-  useEffect,
-  useLayoutEffect,
-  useState,
-} from 'react';
+import React, { FC, createContext, useEffect, useState } from 'react';
 import { IValueDarkTheme } from 'src/interfaces/DarkThemeValue.interface';
 
 interface DarkThemeProviderProps {
