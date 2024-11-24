@@ -1,4 +1,4 @@
-import { FC, useState } from 'react';
+import { FC, useRef, useState } from 'react';
 import ArrowCircleSvg from 'src/assets/images/icons/24x24-icons/Left arrow circle.svg?react';
 
 import styles from './MessageInputWrapper.module.scss';
@@ -29,6 +29,7 @@ import {
   ILoadingVideoMedia,
 } from 'src/interfaces/LoadingMessage.interface';
 import { IUploadTasksRef } from 'src/interfaces/UploadTasks.interface';
+import useAutosizeTextArea from 'src/hooks/useAutosizeTextArea';
 
 interface MessageInputWrapperProps {
   isMobileScreen: boolean;
@@ -44,8 +45,11 @@ const MessageInputWrapper: FC<MessageInputWrapperProps> = ({
   uploadTasksRef,
 }) => {
   const [messageContent, setMessageContent] = useState<string>('');
+  const textAreaRef = useRef<HTMLTextAreaElement>(null);
   const { uid } = useAuth();
   const dispatch = useDispatch();
+
+  useAutosizeTextArea(textAreaRef.current, messageContent, 134);
 
   const firebaseStorageFileUpload = async (
     file: File | Blob,
@@ -383,12 +387,15 @@ const MessageInputWrapper: FC<MessageInputWrapperProps> = ({
         isAttachedItems={attachedItems.length > 0}
         isMobileScreen={isMobileScreen}
       />
-      <input
-        type="text"
-        onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+      <textarea
+        rows={1}
+        ref={textAreaRef}
+        onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
           setMessageContent(e.target.value)
         }
-        onPasteCapture={async (e: React.ClipboardEvent<HTMLInputElement>) => {
+        onPasteCapture={async (
+          e: React.ClipboardEvent<HTMLTextAreaElement>,
+        ) => {
           const items = e.clipboardData.items;
           const newItems = await Promise.all(
             Array.from(items).map(async (item) => {
@@ -419,7 +426,7 @@ const MessageInputWrapper: FC<MessageInputWrapperProps> = ({
         }}
         value={messageContent}
         placeholder="Сообщение"
-        className={styles['message-input-wrapper__input']}
+        className={styles['message-input-wrapper__textarea']}
       />
       <button
         disabled={messageContent.length === 0 && attachedItems.length === 0}

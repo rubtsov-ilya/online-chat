@@ -20,7 +20,6 @@ const DragNDropZone: FC<DragNDropZoneProps> = ({
     'media' | 'file' | null
   >(null);
 
-  console.log(isDragOnDropWrapper);
   const checkFileType = (e: React.DragEvent) => {
     const items = Array.from(e.dataTransfer.items);
 

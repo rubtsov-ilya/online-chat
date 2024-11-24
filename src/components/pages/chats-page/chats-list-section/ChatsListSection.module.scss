@@ -5,7 +5,8 @@
   overflow-y: auto;
   padding-top: 8px;
   @media screen and (min-width: 991px) {
-    @include scrollbar
+    @include scrollbar;
+    border-right: 1px solid rgba(0, 0, 0, 0.08);
   }
 
   &__search-wrapper {

@@ -15,6 +15,7 @@
   --light-overlay-dark: rgba(0, 0, 0, 0.6);
   --light-button-text: #fff;
   --light-button-background: #005fff;
+  --light-scrollbar-track: rgb(245, 245, 245);
 
   /* dark mode colors */
   --dark-black: #fff;
@@ -33,6 +34,7 @@
   --dark-overlay-dark: rgba(0, 0, 0, 0.8);
   --dark-button-text: #005fff;
   --dark-button-background: #fff;
+  --dark-scrollbar-track:rgb(10, 10, 10);
 
   /* fonts */
   --font-family: 'Roboto', sans-serif;
@@ -54,6 +56,7 @@
   --base-overlay-dark: var(--light-overlay-dark);
   --base-button-text: var(--light-button-text);
   --base-button-background: var(--light-button-background);
+  --base-scrollbar-track: var(--light-scrollbar-track);
 
   .dark {
     // dark mode base
@@ -73,5 +76,6 @@
     --base-overlay-dark: var(--dark-overlay-dark);
     --base-button-text: var(--dark-button-text);
     --base-button-background: var(--dark-button-background);
+    --base-scrollbar-track: var(--dark-scrollbar-track);
   }
 }
