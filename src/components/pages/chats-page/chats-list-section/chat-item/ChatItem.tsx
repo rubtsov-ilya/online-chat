@@ -6,8 +6,9 @@ import DeleteSvg from 'src/assets/images/icons/24x24-icons/Delete.svg?react';
 
 import styles from './ChatItem.module.scss';
 import CheckedAndTimeStatuses from 'src/components/ui/checked-and-time-statuses/CheckedAndTimeStatuses';
-import useBodyLock from 'src/hooks/useBodyLock';
-import ModalActionConfirm from 'src/components/ui/modal-action-confirm/ModalActionConfirm';
+import useToggleModal from 'src/hooks/useToggleModal';
+import ModalBackdrop from 'src/components/ui/modal-backdrop/ModalBackdrop';
+import ModalActionConfirm from 'src/components/ui/modal-action-confirm/modalActionConfirm';
 
 interface ChatItemProps {
   isMobileScreen: boolean;
@@ -15,8 +16,8 @@ interface ChatItemProps {
 }
 
 const ChatItem: FC<ChatItemProps> = ({ isMobileScreen, chatsListRef }) => {
-  const { toggleBodyLock } = useBodyLock();
   const [modalOpen, setModalOpen] = useState<'ban' | 'delete' | false>(false);
+  const { toggleModal } = useToggleModal({ setCbState: setModalOpen });
   const [isActive, setIsActive] = useState<boolean>(false);
   const [isHover, setIsHover] = useState<boolean>(false);
   const longPressTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -112,22 +113,6 @@ const ChatItem: FC<ChatItemProps> = ({ isMobileScreen, chatsListRef }) => {
         }
         initialTouchYRef.current = null; // Сбрасываем начальное положение касания
       }
-    }
-  };
-
-  const toggleModal = (
-    state: false | 'ban' | 'delete',
-    timer?: number,
-  ): void => {
-    if (timer) {
-      /* задержка для отработки анимации при закрытии окна */
-      toggleBodyLock();
-      setTimeout(() => {
-        setModalOpen(state);
-      }, timer);
-    } else {
-      setModalOpen(state);
-      toggleBodyLock();
     }
   };
 
@@ -253,7 +238,23 @@ const ChatItem: FC<ChatItemProps> = ({ isMobileScreen, chatsListRef }) => {
           className={styles['chat-item__overlay']}
         />
       )}
-      {modalOpen && <ModalActionConfirm toggleModal={toggleModal} />}
+      {modalOpen && (
+        /* аргумент number в toggleModal - длительность transition opacity в modal-backdrop */
+        <ModalBackdrop
+          toggleModal={() => toggleModal(false, 100)}
+          divIdFromIndexHtml={'modal-backdrop'}
+        >
+          <ModalActionConfirm
+            title={'Удалить чат'}
+            subtitle={
+              'Вы точно хотите удалить чат без возможности восстановления?'
+            }
+            actionBtnText={'Удалить'}
+            action={() => console.log('modalAction')}
+            avatar={userAvatarImg}
+          />
+        </ModalBackdrop>
+      )}
     </>
   );
 };

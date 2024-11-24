@@ -1,18 +1,70 @@
-@import 'src/assets/css/_mixins.scss';
 
 .modal-action-confirm {
-  position: absolute;
-  z-index: 50;
-  height: 100% !important;
-  width: 100% !important;
-  background-color: #00000099;
-  backdrop-filter: blur(2px);
-  opacity: 0;
-  transition: opacity 0.1s ease;
-  pointer-events: none;
-  overflow: hidden;
-  &--visible {
-    opacity: 1;
-    pointer-events: all;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  max-width: 300px;
+  padding: 12px 24px;
+  background-color: var(--base-white-snow);
+  border-radius: 8px;
+  user-select: none;
+  &__info-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  &__avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 999px;
+    background-color: var(--base-grey-whisper);
+  }
+  &__title {
+    font-family: var(--font-family);
+    font-weight: 500;
+    font-size: 16px;
+    text-align: center;
+    color: var(--base-black);
+    font-size: 20px;
+  }
+  &__subtitle {
+    font-family: var(--font-family);
+    font-weight: 400;
+    font-size: 16px;
+    color: var(--base-black);
+  }
+  &__buttons-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  &__action-btn {
+    flex-grow: 1;
+    max-width: 100%;
+    padding: 12px 0;
+    border-radius: 8px;
+    color: var(--base-accent-red);
+    font-family: var(--font-family);
+    font-weight: 400;
+    font-size: 16px;
+    transition: all 0.2s ease;
+    &:hover {
+      background-color: color-mix(in srgb, var(--base-accent-red), transparent 90%);
+    }
+  }
+  &__cancel-btn {
+    flex-grow: 1;
+    max-width: 100%;
+    padding: 12px 0;
+    border-radius: 8px;
+    color: var(--base-accent-blue);
+    font-family: var(--font-family);
+    font-weight: 400;
+    font-size: 16px;
+    transition: all 0.2s ease;
+    &:hover {
+      background-color: color-mix(in srgb, var(--base-accent-blue), transparent 90%);
+    }
   }
 }

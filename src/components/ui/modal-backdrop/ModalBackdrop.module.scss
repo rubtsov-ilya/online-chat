@@ -1,0 +1,21 @@
+@import 'src/assets/css/_mixins.scss';
+
+.modal-backdrop {
+  position: absolute;
+  z-index: 50;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100% !important;
+  width: 100% !important;
+  background-color: #00000099;
+  backdrop-filter: blur(2px);
+  opacity: 0;
+  transition: opacity 0.1s ease;
+  pointer-events: none;
+  overflow: hidden;
+  &--visible {
+    opacity: 1;
+    pointer-events: all;
+  }
+}

@@ -1,38 +1,61 @@
-import { createPortal } from 'react-dom';
-
-import styles from './ModalActionConfirm.module.scss';
-import { FC, useEffect, useState } from 'react';
+import { FC } from 'react';
+import styles from './modalActionConfirm.module.scss';
 
 interface ModalActionConfirmProps {
-  toggleModal: (state: false | 'ban' | 'delete', timer?: number) => void;
+  avatar?: string;
+  title?: string;
+  subtitle: string;
+  actionBtnText: string;
+  action: () => void;
+  closeModal?: () => void;
 }
 
-const ModalActionConfirm: FC<ModalActionConfirmProps> = ({ toggleModal }) => {
-  const [isVisible, setIsVisible] = useState<boolean>(false);
-  useEffect(() => {
-    setTimeout(() => {
-      setIsVisible(true);
-    }, 0);
-  }, []);
-
-  const closeModal = () => {
-    setIsVisible(false);
-    toggleModal(false, 100);
-    /* аргумент - длительность transition opacity в modal-gallery */
-  };
-
-  return createPortal(
+const ModalActionConfirm: FC<ModalActionConfirmProps> = ({
+  title,
+  subtitle,
+  actionBtnText,
+  avatar,
+  action,
+  closeModal,
+}) => {
+  return (
     <div
-      className={`${styles['modal-action-confirm']} ${isVisible ? styles['modal-action-confirm--visible'] : ''}`}
-      onClick={closeModal}
+      className={styles['modal-action-confirm']}
+      onClick={(e: React.MouseEvent<HTMLDivElement>) => e.stopPropagation()}
     >
-      <div
-        onClick={(e: React.MouseEvent<HTMLDivElement>) => e.stopPropagation()}
-      >
-        modal
+      {(avatar !== undefined || title !== undefined) && (
+        <div className={styles['modal-action-confirm__info-wrapper']}>
+          {avatar && (
+            <img
+              src={avatar}
+              alt=""
+              className={styles['modal-action-confirm__avatar']}
+            />
+          )}
+          {title && (
+            <span className={styles['modal-action-confirm__title']}>
+              {title}
+            </span>
+          )}
+        </div>
+      )}
+
+      <p className={styles['modal-action-confirm__subtitle']}>{subtitle}</p>
+      <div className={styles['modal-action-confirm__buttons-wrapper']}>
+        <button
+          className={styles['modal-action-confirm__action-btn']}
+          onClick={action}
+        >
+          {actionBtnText}
+        </button>
+        <button
+          className={styles['modal-action-confirm__cancel-btn']}
+          onClick={closeModal}
+        >
+          Отмена
+        </button>
       </div>
-    </div>,
-    document.getElementById('modal-action-confirm') as HTMLDivElement,
+    </div>
   );
 };
 
