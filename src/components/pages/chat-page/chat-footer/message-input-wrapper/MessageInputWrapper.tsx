@@ -429,9 +429,17 @@ const MessageInputWrapper: FC<MessageInputWrapperProps> = ({
         className={styles['message-input-wrapper__textarea']}
       />
       <button
-        disabled={messageContent.length === 0 && attachedItems.length === 0}
+        disabled={
+          messageContent.trim().length === 0 && attachedItems.length === 0
+        }
         className={styles['message-input-wrapper__btn']}
         onClick={() => {
+          if (
+            messageContent.trim().length === 0 &&
+            attachedItems.length === 0
+          ) {
+            return;
+          }
           sendMessage(messageContent, attachedItems);
           setAttachedItems([]);
           setMessageContent('');
@@ -439,7 +447,7 @@ const MessageInputWrapper: FC<MessageInputWrapperProps> = ({
       >
         <ArrowCircleSvg
           className={
-            messageContent.length === 0 && attachedItems.length === 0
+            messageContent.trim().length === 0 && attachedItems.length === 0
               ? styles['message-input-wrapper__arrow-icon']
               : `${styles['message-input-wrapper__arrow-icon']} ${styles['active']}`
           }
