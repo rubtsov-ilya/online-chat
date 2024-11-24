@@ -208,7 +208,7 @@ const ChatItem: FC<ChatItemProps> = ({ isMobileScreen, chatsListRef }) => {
             if (isActive && longPressTimerRef.current !== null) {
               setIsActive(false);
             }
-            /* вынести в отдельную функцию и там выключать стейт */
+            /* вынести в отдельную функцию и там выключать стейт при экешене нужном*/
           }}
           onTouchMove={onTouchMove}
           className={`${styles['chat-item__foreground']} ${isActive ? styles['chat-item__foreground--active'] : ''} ${isHover && isMobileScreen ? styles['chat-item__foreground--hover'] : ''}`}
@@ -271,6 +271,7 @@ const ChatItem: FC<ChatItemProps> = ({ isMobileScreen, chatsListRef }) => {
           divIdFromIndexHtml={'modal-backdrop'}
         >
           <ModalActionConfirm
+            isMobileScreen={isMobileScreen}
             title={modalActionData[modalOpen].title}
             subtitle={modalActionData[modalOpen].subtitle}
             actionBtnText={modalActionData[modalOpen].actionBtnText}

@@ -6,6 +6,7 @@ interface ModalActionConfirmProps {
   title?: string;
   subtitle: string;
   actionBtnText: string;
+  isMobileScreen: boolean;
   action: () => void;
   closeModal?: () => void;
   /* closeModal !== undefined, передаётся из ModalBackdrop через 
@@ -21,6 +22,7 @@ const ModalActionConfirm: FC<ModalActionConfirmProps> = ({
   subtitle,
   actionBtnText,
   avatar,
+  isMobileScreen,
   action,
   closeModal,
 }) => {
@@ -28,6 +30,11 @@ const ModalActionConfirm: FC<ModalActionConfirmProps> = ({
     <div
       className={styles['modal-action-confirm']}
       onClick={(e: React.MouseEvent<HTMLDivElement>) => e.stopPropagation()}
+      onContextMenu={(e) => {
+        if (isMobileScreen) {
+          e.preventDefault();
+        }
+      }}
     >
       {(avatar !== undefined || title !== undefined) && (
         <div className={styles['modal-action-confirm__info-wrapper']}>
