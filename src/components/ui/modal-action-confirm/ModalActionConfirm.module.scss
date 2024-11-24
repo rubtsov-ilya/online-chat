@@ -1,3 +1,4 @@
+@import 'src/assets/css/_mixins.scss';
 
 .modal-action-confirm {
   display: flex;
@@ -23,10 +24,8 @@
   &__title {
     font-family: var(--font-family);
     font-weight: 500;
-    font-size: 16px;
-    text-align: center;
-    color: var(--base-black);
     font-size: 20px;
+    color: var(--base-black);
   }
   &__subtitle {
     font-family: var(--font-family);
@@ -49,8 +48,25 @@
     font-weight: 400;
     font-size: 16px;
     transition: all 0.2s ease;
+    @include tablet {
+      /* длительность анимации закрытия модального окна 100ms, делить на 2, чтобы анимация active успела отобразиться */
+      transition: all 0.05s ease;
+    }
     &:hover {
-      background-color: color-mix(in srgb, var(--base-accent-red), transparent 90%);
+      background-color: color-mix(
+        in srgb,
+        var(--base-accent-red),
+        transparent 90%
+      );
+    }
+    @include tablet {
+      &:active {
+        background-color: color-mix(
+          in srgb,
+          var(--base-accent-red),
+          transparent 90%
+        );
+      }
     }
   }
   &__cancel-btn {
@@ -63,8 +79,25 @@
     font-weight: 400;
     font-size: 16px;
     transition: all 0.2s ease;
+    @include tablet {
+      /* длительность анимации закрытия модального окна 100ms, делить на 2, чтобы анимация active успела отобразиться */
+      transition: all 0.05s ease;
+    }
     &:hover {
-      background-color: color-mix(in srgb, var(--base-accent-blue), transparent 90%);
+      background-color: color-mix(
+        in srgb,
+        var(--base-accent-blue),
+        transparent 90%
+      );
+    }
+    @include tablet {
+      &:active {
+        background-color: color-mix(
+          in srgb,
+          var(--base-accent-blue),
+          transparent 90%
+        );
+      }
     }
   }
 }

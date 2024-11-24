@@ -24,7 +24,6 @@ const ModalBackdrop: FC<ModalBackdropProps> = ({
   const closeModal = () => {
     setIsVisible(false);
     toggleModal();
-    /* аргумент - длительность transition opacity в modal-backdrop */
   };
 
   return createPortal(

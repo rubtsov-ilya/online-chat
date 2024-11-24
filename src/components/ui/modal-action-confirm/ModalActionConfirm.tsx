@@ -8,6 +8,12 @@ interface ModalActionConfirmProps {
   actionBtnText: string;
   action: () => void;
   closeModal?: () => void;
+  /* closeModal !== undefined, передаётся из ModalBackdrop через 
+  React.cloneElement(children as... Поэтому указан проп как необязательный */
+  /* const closeModal = () => {
+    setIsVisible(false);
+    toggleModal();
+  }; */
 }
 
 const ModalActionConfirm: FC<ModalActionConfirmProps> = ({
@@ -44,13 +50,16 @@ const ModalActionConfirm: FC<ModalActionConfirmProps> = ({
       <div className={styles['modal-action-confirm__buttons-wrapper']}>
         <button
           className={styles['modal-action-confirm__action-btn']}
-          onClick={action}
+          onClick={() => {
+            action();
+            closeModal!();
+          }}
         >
           {actionBtnText}
         </button>
         <button
           className={styles['modal-action-confirm__cancel-btn']}
-          onClick={closeModal}
+          onClick={closeModal!}
         >
           Отмена
         </button>

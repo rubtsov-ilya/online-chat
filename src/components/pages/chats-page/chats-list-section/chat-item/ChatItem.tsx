@@ -32,6 +32,25 @@ const ChatItem: FC<ChatItemProps> = ({ isMobileScreen, chatsListRef }) => {
     userName: 'Антон Арбузов',
   };
 
+  const modalActionData = {
+    delete: {
+      title: 'Удалить чат',
+      subtitle: 'Вы точно хотите удалить чат без возможности восстановления?',
+      actionBtnText: 'Удалить',
+      action() {
+        console.log('delete');
+      },
+    },
+    ban: {
+      title: 'Подтверждение',
+      subtitle: 'Запретить пользователю писать Вам сообщения?',
+      actionBtnText: 'Заблокировать',
+      action() {
+        console.log('ban');
+      },
+    },
+  };
+
   useEffect(() => {
     const onScroll = (event: Event) => {
       if (event.cancelable) {
@@ -128,7 +147,14 @@ const ChatItem: FC<ChatItemProps> = ({ isMobileScreen, chatsListRef }) => {
         }}
         ref={chatItemRef}
       >
-        <div className={styles['chat-item__background']}>
+        <div
+          className={styles['chat-item__background']}
+          onContextMenu={(e) => {
+            if (isMobileScreen) {
+              e.preventDefault();
+            }
+          }}
+        >
           <button
             onClick={() => toggleModal('ban')}
             onContextMenu={(e) => {
@@ -245,12 +271,10 @@ const ChatItem: FC<ChatItemProps> = ({ isMobileScreen, chatsListRef }) => {
           divIdFromIndexHtml={'modal-backdrop'}
         >
           <ModalActionConfirm
-            title={'Удалить чат'}
-            subtitle={
-              'Вы точно хотите удалить чат без возможности восстановления?'
-            }
-            actionBtnText={'Удалить'}
-            action={() => console.log('modalAction')}
+            title={modalActionData[modalOpen].title}
+            subtitle={modalActionData[modalOpen].subtitle}
+            actionBtnText={modalActionData[modalOpen].actionBtnText}
+            action={modalActionData[modalOpen].action}
             avatar={userAvatarImg}
           />
         </ModalBackdrop>
