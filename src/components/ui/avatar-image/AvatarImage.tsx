@@ -11,7 +11,8 @@ const AvatarImage: FC<UserAvatarProps> = ({ AvatarImg, isLittle }) => {
   return (
     <img
       src={AvatarImg}
-      alt="Avatar"
+      alt=""
+      onError={undefined}
       className={`${styles['avatar-image']} ${isLittle ? styles['avatar-image--little'] : ''}`}
     />
   );

@@ -21,6 +21,7 @@ interface MessageProps {
   uploadTasksRef: React.MutableRefObject<IUploadTasksRef>;
   uid: string | null;
   messageIndex: number;
+  avatar: string;
 }
 
 const Message: FC<MessageProps> = ({
@@ -30,6 +31,7 @@ const Message: FC<MessageProps> = ({
   isFirstOfGroup,
   uploadTasksRef,
   messageIndex,
+  avatar,
 }) => {
   const cancelUploadsForMessage = (messageId: string) => {
     if (uploadTasksRef.current[messageId]) {
@@ -54,7 +56,7 @@ const Message: FC<MessageProps> = ({
   return (
     <div className={styles['message']} id={messageData.messageId}>
       {isLastOfGroup && uid && messageData.senderUid != uid && (
-        <AvatarImage AvatarImg={messageData.userAvatar} isLittle={true} />
+        <AvatarImage AvatarImg={avatar} isLittle={true} />
       )}
       <div
         className={`${styles['message__wrapper']} ${messageData.senderUid === uid ? styles['own'] : ''} ${isLastOfGroup ? `${styles['border']} ${styles['margin-left']}` : ''} ${isFirstOfGroup && messageIndex !== 0 ? styles['margin-top'] : ''}`}

@@ -21,11 +21,11 @@ export interface IMessage {
   messageText: string;
   messageDateUTC: string;
   messageId: string;
+  isDeleted: boolean;
   isChecked: boolean;
   isLoading: boolean;
   isEdited: boolean;
   senderUid: string;
-  userAvatar: string;
   media: (IImgMedia | IVideoMedia)[];
   files: IFile[];
 }

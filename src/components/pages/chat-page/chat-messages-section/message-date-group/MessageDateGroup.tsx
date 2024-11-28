@@ -11,6 +11,7 @@ interface MessageDateGroupProps {
   uploadTasksRef: React.MutableRefObject<IUploadTasksRef>;
   uid: string | null;
   chatMessagesRef: React.RefObject<HTMLDivElement>;
+  avatar: string;
 }
 
 const MessageDateGroup: FC<MessageDateGroupProps> = ({
@@ -18,6 +19,7 @@ const MessageDateGroup: FC<MessageDateGroupProps> = ({
   uid,
   uploadTasksRef,
   chatMessagesRef,
+  avatar,
 }) => {
   // Предполагаем, что messageData и prevMessageData приходят извне, если нужно их использовать
   return (
@@ -32,6 +34,7 @@ const MessageDateGroup: FC<MessageDateGroupProps> = ({
             <Message
               key={index}
               uid={uid}
+              avatar={avatar}
               uploadTasksRef={uploadTasksRef}
               messageData={messageData}
               messageIndex={index}

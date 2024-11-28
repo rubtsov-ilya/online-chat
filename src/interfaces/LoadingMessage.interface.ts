@@ -34,7 +34,7 @@ export interface ILoadingMessage {
   messageId: string;
   isChecked: boolean;
   senderUid: string;
-  userAvatar: string;
+  isDeleted: boolean;
   isLoading: boolean;
   isCanceled: boolean;
   isEdited: boolean;

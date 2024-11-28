@@ -16,15 +16,18 @@ import { ILoadingMessage } from 'src/interfaces/LoadingMessage.interface';
 interface ChatMessagesSectionProps {
   isMobileScreen?: boolean;
   uploadTasksRef: React.MutableRefObject<IUploadTasksRef>;
+  avatar: string;
 }
 
 const ChatMessagesSection: FC<ChatMessagesSectionProps> = ({
   isMobileScreen,
   uploadTasksRef,
+  avatar,
 }) => {
   const ComponentTag = isMobileScreen ? 'section' : 'div';
   /* const [messagesArray, setMessagesArray] = useState([]); */
   const { uid } = useAuth();
+
   const { messagesArray } = useGetMessagesFromRtk();
   const endRef = useRef<HTMLDivElement>(null);
   const chatMessagesRef = useRef<HTMLDivElement>(null);
@@ -37,8 +40,7 @@ const ChatMessagesSection: FC<ChatMessagesSectionProps> = ({
       messageId: '7320616e-a5ac-4d55-bf99-cf8f4cbbb44f',
       isChecked: false,
       senderUid: 'yp7vuU1DFuRnGlwa5m7IGUtV7GJ3',
-      userAvatar:
-        'https://img.freepik.com/free-photo/futuristic-cat-with-goggles_23-2150969291.jpg?t=st=1723732192~exp=1723735792~hmac=a4a2681fc1de61379eaa4e0c3fa697ded740bab5de9171e7678b25df7276ff80&w=826',
+      isDeleted: false,
       isLoading: false,
       isEdited: false,
       media: [],
@@ -50,8 +52,7 @@ const ChatMessagesSection: FC<ChatMessagesSectionProps> = ({
       messageId: '2f44f109-7661-485c-bb23-ef5068e2bcd9',
       isChecked: false,
       senderUid: 'yp7vuU1DFuRnGlwa5m7IGUtV7GJ6',
-      userAvatar:
-        'https://img.freepik.com/free-photo/futuristic-cat-with-goggles_23-2150969291.jpg?t=st=1723732192~exp=1723735792~hmac=a4a2681fc1de61379eaa4e0c3fa697ded740bab5de9171e7678b25df7276ff80&w=826',
+      isDeleted: false,
       isLoading: false,
       isEdited: false,
       media: [],
@@ -64,8 +65,7 @@ const ChatMessagesSection: FC<ChatMessagesSectionProps> = ({
       messageId: 'ee2a85a2-f7e3-4430-908a-599f2b88901b',
       isChecked: true,
       senderUid: 'yp7vuU1DFuRnGlwa5m7IGUtV7GJ3',
-      userAvatar:
-        'https://img.freepik.com/free-photo/futuristic-cat-with-goggles_23-2150969291.jpg?t=st=1723732192~exp=1723735792~hmac=a4a2681fc1de61379eaa4e0c3fa697ded740bab5de9171e7678b25df7276ff80&w=826',
+      isDeleted: false,
       isLoading: false,
       isEdited: false,
       media: [
@@ -133,8 +133,7 @@ const ChatMessagesSection: FC<ChatMessagesSectionProps> = ({
       messageId: '4a985e4f-21c7-4a66-869b-5d4fc3d6d0fc',
       isChecked: true,
       senderUid: 'yp7vuU1DFuRnGlwa5m7IGUtV7GJ3',
-      userAvatar:
-        'https://img.freepik.com/free-photo/futuristic-cat-with-goggles_23-2150969291.jpg?t=st=1723732192~exp=1723735792~hmac=a4a2681fc1de61379eaa4e0c3fa697ded740bab5de9171e7678b25df7276ff80&w=826',
+      isDeleted: false,
       isLoading: false,
       isEdited: false,
       media: [
@@ -154,8 +153,7 @@ const ChatMessagesSection: FC<ChatMessagesSectionProps> = ({
       messageId: 'cd625728-6a3f-4528-a6f1-546f1f81df26',
       isChecked: true,
       senderUid: 'yp7vuU1DFuRnGlwa5m7IGUtV7GJ3',
-      userAvatar:
-        'https://img.freepik.com/free-photo/futuristic-cat-with-goggles_23-2150969291.jpg?t=st=1723732192~exp=1723735792~hmac=a4a2681fc1de61379eaa4e0c3fa697ded740bab5de9171e7678b25df7276ff80&w=826',
+      isDeleted: false,
       isLoading: false,
       isEdited: false,
       media: [
@@ -181,8 +179,7 @@ const ChatMessagesSection: FC<ChatMessagesSectionProps> = ({
       messageId: '28af7d4a-af65-4640-92be-6873e72e7689',
       isChecked: true,
       senderUid: 'yp7vuU1DFuRnGlwa5m7IGUtV7GJ3',
-      userAvatar:
-        'https://img.freepik.com/premium-photo/there-is-cat-that-is-looking-camera-flowers-generative-ai_1035438-4846.jpg?w=740',
+      isDeleted: false,
       isLoading: false,
       isEdited: false,
       media: [
@@ -208,8 +205,7 @@ const ChatMessagesSection: FC<ChatMessagesSectionProps> = ({
       messageId: 'fecb7b57-3361-4d67-9456-30eec3f1980c',
       isChecked: true,
       senderUid: 'yp7vuU1DFuRnGlwa5m7IGUtV7GJ3',
-      userAvatar:
-        'https://img.freepik.com/premium-photo/there-is-cat-that-is-looking-camera-flowers-generative-ai_1035438-4846.jpg?w=740',
+      isDeleted: false,
       isLoading: false,
       isEdited: false,
       media: [
@@ -241,8 +237,7 @@ const ChatMessagesSection: FC<ChatMessagesSectionProps> = ({
       messageId: '93bbffa4-90b0-4a31-8dbd-8fe86f76f08a',
       isChecked: true,
       senderUid: 'yp7vuU1DFuRnGlwa5m7IGUtV7GJ3',
-      userAvatar:
-        'https://img.freepik.com/premium-photo/there-is-cat-that-is-looking-camera-flowers-generative-ai_1035438-4846.jpg?w=740',
+      isDeleted: false,
       isLoading: false,
       isEdited: false,
       media: [],
@@ -255,8 +250,7 @@ const ChatMessagesSection: FC<ChatMessagesSectionProps> = ({
       messageId: 'd6ec6240-80b9-4317-8ebb-ea2f2d6da78c',
       isChecked: true,
       senderUid: 'yp7vuU1DFuRnGlwa5m7IGUtV7GJ6',
-      userAvatar:
-        'https://img.freepik.com/free-photo/futuristic-cat-with-goggles_23-2150969291.jpg?t=st=1723732192~exp=1723735792~hmac=a4a2681fc1de61379eaa4e0c3fa697ded740bab5de9171e7678b25df7276ff80&w=826',
+      isDeleted: false,
       isLoading: false,
       isEdited: false,
       media: [],
@@ -268,8 +262,7 @@ const ChatMessagesSection: FC<ChatMessagesSectionProps> = ({
       messageId: '3d3cf30e-1adb-4ed2-b585-866000ef70e3',
       isChecked: false,
       senderUid: 'yp7vuU1DFuRnGlwa5m7IGUtV7GJ6',
-      userAvatar:
-        'https://img.freepik.com/free-photo/futuristic-cat-with-goggles_23-2150969291.jpg?t=st=1723732192~exp=1723735792~hmac=a4a2681fc1de61379eaa4e0c3fa697ded740bab5de9171e7678b25df7276ff80&w=826',
+      isDeleted: false,
       isLoading: false,
       isEdited: false,
       media: [
@@ -300,8 +293,7 @@ const ChatMessagesSection: FC<ChatMessagesSectionProps> = ({
       messageId: '8df26386-978b-4be7-b484-4fc9d1edd231',
       isChecked: false,
       senderUid: 'yp7vuU1DFuRnGlwa5m7IGUtV7GJ6',
-      userAvatar:
-        'https://img.freepik.com/free-photo/futuristic-cat-with-goggles_23-2150969291.jpg?t=st=1723732192~exp=1723735792~hmac=a4a2681fc1de61379eaa4e0c3fa697ded740bab5de9171e7678b25df7276ff80&w=826',
+      isDeleted: false,
       isLoading: false,
       isEdited: false,
       media: [
@@ -327,8 +319,7 @@ const ChatMessagesSection: FC<ChatMessagesSectionProps> = ({
       messageId: '8c9480a9-5e6b-4940-bd71-e180a7764329',
       isChecked: true,
       senderUid: 'yp7vuU1DFuRnGlwa5m7IGUtV7GJ6',
-      userAvatar:
-        'https://img.freepik.com/free-photo/futuristic-cat-with-goggles_23-2150969291.jpg?t=st=1723732192~exp=1723735792~hmac=a4a2681fc1de61379eaa4e0c3fa697ded740bab5de9171e7678b25df7276ff80&w=826',
+      isDeleted: false,
       isLoading: false,
       isEdited: false,
       media: [],
@@ -340,8 +331,7 @@ const ChatMessagesSection: FC<ChatMessagesSectionProps> = ({
       messageId: '6f664af4-6aa8-4f48-b24b-5457ff5fa083',
       isChecked: true,
       senderUid: 'yp7vuU1DFuRnGlwa5m7IGUtV7GJ6',
-      userAvatar:
-        'https://img.freepik.com/free-photo/futuristic-cat-with-goggles_23-2150969291.jpg?t=st=1723732192~exp=1723735792~hmac=a4a2681fc1de61379eaa4e0c3fa697ded740bab5de9171e7678b25df7276ff80&w=826',
+      isDeleted: false,
       isLoading: false,
       media: [
         {
@@ -368,8 +358,7 @@ const ChatMessagesSection: FC<ChatMessagesSectionProps> = ({
       messageId: '66354598-bba7-4ae7-9940-9aba88f93cac',
       isChecked: true,
       senderUid: 'yp7vuU1DFuRnGlwa5m7IGUtV7GJ6',
-      userAvatar:
-        'https://img.freepik.com/free-photo/futuristic-cat-with-goggles_23-2150969291.jpg?t=st=1723732192~exp=1723735792~hmac=a4a2681fc1de61379eaa4e0c3fa697ded740bab5de9171e7678b25df7276ff80&w=826',
+      isDeleted: false,
       isLoading: false,
       isEdited: false,
       media: [
@@ -396,8 +385,7 @@ const ChatMessagesSection: FC<ChatMessagesSectionProps> = ({
       messageId: '909e395c-6ac2-4900-a56a-b2766609cc60',
       isChecked: true,
       senderUid: 'yp7vuU1DFuRnGlwa5m7IGUtV7GJ6',
-      userAvatar:
-        'https://img.freepik.com/free-photo/futuristic-cat-with-goggles_23-2150969291.jpg?t=st=1723732192~exp=1723735792~hmac=a4a2681fc1de61379eaa4e0c3fa697ded740bab5de9171e7678b25df7276ff80&w=826',
+      isDeleted: false,
       isLoading: false,
       isEdited: false,
       media: [
@@ -425,8 +413,7 @@ const ChatMessagesSection: FC<ChatMessagesSectionProps> = ({
       messageId: '9ec08cd0-7be2-488d-8bfd-a5a0b6d165e0',
       isChecked: true,
       senderUid: 'yp7vuU1DFuRnGlwa5m7IGUtV7GJ6',
-      userAvatar:
-        'https://img.freepik.com/free-photo/futuristic-cat-with-goggles_23-2150969291.jpg?t=st=1723732192~exp=1723735792~hmac=a4a2681fc1de61379eaa4e0c3fa697ded740bab5de9171e7678b25df7276ff80&w=826',
+      isDeleted: false,
       isLoading: false,
       isEdited: false,
       media: [],
@@ -475,8 +462,7 @@ const ChatMessagesSection: FC<ChatMessagesSectionProps> = ({
             messageId: '8c9480a9-5e6b-4940-bd71-e180a7764329',
             isChecked: true,
             senderUid: 'yp7vuU1DFuRnGlwa5m7IGUtV7GJ6',
-            userAvatar:
-              'https://img.freepik.com/free-photo/futuristic-cat-with-goggles_23-2150969291.jpg?t=st=1723732192~exp=1723735792~hmac=a4a2681fc1de61379eaa4e0c3fa697ded740bab5de9171e7678b25df7276ff80&w=826',
+            isDeleted: false,
             isLoading: false,
             isEdited: false,
             media: [],
@@ -555,6 +541,7 @@ const ChatMessagesSection: FC<ChatMessagesSectionProps> = ({
             ).map(([date, messages]) => (
               <MessageDateGroup
                 key={date}
+                avatar={avatar}
                 messagesArray={messages}
                 uid={uid}
                 uploadTasksRef={uploadTasksRef}

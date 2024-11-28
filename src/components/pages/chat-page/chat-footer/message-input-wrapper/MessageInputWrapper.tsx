@@ -49,7 +49,7 @@ const MessageInputWrapper: FC<MessageInputWrapperProps> = ({
   const { uid } = useAuth();
   const dispatch = useDispatch();
 
-  useAutosizeTextArea(textAreaRef.current, messageContent, 134);
+  useAutosizeTextArea(textAreaRef.current, messageContent, 130);
 
   const firebaseStorageFileUpload = async (
     file: File | Blob,
@@ -233,9 +233,9 @@ const MessageInputWrapper: FC<MessageInputWrapperProps> = ({
       messageText: messageWithLocaleUrl.messageText,
       messageDateUTC: messageWithLocaleUrl.messageDateUTC,
       messageId: messageWithLocaleUrl.messageId,
+      isDeleted: messageWithLocaleUrl.isDeleted,
       isChecked: messageWithLocaleUrl.isChecked,
       senderUid: messageWithLocaleUrl.senderUid,
-      userAvatar: messageWithLocaleUrl.userAvatar,
       isEdited: false,
       isLoading: false,
       media: newFilesAndMediaArray.filter((item) => !('fileUrl' in item)) as (
@@ -321,10 +321,9 @@ const MessageInputWrapper: FC<MessageInputWrapperProps> = ({
       messageText: messageContentLocale,
       messageDateUTC: new Date().toISOString(),
       messageId: uuidv4(),
+      isDeleted: false,
       isChecked: false,
       senderUid: uid!,
-      userAvatar:
-        'получать из database и ставить сразу в user редакса в useAuth и тд',
       isLoading: true,
       isCanceled: false,
       isEdited: false,
@@ -422,6 +421,20 @@ const MessageInputWrapper: FC<MessageInputWrapperProps> = ({
 
           if (filteredItems.length > 0) {
             setAttachedItems((prevItems) => [...prevItems, ...filteredItems]);
+          }
+        }}
+        onKeyDown={(e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+          if (e.key === 'Enter' && !isMobileScreen && !e.shiftKey) {
+            e.preventDefault();
+            if (
+              messageContent.trim().length === 0 &&
+              attachedItems.length === 0
+            ) {
+              return;
+            }
+            sendMessage(messageContent, attachedItems);
+            setAttachedItems([]);
+            setMessageContent('');
           }
         }}
         value={messageContent}

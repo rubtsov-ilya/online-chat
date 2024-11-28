@@ -7,9 +7,10 @@ import styles from './ChatHeader.module.scss';
 
 interface ChatHeaderProps {
   isMobileScreen?: boolean;
+  avatar: string;
 }
 
-const ChatHeader: FC<ChatHeaderProps> = ({ isMobileScreen }) => {
+const ChatHeader: FC<ChatHeaderProps> = ({ isMobileScreen, avatar }) => {
   const ComponentTag = isMobileScreen ? 'header' : 'div';
 
   return (
@@ -28,7 +29,7 @@ const ChatHeader: FC<ChatHeaderProps> = ({ isMobileScreen }) => {
           <span className={styles['chat-header__chat-name']}>
             {'Павел Дуров'}
           </span>
-          <AvatarImage AvatarImg={userAvatarImg} />
+          <AvatarImage AvatarImg={avatar} />
         </div>
       </div>
     </ComponentTag>
