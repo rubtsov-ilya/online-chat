@@ -1,0 +1,9 @@
+.cropper-crop-box,
+.cropper-view-box {
+  border-radius: 50%;
+}
+
+.cropper-view-box {
+  box-shadow: 0 0 0 1px var(--base-accent-blue);
+  outline: 0;
+}

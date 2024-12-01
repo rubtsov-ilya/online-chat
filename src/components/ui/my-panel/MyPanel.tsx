@@ -10,9 +10,9 @@ import { removeUser } from 'src/redux/slices/UserSlice';
 import userAvatarImg from 'src/assets/images/icons/dev-icons/avatar.jpg';
 
 import MyPanelBtn from '../my-panel-btn/MyPanelBtn';
-import AvatarImage from '../avatar-image/AvatarImage';
 
 import styles from './MyPanel.module.scss';
+import UploadAvatar from '../upload-avatar/UploadAvatar';
 
 interface MyPanelProps {
   isPanelOpen: boolean;
@@ -24,7 +24,7 @@ const MyPanel: FC<MyPanelProps> = ({ isPanelOpen, setIsPanelOpen }) => {
   const auth = getAuth();
   const { toggleBodyLock } = useBodyLock();
 
-  const onBackdropClick = (e: React.MouseEvent<HTMLDivElement>): void => {
+  const onBackdropClick = (): void => {
     setIsPanelOpen((prev) => !prev);
     toggleBodyLock();
   };
@@ -60,8 +60,10 @@ const MyPanel: FC<MyPanelProps> = ({ isPanelOpen, setIsPanelOpen }) => {
           className={styles['my-panel']}
         >
           <div className={styles['my-panel__user-wrapper']}>
-            <AvatarImage AvatarImg={userAvatarImg} />
-            <span className={styles['my-panel__user-name']}>{'Andrew Jones'}</span>
+            <UploadAvatar userAvatarImg={userAvatarImg} />
+            <span className={styles['my-panel__user-name']}>
+              {'Andrew Jones'}
+            </span>
           </div>
           <MyPanelBtn
             Svg={PencilSvg}

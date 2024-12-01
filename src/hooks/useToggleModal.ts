@@ -31,3 +31,20 @@ export default useToggleModal;
 
 /* const openModal = () => toggleModal('ban'); */
 /* const closeModal = () => toggleModal(false, 100); */
+
+/* {modalOpen && (
+  //аргумент number в toggleModal - длительность transition opacity в modal-backdrop 
+  <ModalBackdrop
+    toggleModal={() => toggleModal(false, 100)}
+    divIdFromIndexHtml={'modal-backdrop'}
+  >
+    <ModalActionConfirm
+      isMobileScreen={isMobileScreen}
+      title={modalActionData[modalOpen].title}
+      subtitle={modalActionData[modalOpen].subtitle}
+      actionBtnText={modalActionData[modalOpen].actionBtnText}
+      action={modalActionData[modalOpen].action}
+      avatar={userAvatarImg}
+    />
+  </ModalBackdrop>
+)} */

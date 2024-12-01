@@ -1,0 +1,33 @@
+.upload-avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  cursor: pointer;
+  &__btn {
+    position: absolute;
+    bottom: -33%;
+    right: -33%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    padding: 3px;
+    transform: translate(-50%, -50%);
+    border-radius: 999px;
+    background-color: var(--base-accent-blue);
+    transition: all 0.2s ease;
+  }
+
+  &__icon {
+    min-height: 14px;
+    min-width: 14px;
+    path {
+      fill: var(--light-white);
+    }
+  }
+  &:hover &__btn {
+    background-color: var(--base-accent-dark-blue);
+  }
+}

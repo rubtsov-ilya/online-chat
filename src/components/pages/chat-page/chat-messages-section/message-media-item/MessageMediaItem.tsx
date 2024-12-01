@@ -58,6 +58,9 @@ const MessageMediaItem: FC<MessageMediaItemProps> = ({
             src={imgUrl || videoPreview}
             alt=""
             className={styles['media-item']}
+            onDragStart={(e: React.DragEvent<HTMLImageElement>) =>
+              e.preventDefault()
+            }
           />
           {progress !== undefined && progress < 100 && (
             <CircularLoadingProgressbar
@@ -73,6 +76,9 @@ const MessageMediaItem: FC<MessageMediaItemProps> = ({
             preload="metadata"
             onClick={onItemClick}
             className={styles['media-item']}
+            onDragStart={(e: React.DragEvent<HTMLVideoElement>) =>
+              e.preventDefault()
+            }
           >
             <source src={videoUrl} type="video/mp4" />
             <source src={videoUrl} type="video/webm" />

@@ -12,10 +12,10 @@ import 'swiper/css/navigation';
 /* import CrossSvg from '../../../assets/images/home-page-icons/cross.svg?react'; */
 
 import styles from './ModalGallery.module.scss';
-import { useMediaQuery } from 'react-responsive';
 import type { Swiper as SwiperType } from 'swiper';
 import VideoMediaItem from '../video-media-item/VideoMediaItem';
 import ImageMediaItem from '../image-media-item/ImageMediaItem';
+import useMobileScreen from 'src/hooks/useMobileScreen';
 
 interface ModalGalleryProps {
   toggleModal: (timer?: number) => void;
@@ -31,7 +31,7 @@ const ModalGallery: FC<ModalGalleryProps> = ({
   media,
   mediaIndex,
 }) => {
-  const isMobileScreen = useMediaQuery({ query: '(max-width: 991px)' });
+  const { isMobileScreen } = useMobileScreen();
   const [isVisible, setIsVisible] = useState<boolean>(false);
   const [isTopBarVisible, setIsTopBarVisible] = useState<boolean>(true);
   const [navigationState, setNavigationState] = useState<

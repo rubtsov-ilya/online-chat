@@ -10,10 +10,10 @@ import RegisterPage from 'src/components/pages/register-page/RegisterPage.tsx';
 import ResetPasswordPage from 'src/components/pages/reset-password-page/ResetPasswordPage.tsx';
 import ChatsPage from 'src/components/pages/chats-page/ChatsPage';
 import ChatPage from 'src/components/pages/chat-page/ChatPage';
-import { useMediaQuery } from 'react-responsive';
+import useMobileScreen from 'src/hooks/useMobileScreen';
 
 export default function App() {
-  const isMobileScreen = useMediaQuery({ query: '(max-width: 991px)' });
+  const { isMobileScreen } = useMobileScreen();
 
   return (
     <BodyLockProvider>
