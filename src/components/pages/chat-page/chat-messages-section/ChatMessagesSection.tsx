@@ -487,6 +487,7 @@ const ChatMessagesSection: FC<ChatMessagesSectionProps> = ({
       const animationLength = 80;
       const scrollCoefficient = 2.8;
       const { scrollTop, clientHeight, scrollHeight } = chatMessagesCurrent;
+      /* if логика = высота всего див минус прокрученное расстояние от верха > высота viewport умноженная на коэффициент (колво экранов заданное вручную) */
       if (scrollHeight - scrollTop > clientHeight * scrollCoefficient) {
         const scrollPosition = scrollHeight - clientHeight - animationLength;
         chatMessagesCurrent.scrollTo({ top: scrollPosition, behavior: 'auto' });
