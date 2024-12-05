@@ -7,3 +7,22 @@
   box-shadow: 0 0 0 1px var(--base-accent-blue);
   outline: 0;
 }
+
+/* .cropper-modal {
+  opacity: 0 !important;
+} */
+
+.cropper-point {
+  background-color: var(--base-accent-blue) !important;
+  height: 7px !important;
+  width: 7px !important;
+}
+
+.cropper-line {
+  background-color: var(--base-accent-blue) !important;
+}
+
+.cropper-modal {
+  /* background-color: unset !important;
+  opacity: unset !important; */
+}

@@ -406,7 +406,7 @@ const MessageInputWrapper: FC<MessageInputWrapperProps> = ({
                   return {
                     imgUrl: url,
                     name: file.name,
-                    fileObject: file,
+                    fileObject: compressedFile,
                   };
                 }
               }

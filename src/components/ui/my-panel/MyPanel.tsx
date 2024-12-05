@@ -62,7 +62,7 @@ const MyPanel: FC<MyPanelProps> = ({ isPanelOpen, setIsPanelOpen }) => {
           <div className={styles['my-panel__user-wrapper']}>
             <UploadAvatar userAvatarImg={userAvatarImg} />
             <span className={styles['my-panel__user-name']}>
-              {'Andrew Jones'}
+              {'Andrew Jones Andrew Jones Andrew JonesAndrew Jones'}
             </span>
           </div>
           <MyPanelBtn

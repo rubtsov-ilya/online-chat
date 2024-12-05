@@ -342,6 +342,10 @@ const AuthForm: FC<AuthFormProps> = ({
                     value: 3,
                     message: 'Минимальная длина 3 символа',
                   },
+                  maxLength: {
+                    value: 32,
+                    message: 'Максимальная длина 32 символа',
+                  },
                 })}
                 onChange={(e: ChangeEvent<HTMLInputElement>) =>
                   setUsernameValue(e.target.value)

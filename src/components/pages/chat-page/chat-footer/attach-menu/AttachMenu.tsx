@@ -126,12 +126,15 @@ const AttachMenu: FC<AttachBtnProps> = ({
                   if (file.type.startsWith('image/')) {
                     const compressedFile = await compressImage(file);
                     const url = URL.createObjectURL(compressedFile);
-                    return { imgUrl: url, name: file.name, fileObject: file };
+                    return {
+                      imgUrl: url,
+                      name: file.name,
+                      fileObject: compressedFile,
+                    };
                   } else if (file.type.startsWith('video/')) {
                     const url = URL.createObjectURL(file);
                     return { videoUrl: url, name: file.name, fileObject: file };
                   } else {
-                    /* const url = URL.createObjectURL(file); */
                     return { isFile: true, name: file.name, fileObject: file };
                   }
                 }),

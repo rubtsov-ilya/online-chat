@@ -41,6 +41,9 @@
     font-weight: 700;
     font-size: 16px;
     color: var(--base-black);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 }
 
