@@ -1,0 +1,120 @@
+@import 'src/assets/css/_mixins.scss';
+
+.modal-input-confirm {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  max-width: 300px;
+  padding: 12px 24px;
+  background-color: var(--base-white-snow);
+  border-radius: 8px;
+  user-select: none;
+  &__info-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  &__avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 999px;
+    background-color: var(--base-grey-whisper);
+  }
+  &__title {
+    font-family: var(--font-family);
+    font-weight: 500;
+    font-size: 20px;
+    color: var(--base-black);
+  }
+  &__subtitle {
+    font-family: var(--font-family);
+    font-weight: 400;
+    font-size: 16px;
+    color: var(--base-black);
+  }
+  &__buttons-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  &__action-btn {
+    flex-grow: 1;
+    max-width: 100%;
+    padding: 12px 0;
+    border-radius: 8px;
+    color: var(--base-accent-red);
+    font-family: var(--font-family);
+    font-weight: 400;
+    font-size: 16px;
+    transition: all 0.2s ease;
+    @include tablet {
+      /* длительность анимации закрытия модального окна 100ms, делить на 2, чтобы анимация active успела отобразиться */
+      transition: all 0.05s ease;
+    }
+    &:hover {
+      background-color: color-mix(
+        in srgb,
+        var(--base-accent-red),
+        transparent 90%
+      );
+    }
+    @include tablet {
+      &:active {
+        background-color: color-mix(
+          in srgb,
+          var(--base-accent-red),
+          transparent 90%
+        );
+      }
+    }
+  }
+  &__cancel-btn {
+    flex-grow: 1;
+    max-width: 100%;
+    padding: 12px 0;
+    border-radius: 8px;
+    color: var(--base-accent-blue);
+    font-family: var(--font-family);
+    font-weight: 400;
+    font-size: 16px;
+    transition: all 0.2s ease;
+    @include tablet {
+      /* длительность анимации закрытия модального окна 100ms, делить на 2, чтобы анимация active успела отобразиться */
+      transition: all 0.05s ease;
+    }
+    &:hover {
+      background-color: color-mix(
+        in srgb,
+        var(--base-accent-blue),
+        transparent 90%
+      );
+    }
+    @include tablet {
+      &:active {
+        background-color: color-mix(
+          in srgb,
+          var(--base-accent-blue),
+          transparent 90%
+        );
+      }
+    }
+  }
+  &__input {
+    width: 100%;
+    height: 36px;
+    padding: 6px 8px;
+    border: 1px solid var(--base-grey-whisper);
+    border-radius: 999px;
+    font-family: var(--font-family);
+    font-weight: 500;
+    font-size: 14px;
+    color: var(--base-black);
+  }
+  &__label-error {
+    font-family: var(--font-family);
+    font-weight: 500;
+    font-size: 14px;
+    color: var(--base-accent-blue);
+  }
+}

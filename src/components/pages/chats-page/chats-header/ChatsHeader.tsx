@@ -6,7 +6,7 @@ import AvatarImage from 'src/components/ui/avatar-image/AvatarImage';
 import styles from './ChatsHeader.module.scss';
 
 interface HeaderProps {
-  isMobileScreen?: boolean;
+  isMobileScreen: boolean;
 }
 
 const Header: FC<HeaderProps> = ({ isMobileScreen }) => {
@@ -18,7 +18,7 @@ const Header: FC<HeaderProps> = ({ isMobileScreen }) => {
         <div className={styles['top-bar__content']}>
           <AvatarImage AvatarImg={userAvatarImg} />
           <h1 className={styles['top-bar__title']}>Online Chat</h1>
-          <PencilBtn />
+          <PencilBtn isMobileScreen={isMobileScreen} />
         </div>
       </div>
     </ComponentTag>

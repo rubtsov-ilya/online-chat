@@ -1,5 +1,5 @@
 import useBodyLock from 'src/hooks/useBodyLock';
-import { FC } from 'react';
+import { FC, useState } from 'react';
 import { createPortal } from 'react-dom';
 import PencilSvg from 'src/assets/images/icons/24x24-icons/Pencil New.svg?react';
 import GroupSvg from 'src/assets/images/icons/24x24-icons/Group.svg?react';
@@ -13,16 +13,27 @@ import MyPanelBtn from '../my-panel-btn/MyPanelBtn';
 
 import styles from './MyPanel.module.scss';
 import UploadAvatar from '../upload-avatar/UploadAvatar';
+import useToggleModal from 'src/hooks/useToggleModal';
+import ModalBackdrop from '../modal-backdrop/ModalBackdrop';
+import ModalInputConfirm from '../modal-input-confirm/modalInputConfirm';
 
 interface MyPanelProps {
   isPanelOpen: boolean;
   setIsPanelOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  isMobileScreen: boolean;
 }
 
-const MyPanel: FC<MyPanelProps> = ({ isPanelOpen, setIsPanelOpen }) => {
+const MyPanel: FC<MyPanelProps> = ({
+  isMobileScreen,
+  isPanelOpen,
+  setIsPanelOpen,
+}) => {
+  const [modalOpen, setModalOpen] = useState<boolean>(false);
+  const [inputValue, setInputValue] = useState<string>('');
   const dispatch = useDispatch();
   const auth = getAuth();
   const { toggleBodyLock } = useBodyLock();
+  const { toggleModal } = useToggleModal({ setCbState: setModalOpen });
 
   const onBackdropClick = (): void => {
     setIsPanelOpen((prev) => !prev);
@@ -42,6 +53,17 @@ const MyPanel: FC<MyPanelProps> = ({ isPanelOpen, setIsPanelOpen }) => {
     /* navigate( '/' ) */
   };
 
+  const modalAction = () => {
+    console.log(inputValue);
+  };
+
+  const validateInput = (value: string): string => {
+    if (value.length < 3) return 'Минимальная длина 3 символа';
+    if (value.length > 32) return 'Максимальная длина 32 символа';
+    /* нет ошибки */
+    return '';
+  };
+
   return createPortal(
     <div
       onClick={(e: React.MouseEvent<HTMLDivElement>) => e.stopPropagation()}
@@ -49,11 +71,7 @@ const MyPanel: FC<MyPanelProps> = ({ isPanelOpen, setIsPanelOpen }) => {
     >
       <div
         onClick={onBackdropClick}
-        className={
-          isPanelOpen
-            ? `${styles['my-panel-backdrop']} ${styles['active']}`
-            : styles['my-panel-backdrop']
-        }
+        className={`${styles['my-panel-backdrop']} ${isPanelOpen ? styles['active'] : ''}`}
       >
         <div
           onClick={(e: React.MouseEvent<HTMLDivElement>) => e.stopPropagation()}
@@ -67,8 +85,8 @@ const MyPanel: FC<MyPanelProps> = ({ isPanelOpen, setIsPanelOpen }) => {
           </div>
           <MyPanelBtn
             Svg={PencilSvg}
-            onBtnClick={() => {}}
-            text={'Новый чат'}
+            onBtnClick={() => toggleModal(true)}
+            text={'Изменить имя'}
           />
           <MyPanelBtn
             Svg={GroupSvg}
@@ -80,6 +98,26 @@ const MyPanel: FC<MyPanelProps> = ({ isPanelOpen, setIsPanelOpen }) => {
             onBtnClick={onSignOutButtonClick}
             text={'Выйти'}
           />
+          {modalOpen && (
+            /* аргумент number в toggleModal - длительность transition opacity в modal-backdrop */
+            <ModalBackdrop
+              toggleModal={() => toggleModal(false, 100)}
+              divIdFromIndexHtml={'modal-backdrop'}
+            >
+              <ModalInputConfirm
+                isMobileScreen={isMobileScreen}
+                inputPlaceholder={'Имя'}
+                title={'Изменить имя'}
+                actionBtnText={'Сохранить'}
+                action={modalAction}
+                avatar={userAvatarImg}
+                widthStyle={'300px'}
+                inputValue={inputValue}
+                setInputValue={setInputValue}
+                validateInput={validateInput}
+              />
+            </ModalBackdrop>
+          )}
         </div>
       </div>
     </div>,

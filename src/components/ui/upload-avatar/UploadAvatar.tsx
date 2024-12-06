@@ -35,7 +35,7 @@ const UploadAvatar: FC<UploadAvatarProps> = ({ userAvatarImg }) => {
   const acceptFormats =
     'image/jpeg, image/png, image/bmp, image/webp, image/avif';
 
-/*   useEffect(() => {
+  /*   useEffect(() => {
     setUploadProgress(15);
   }, []); */
 

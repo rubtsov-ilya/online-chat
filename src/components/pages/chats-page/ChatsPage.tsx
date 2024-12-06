@@ -29,7 +29,7 @@ const ChatsPage: FC<ChatsPageProps> = ({ isMobileScreen }) => {
 
       {isMobileScreen && (
         <>
-          <ChatsHeader />
+          <ChatsHeader isMobileScreen={isMobileScreen} />
           <ChatsListSection isMobileScreen={isMobileScreen} />
         </>
       )}

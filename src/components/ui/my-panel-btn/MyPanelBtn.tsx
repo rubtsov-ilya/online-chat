@@ -4,7 +4,7 @@ import styles from './MyPanelBtn.module.scss';
 
 interface MyPanelBtnProps {
   Svg: React.FunctionComponent<React.SVGProps<SVGSVGElement>>;
-  onBtnClick: () => any;
+  onBtnClick: () => void;
   text: string;
 }
 
