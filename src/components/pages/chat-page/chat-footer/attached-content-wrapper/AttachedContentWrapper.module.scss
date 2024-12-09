@@ -1,5 +1,4 @@
-@import 'src/assets/css/_mixins.scss';
-
+@use 'src/assets/css/_mixins.scss' as *;
 .attached-content-wrapper {
   padding-top: 8px;
   display: flex;

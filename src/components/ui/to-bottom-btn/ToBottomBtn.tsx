@@ -3,7 +3,7 @@ import styles from './ToBottomBtn.module.scss';
 import ArrowSvg from 'src/assets/images/icons/24x24-icons/Arrow Right.svg?react';
 
 interface ToBottomBtnProps {
-  chatMessagesRef: React.RefObject<HTMLDivElement>;
+  chatMessagesRef: React.RefObject<HTMLDivElement | null>;
   scrollToBottom: () => void;
 }
 

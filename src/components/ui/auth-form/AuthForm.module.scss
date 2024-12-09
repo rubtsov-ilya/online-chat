@@ -1,4 +1,4 @@
-@import '../../../assets/css/_mixins';
+@use 'src/assets/css/_mixins.scss' as *;
 
 .form-wrapper {
   display: flex;

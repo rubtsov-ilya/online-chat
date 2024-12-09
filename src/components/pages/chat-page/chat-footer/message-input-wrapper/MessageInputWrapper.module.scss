@@ -1,4 +1,4 @@
-@import 'src/assets/css/_mixins.scss';
+@use 'src/assets/css/_mixins.scss' as *;
 .message-input-wrapper {
   /* размер компонента образует .attach-btn height для отступов у скроллбара*/
   display: flex;

@@ -5,7 +5,7 @@ import { ILoadingMessage } from 'src/interfaces/LoadingMessage.interface';
 
 interface MessageStickyDateProps {
   messageData: IMessage | ILoadingMessage;
-  chatMessagesRef: React.RefObject<HTMLDivElement>;
+  chatMessagesRef: React.RefObject<HTMLDivElement | null>;
 }
 
 const MessageStickyDate: FC<MessageStickyDateProps> = ({

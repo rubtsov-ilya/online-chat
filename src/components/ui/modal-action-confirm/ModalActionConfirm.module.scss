@@ -1,4 +1,4 @@
-@import 'src/assets/css/_mixins.scss';
+@use 'src/assets/css/_mixins.scss' as *;
 
 .modal-action-confirm {
   display: flex;

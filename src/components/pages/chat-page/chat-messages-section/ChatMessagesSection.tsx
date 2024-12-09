@@ -2,14 +2,12 @@ import { FC, useEffect, useLayoutEffect, useRef, useState } from 'react';
 
 import useGetMessagesFromRtk from 'src/hooks/useGetMessagesFromRtk';
 import styles from './ChatMessagesSection.module.scss';
-import Message from './message/Message';
 import ToBottomBtn from 'src/components/ui/to-bottom-btn/ToBottomBtn';
 import { addInitialMessagesArray } from 'src/redux/slices/MessagesArraySlice';
 import { useDispatch } from 'react-redux';
 import { IMessage } from 'src/interfaces/Message.interface';
 import { IUploadTasksRef } from 'src/interfaces/UploadTasks.interface';
 import useAuth from 'src/hooks/useAuth';
-import MessageStickyDate from './message-sticky-date/MessageStickyDate';
 import MessageDateGroup from './message-date-group/MessageDateGroup';
 import { ILoadingMessage } from 'src/interfaces/LoadingMessage.interface';
 

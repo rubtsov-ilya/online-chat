@@ -1,4 +1,4 @@
-@import 'src/assets/css/_mixins.scss';
+@use 'src/assets/css/_mixins.scss' as *;
 .modal-cropper {
   display: flex;
   flex-direction: column;

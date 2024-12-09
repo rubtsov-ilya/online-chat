@@ -10,4 +10,12 @@ export default defineConfig({
       src: '/src',
     },
   },
+  css: {
+    preprocessorOptions: {
+      scss: {
+        // Использование компилятора sass, если нужно
+        api: 'modern',
+      },
+    },
+  },
 });

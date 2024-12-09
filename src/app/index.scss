@@ -1,5 +1,5 @@
-@import 'src/assets/css/_reset.scss';
-@import 'src/assets/fonts/_fonts.scss';
-@import 'src/assets/css/_vars.scss';
-@import 'src/assets/css/_mixins.scss';
-@import 'src/assets/css/_base.scss';
+@use 'src/assets/css/_reset.scss' as *;
+@use 'src/assets/fonts/_fonts.scss' as *;
+@use 'src/assets/css/_vars.scss' as *;
+@use 'src/assets/css/_mixins.scss' as *;
+@use 'src/assets/css/_base.scss' as *;

@@ -10,7 +10,7 @@ interface MessageDateGroupProps {
   messagesArray: (IMessage | ILoadingMessage)[];
   uploadTasksRef: React.MutableRefObject<IUploadTasksRef>;
   uid: string | null;
-  chatMessagesRef: React.RefObject<HTMLDivElement>;
+  chatMessagesRef: React.RefObject<HTMLDivElement | null>;
   avatar: string;
 }
 
