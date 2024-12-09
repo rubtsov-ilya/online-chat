@@ -346,6 +346,10 @@ const AuthForm: FC<AuthFormProps> = ({
                     value: 32,
                     message: 'Максимальная длина 32 символа',
                   },
+                  pattern: {
+                    value: /^[a-zA-Zа-яА-Я0-9\s]+$/, // только латиница и кириллица буквы + цифры + пробелы
+                    message: 'Допускаются только буквы и цифры',
+                  }
                 })}
                 onChange={(e: ChangeEvent<HTMLInputElement>) =>
                   setUsernameValue(e.target.value)

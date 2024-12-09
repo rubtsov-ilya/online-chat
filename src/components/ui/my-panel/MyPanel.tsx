@@ -60,6 +60,10 @@ const MyPanel: FC<MyPanelProps> = ({
   const validateInput = (value: string): string => {
     if (value.length < 3) return 'Минимальная длина 3 символа';
     if (value.length > 32) return 'Максимальная длина 32 символа';
+    const regex = /^[a-zA-Zа-яА-Я0-9\s]+$/;
+    console.log(!regex.test(value))
+    if (!regex.test(value))
+      return 'Допускаются только буквы и цифры';
     /* нет ошибки */
     return '';
   };
