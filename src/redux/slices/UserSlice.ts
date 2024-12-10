@@ -2,14 +2,16 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 interface IInitialState {
   email: null | string;
-  token: null | string;
   uid: null | string;
+  avatar: null | string;
+  username: null | string;
 }
 
 const initialState: IInitialState = {
   email: null,
-  token: null,
   uid: null,
+  avatar: null,
+  username: null,
 };
 
 const userSlice = createSlice({
@@ -19,19 +21,22 @@ const userSlice = createSlice({
     selectUser: (state) => state,
   },
   reducers: {
-    setUser(state, action: PayloadAction<IInitialState>) {
+    setUserWithoutUsername(state, action: PayloadAction<Omit<IInitialState, 'username'>>) {
       state.email = action.payload.email;
-      state.token = action.payload.token;
       state.uid = action.payload.uid;
+      state.avatar = action.payload.avatar;
+    },
+    setUsername(state, action: PayloadAction<Pick<IInitialState, 'username'>>) {
+      state.username = action.payload.username;
     },
     removeUser(state) {
       state.email = null;
-      state.token = null;
       state.uid = null;
+      state.avatar = null;
     },
   },
 });
 
-export const { setUser, removeUser } = userSlice.actions;
+export const { setUsername, setUserWithoutUsername, removeUser } = userSlice.actions;
 export const { selectUser } = userSlice.selectors;
 export default userSlice.reducer;

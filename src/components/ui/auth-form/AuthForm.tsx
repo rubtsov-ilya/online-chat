@@ -19,7 +19,9 @@ import {
   signInWithEmailAndPassword,
   User,
 } from 'firebase/auth';
-import { useAddUserToDataBaseMutation } from 'src/redux';
+import { firebaseDatabase } from 'src/firebase';
+import { ref as refFirebaseDatabase, set } from 'firebase/database';
+/* import { useAddUserToDataBaseMutation } from 'src/redux'; */
 import LogoSvg from 'src/assets/images/icons/logo-icons/Logo.svg?react';
 
 import styles from './AuthForm.module.scss';
@@ -39,7 +41,7 @@ const AuthForm: FC<AuthFormProps> = ({
   isResetPassword,
   setIsMessageSended,
 }) => {
-  const [addUserToDataBase] = useAddUserToDataBaseMutation();
+  /* const [addUserToDataBase] = useAddUserToDataBaseMutation(); */
   const [isPasswordHidden, setIsPasswordHidden] = useState(true);
   const [mailValue, setMailValue] = useState<string>('');
   const [passwordValue, setPasswordValue] = useState<string>('');
@@ -66,10 +68,28 @@ const AuthForm: FC<AuthFormProps> = ({
     setPasswordValue('')
     setMailValue('')
     setConfirmPasswordValue('')
+    setUsernameValue('')
    }
  */
-  async function addUserDuringRegister(user: User) {
-    await addUserToDataBase({ uid: user.uid });
+  function addUserDuringRegister(user: User, username: string) {
+    const uid = user.uid;
+
+    set(refFirebaseDatabase(firebaseDatabase, 'users/' + uid), {
+      uid: uid,
+      email: user.email,
+      username: username,
+    });
+
+    // Add user to "usersAvatars"
+    set(
+      refFirebaseDatabase(firebaseDatabase, `usersAvatars/${uid}`),
+      'default',
+    );
+
+    // Add user to "userChats"
+    set(refFirebaseDatabase(firebaseDatabase, `userChats/${uid}`), {
+      uid: uid,
+    });
   }
 
   const onFormSubmit: SubmitHandler<IAuthValues> = (data) => {
@@ -79,7 +99,7 @@ const AuthForm: FC<AuthFormProps> = ({
       createUserWithEmailAndPassword(auth, data.email, data.password)
         .then(({ user }) => {
           if (user) {
-            addUserDuringRegister(user);
+            addUserDuringRegister(user, data.username);
             navigate('/');
           }
           // Signed up
@@ -349,7 +369,7 @@ const AuthForm: FC<AuthFormProps> = ({
                   pattern: {
                     value: /^[a-zA-Zа-яА-Я0-9\s]+$/, // только латиница и кириллица буквы + цифры + пробелы
                     message: 'Допускаются только буквы и цифры',
-                  }
+                  },
                 })}
                 onChange={(e: ChangeEvent<HTMLInputElement>) =>
                   setUsernameValue(e.target.value)

@@ -1,4 +1,6 @@
 import { FC, useRef, useState } from 'react';
+import { firebaseDatabase } from 'src/firebase';
+import { ref as refFirebaseDatabase, set } from 'firebase/database';
 import styles from './UploadAvatar.module.scss';
 import AvatarImage from '../avatar-image/AvatarImage';
 import useToggleModal from 'src/hooks/useToggleModal';
@@ -13,7 +15,8 @@ import useMobileScreen from 'src/hooks/useMobileScreen';
 import { getDownloadURL, ref, uploadBytesResumable } from 'firebase/storage';
 
 interface UploadAvatarProps {
-  userAvatarImg: string;
+  userAvatar: string;
+  uid: string;
 }
 
 interface IAvatar {
@@ -21,7 +24,7 @@ interface IAvatar {
   fileObject: File;
 }
 
-const UploadAvatar: FC<UploadAvatarProps> = ({ userAvatarImg }) => {
+const UploadAvatar: FC<UploadAvatarProps> = ({ userAvatar, uid }) => {
   const { isMobileScreen } = useMobileScreen();
   const [modalOpen, setModalOpen] = useState<boolean>(false);
   const [avatar, setAvatar] = useState<IAvatar | null>(null);
@@ -34,29 +37,6 @@ const UploadAvatar: FC<UploadAvatarProps> = ({ userAvatarImg }) => {
 
   const acceptFormats =
     'image/jpeg, image/png, image/bmp, image/webp, image/avif';
-
-  /*   useEffect(() => {
-    setUploadProgress(15);
-  }, []); */
-
-  /* const closeModal = () => toggleModal(false, 100); */
-
-  /* {modalOpen && (
-  //аргумент number в toggleModal - длительность transition opacity в modal-backdrop 
-  <ModalBackdrop
-    toggleModal={() => toggleModal(false, 100)}
-    divIdFromIndexHtml={'modal-backdrop'}
-  >
-    <ModalActionConfirm
-      isMobileScreen={isMobileScreen}
-      title={modalActionData[modalOpen].title}
-      subtitle={modalActionData[modalOpen].subtitle}
-      actionBtnText={modalActionData[modalOpen].actionBtnText}
-      action={modalActionData[modalOpen].action}
-      avatar={userAvatarImg}
-    />
-  </ModalBackdrop>
-)} */
 
   const firebaseStorageFileUpload = async (file: File) => {
     const storageRef = ref(
@@ -112,7 +92,12 @@ const UploadAvatar: FC<UploadAvatarProps> = ({ userAvatarImg }) => {
     if (file) {
       const compressedFile = await compressImage(file);
       const firebaseUrl = await firebaseStorageFileUpload(compressedFile);
-      console.log(firebaseUrl);
+      if (typeof firebaseUrl === 'string' ) {
+        set(
+          refFirebaseDatabase(firebaseDatabase, `usersAvatars/${uid}`),
+          firebaseUrl,
+        );
+      }
     }
   };
 
@@ -126,7 +111,7 @@ const UploadAvatar: FC<UploadAvatarProps> = ({ userAvatarImg }) => {
         }}
         className={`${styles['upload-avatar']} ${typeof uploadProgress === 'number' ? styles['upload-avatar--loading'] : ''}`}
       >
-        <AvatarImage AvatarImg={userAvatarImg} />
+        <AvatarImage AvatarImg={userAvatar} />
         {uploadProgress === false && (
           <CameraSvg className={styles['upload-avatar__camera-icon']} />
         )}

@@ -1,6 +1,5 @@
 import { FC } from 'react';
 import LeftChevronSvg from 'src/assets/images/icons/24x24-icons/Left Chevron.svg?react';
-import userAvatarImg from 'src/assets/images/icons/dev-icons/avatar.jpg';
 import AvatarImage from 'src/components/ui/avatar-image/AvatarImage';
 
 import styles from './ChatHeader.module.scss';

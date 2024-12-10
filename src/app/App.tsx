@@ -1,5 +1,5 @@
 /// <reference types='vite-plugin-svgr/client' />
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import BodyLockProvider from 'src/providers/BodyLockProvider.tsx';
 import ScrollToTopProvider from 'src/providers/ScrollToTopProvider.tsx';
 import DarkThemeProvider from 'src/providers/DarkThemeProvider.tsx';
@@ -11,8 +11,10 @@ import ResetPasswordPage from 'src/components/pages/reset-password-page/ResetPas
 import ChatsPage from 'src/components/pages/chats-page/ChatsPage';
 import ChatPage from 'src/components/pages/chat-page/ChatPage';
 import useMobileScreen from 'src/hooks/useMobileScreen';
+import useAuth from 'src/hooks/useAuth';
 
 export default function App() {
+  const { isAuth } = useAuth();
   const { isMobileScreen } = useMobileScreen();
 
   return (
@@ -28,20 +30,20 @@ export default function App() {
               <Route path="*" element={<Navigate to="/" replace/>} />
             </Route> */}
           <Route path="/">
-            <Route index element={<HomePage />} />
-            <Route path="login" element={<LoginPage />} />
-            <Route path="register" element={<RegisterPage />} />
-            <Route path="reset-password" element={<ResetPasswordPage />} />
+            <Route index element={isAuth ? <Navigate to="/chats" replace/> : <Navigate to="/login" replace/>} />
+            <Route path="login" element={isAuth ? <Navigate to="/chats" replace/> : <LoginPage />} />
+            <Route path="register" element={isAuth ? <Navigate to="/chats" replace/> : <RegisterPage />} />
+            <Route path="reset-password" element={isAuth ? <Navigate to="/chats" replace/> : <ResetPasswordPage />} />
             <Route
               path="chats"
-              element={<ChatsPage isMobileScreen={isMobileScreen} />}
+              element={isAuth ? <ChatsPage isMobileScreen={isMobileScreen} /> : <Navigate to="/login" replace/>}
             >
-              {!isMobileScreen && <Route path="chat" element={<ChatPage />} />}
+              {!isMobileScreen && <Route path="chat" element={isAuth ? <ChatPage /> : <Navigate to="/login" replace/>} />}
             </Route>
             {isMobileScreen && (
-              <Route path="chats/chat" element={<ChatPage />} />
+              <Route path="chats/chat" element={isAuth ? <ChatPage /> : <Navigate to="/login" replace/>} />
             )}
-            {/* <Route path="*" element={<Navigate to="/" replace/>} /> */}
+            <Route path="*" element={isAuth ? <Navigate to="/chats" replace/> : <Navigate to="/login" replace/>} />
           </Route>
         </Routes>
       </DarkThemeProvider>

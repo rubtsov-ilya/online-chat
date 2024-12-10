@@ -1,5 +1,5 @@
 import { FC, useEffect, useState } from 'react';
-import styles from './modalInputConfirm.module.scss';
+import styles from './ModalInputConfirm.module.scss';
 
 interface ModalInputConfirmProps {
   avatar?: string;

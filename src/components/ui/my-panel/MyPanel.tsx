@@ -7,7 +7,6 @@ import UserSvg from 'src/assets/images/icons/24x24-icons/User.svg?react';
 import { useDispatch } from 'react-redux';
 import { getAuth, signOut } from 'firebase/auth';
 import { removeUser } from 'src/redux/slices/UserSlice';
-import userAvatarImg from 'src/assets/images/icons/dev-icons/avatar.jpg';
 
 import MyPanelBtn from '../my-panel-btn/MyPanelBtn';
 
@@ -15,7 +14,10 @@ import styles from './MyPanel.module.scss';
 import UploadAvatar from '../upload-avatar/UploadAvatar';
 import useToggleModal from 'src/hooks/useToggleModal';
 import ModalBackdrop from '../modal-backdrop/ModalBackdrop';
-import ModalInputConfirm from '../modal-input-confirm/modalInputConfirm';
+import ModalInputConfirm from '../modal-input-confirm/ModalInputConfirm';
+import useAuth from 'src/hooks/useAuth';
+import { firebaseDatabase } from 'src/firebase';
+import { ref, update } from 'firebase/database';
 
 interface MyPanelProps {
   isPanelOpen: boolean;
@@ -28,6 +30,7 @@ const MyPanel: FC<MyPanelProps> = ({
   isPanelOpen,
   setIsPanelOpen,
 }) => {
+  const { avatar: userAvatar, uid, username } = useAuth();
   const [modalOpen, setModalOpen] = useState<boolean>(false);
   const [inputValue, setInputValue] = useState<string>('');
   const dispatch = useDispatch();
@@ -53,17 +56,19 @@ const MyPanel: FC<MyPanelProps> = ({
     /* navigate( '/' ) */
   };
 
-  const modalAction = () => {
-    console.log(inputValue);
+  const modalAction = async () => {
+    const userRef = ref(firebaseDatabase, `users/${uid}`);
+    await update(userRef, {
+      username: inputValue,
+    });
+    setInputValue('');
   };
 
   const validateInput = (value: string): string => {
     if (value.length < 3) return 'Минимальная длина 3 символа';
     if (value.length > 32) return 'Максимальная длина 32 символа';
     const regex = /^[a-zA-Zа-яА-Я0-9\s]+$/;
-    console.log(!regex.test(value))
-    if (!regex.test(value))
-      return 'Допускаются только буквы и цифры';
+    if (!regex.test(value)) return 'Допускаются только буквы и цифры';
     /* нет ошибки */
     return '';
   };
@@ -82,10 +87,8 @@ const MyPanel: FC<MyPanelProps> = ({
           className={styles['my-panel']}
         >
           <div className={styles['my-panel__user-wrapper']}>
-            <UploadAvatar userAvatarImg={userAvatarImg} />
-            <span className={styles['my-panel__user-name']}>
-              {'Andrew Jones Andrew Jones Andrew JonesAndrew Jones'}
-            </span>
+            <UploadAvatar uid={uid!} userAvatar={userAvatar!} />
+            <span className={styles['my-panel__user-name']}>{username}</span>
           </div>
           <MyPanelBtn
             Svg={PencilSvg}
@@ -114,7 +117,7 @@ const MyPanel: FC<MyPanelProps> = ({
                 title={'Изменить имя'}
                 actionBtnText={'Сохранить'}
                 action={modalAction}
-                avatar={userAvatarImg}
+                avatar={userAvatar!}
                 widthStyle={'300px'}
                 inputValue={inputValue}
                 setInputValue={setInputValue}
