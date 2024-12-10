@@ -1,5 +1,6 @@
 import { FC, useEffect, useState } from 'react';
 import styles from './ModalInputConfirm.module.scss';
+import AvatarImage from '../avatar-image/AvatarImage';
 
 interface ModalInputConfirmProps {
   avatar?: string;
@@ -73,11 +74,7 @@ const ModalInputConfirm: FC<ModalInputConfirmProps> = ({
       {(avatar !== undefined || title !== undefined) && (
         <div className={styles['modal-input-confirm__info-wrapper']}>
           {avatar && (
-            <img
-              src={avatar}
-              alt=""
-              className={styles['modal-input-confirm__avatar']}
-            />
+            <AvatarImage isLittle={true} AvatarImg={avatar} />
           )}
           {title && (
             <span className={styles['modal-input-confirm__title']}>

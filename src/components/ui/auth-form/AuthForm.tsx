@@ -100,7 +100,7 @@ const AuthForm: FC<AuthFormProps> = ({
         .then(({ user }) => {
           if (user) {
             addUserDuringRegister(user, data.username);
-            navigate('/');
+            /* navigate('/'); */
           }
           // Signed up
         })
@@ -122,7 +122,7 @@ const AuthForm: FC<AuthFormProps> = ({
         .then(({ user }) => {
           // Signed in
           if (user) {
-            navigate('/');
+            /* navigate('/'); */
           }
         })
         .catch((error) => {
@@ -365,6 +365,14 @@ const AuthForm: FC<AuthFormProps> = ({
                   maxLength: {
                     value: 32,
                     message: 'Максимальная длина 32 символа',
+                  },
+                  validate: {
+                    // Проверка на минимальную длину, игнорируя пробелы
+                    minLengthNoSpaces: (value) => {
+                      const cleanedValue = value.replace(/\s/g, ''); // удаляем пробелы
+                      console.log(cleanedValue); // Для отладки
+                      return cleanedValue.length >= 3 || 'Минимальная длина 3 символа';
+                    },
                   },
                   pattern: {
                     value: /^[a-zA-Zа-яА-Я0-9\s]+$/, // только латиница и кириллица буквы + цифры + пробелы
