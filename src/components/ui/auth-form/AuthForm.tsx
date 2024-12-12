@@ -48,7 +48,6 @@ const AuthForm: FC<AuthFormProps> = ({
   const [confirmPasswordValue, setConfirmPasswordValue] = useState<string>('');
   const [usernameValue, setUsernameValue] = useState<string>('');
   const passwordInputRef = useRef<HTMLInputElement | null>(null);
-  const navigate = useNavigate();
   const {
     register,
     formState: { errors },

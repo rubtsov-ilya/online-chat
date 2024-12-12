@@ -9,6 +9,10 @@ interface ModalBackdropProps {
   divIdFromIndexHtml: string;
 }
 
+interface ModalChildProps {
+  closeModal: () => void;
+}
+
 const ModalBackdrop: FC<ModalBackdropProps> = ({
   children,
   toggleModal,
@@ -31,9 +35,10 @@ const ModalBackdrop: FC<ModalBackdropProps> = ({
       className={`${styles['modal-backdrop']} ${isVisible ? styles['modal-backdrop--visible'] : ''}`}
       onClick={closeModal}
     >
-      {React.cloneElement(children as React.ReactElement, {
-        closeModal: () => closeModal(),
-      })}
+      {React.isValidElement(children) &&
+        React.cloneElement(children as React.ReactElement<ModalChildProps>, {
+          closeModal: closeModal,
+        })}
     </div>,
     document.getElementById(divIdFromIndexHtml) as HTMLDivElement,
   );

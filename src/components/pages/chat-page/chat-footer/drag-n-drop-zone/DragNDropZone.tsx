@@ -3,6 +3,8 @@ import styles from './DragNDropZone.module.scss';
 
 import imageCompression from 'browser-image-compression';
 import { AttachedItemType } from 'src/interfaces/AttachedItem.interface';
+import { MAX_UPLOAD_FILE_SIZE } from 'src/constants'; // Импортируем константу
+import { customToastError } from 'src/components/ui/custom-toast-container/CustomToastContainer';
 
 interface DragNDropZoneProps {
   isDrag: boolean;
@@ -72,6 +74,10 @@ const DragNDropZone: FC<DragNDropZoneProps> = ({
     if (files) {
       const newItems = await Promise.all(
         Array.from(files).map(async (file) => {
+          if (file.size > MAX_UPLOAD_FILE_SIZE) {
+            customToastError("Максимальный размер 50MB");
+            return null; // Если файл слишком большой, возвращаем null
+          }
           if (file.type.startsWith('image/')) {
             const compressedFile = await compressImage(file);
             const url = URL.createObjectURL(compressedFile);
@@ -85,7 +91,10 @@ const DragNDropZone: FC<DragNDropZoneProps> = ({
           }
         }),
       );
-      setAttachedItems((prevItems) => [...prevItems, ...newItems]);
+      const validItems = newItems.filter(item => item !== null) as AttachedItemType[];
+      if (validItems.length > 0) {
+        setAttachedItems((prevItems) => [...prevItems, ...validItems]);
+      }
     }
     setIsDrag(false);
   };
@@ -95,10 +104,17 @@ const DragNDropZone: FC<DragNDropZoneProps> = ({
     const files = e.dataTransfer.files;
     if (files) {
       const newItems = Array.from(files).map((file) => {
+        if (file.size > MAX_UPLOAD_FILE_SIZE) {
+          customToastError("Максимальный размер 50MB");
+          return null; // Если файл слишком большой, возвращаем null
+        }
         /* const url = URL.createObjectURL(file); */
         return { isFile: true, name: file.name, fileObject: file };
       });
-      setAttachedItems((prevItems) => [...prevItems, ...newItems]);
+      const validItems = newItems.filter(item => item !== null) as AttachedItemType[];
+      if (validItems.length > 0) {
+        setAttachedItems((prevItems) => [...prevItems, ...validItems]);
+      }
     }
     setIsDrag(false);
   };

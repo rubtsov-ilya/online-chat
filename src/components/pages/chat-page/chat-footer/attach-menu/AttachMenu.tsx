@@ -8,6 +8,8 @@ import AttachSvg from 'src/assets/images/icons/24x24-icons/Attach.svg?react';
 import { AttachedItemType } from 'src/interfaces/AttachedItem.interface';
 
 import imageCompression from 'browser-image-compression';
+import { MAX_UPLOAD_FILE_SIZE } from 'src/constants';
+import CustomToastContainer, { customToastError } from 'src/components/ui/custom-toast-container/CustomToastContainer';
 
 interface AttachBtnProps {
   isMobileScreen: boolean;
@@ -123,6 +125,10 @@ const AttachMenu: FC<AttachBtnProps> = ({
             if (files) {
               const newItems = await Promise.all(
                 Array.from(files).map(async (file) => {
+                  if (file.size > MAX_UPLOAD_FILE_SIZE) {
+                    customToastError("Максимальный размер 50MB");
+                    return null; // Если файл слишком большой, возвращаем null
+                  }
                   if (file.type.startsWith('image/')) {
                     const compressedFile = await compressImage(file);
                     const url = URL.createObjectURL(compressedFile);
@@ -139,7 +145,10 @@ const AttachMenu: FC<AttachBtnProps> = ({
                   }
                 }),
               );
-              setAttachedItems((prevItems) => [...prevItems, ...newItems]);
+              const validItems = newItems.filter(item => item !== null) as AttachedItemType[];
+              if (validItems.length > 0) {
+                setAttachedItems((prevItems) => [...prevItems, ...validItems]);
+              }
             }
           }}
         />
@@ -153,9 +162,16 @@ const AttachMenu: FC<AttachBtnProps> = ({
             if (files) {
               const newItems = Array.from(files).map((file) => {
                 /* const url = URL.createObjectURL(file); */
+                if (file.size > MAX_UPLOAD_FILE_SIZE) {
+                  customToastError("Максимальный размер 50MB");
+                  return null; // Если файл слишком большой, возвращаем null
+                }
                 return { isFile: true, name: file.name, fileObject: file };
               });
-              setAttachedItems((prevItems) => [...prevItems, ...newItems]);
+              const validItems = newItems.filter(item => item !== null) as AttachedItemType[];
+              if (validItems.length > 0) {
+                setAttachedItems((prevItems) => [...prevItems, ...validItems]);
+              }
             }
           }}
         />

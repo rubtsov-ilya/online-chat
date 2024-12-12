@@ -1,0 +1,17 @@
+.custom-toast-error {
+  background-color: var(--base-white) !important; /* Оранжевый фон */
+  color: var(--base-black) !important; /* Белый текст */
+  min-height: 56px !important; /* Устанавливаем высоту тоста */
+
+  .Toastify__toast-body {
+    path {
+      fill: var(--base-accent-red) !important; /* Красный для ошибок */
+    }
+  }
+  .Toastify__close-button {
+    path {
+      fill: var(--base-black) !important; /* Красный для ошибок */
+    }
+  }
+
+}

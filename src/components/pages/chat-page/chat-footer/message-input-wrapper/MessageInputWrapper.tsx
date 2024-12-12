@@ -30,6 +30,8 @@ import {
 } from 'src/interfaces/LoadingMessage.interface';
 import { IUploadTasksRef } from 'src/interfaces/UploadTasks.interface';
 import useAutosizeTextArea from 'src/hooks/useAutosizeTextArea';
+import { MAX_UPLOAD_FILE_SIZE } from 'src/constants';
+import { customToastError } from 'src/components/ui/custom-toast-container/CustomToastContainer';
 
 interface MessageInputWrapperProps {
   isMobileScreen: boolean;
@@ -401,6 +403,10 @@ const MessageInputWrapper: FC<MessageInputWrapperProps> = ({
               if (item.kind === 'file' && item.type.startsWith('image/')) {
                 const file = item.getAsFile();
                 if (file) {
+                  if (file.size > MAX_UPLOAD_FILE_SIZE) {
+                    customToastError("Максимальный размер 50MB");
+                    return null; // Если файл слишком большой, возвращаем null
+                  }
                   const compressedFile = await compressImage(file);
                   const url = URL.createObjectURL(compressedFile);
                   return {

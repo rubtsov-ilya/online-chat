@@ -6,6 +6,7 @@ import ChatHeader from './chat-header/ChatHeader';
 import ChatMessagesSection from './chat-messages-section/ChatMessagesSection';
 import { IUploadTasksRef } from 'src/interfaces/UploadTasks.interface';
 import useMobileScreen from 'src/hooks/useMobileScreen';
+import CustomToastContainer from 'src/components/ui/custom-toast-container/CustomToastContainer';
 
 const ChatPage: FC = () => {
   const { isMobileScreen } = useMobileScreen();
@@ -44,6 +45,7 @@ const ChatPage: FC = () => {
         uploadTasksRef={uploadTasksRef}
         isMobileScreen={isMobileScreen}
       />
+      <CustomToastContainer />
     </ComponentTag>
   );
 };
