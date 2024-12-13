@@ -58,25 +58,6 @@
     cursor: text;
   }
 
-  &__btn {
-    margin-top: 12px;
-    height: 48px;
-    width: 100%;
-    padding: 15px 8px;
-    border-radius: 26px;
-    font-family: var(--font-family);
-    font-weight: 500;
-    font-size: 16px;
-    text-align: center;
-    color: var(--base-white);
-    background-color: var(--base-accent-blue);
-    transition: background-color 0.2s ease;
-
-    &:hover {
-      background-color: var(--base-accent-dark-blue);
-    }
-  }
-
   &__hide-btn {
     user-select: none;
     display: inline-flex;
@@ -132,4 +113,50 @@
   &__link:first-of-type {
     margin-top: auto;
   }
+
+  &__btn {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 12px;
+    height: 48px;
+    width: 100%;
+    padding: 15px 8px;
+    border-radius: 26px;
+    font-family: var(--font-family);
+    font-weight: 500;
+    font-size: 16px;
+    text-align: center;
+    color: var(--base-white);
+    background-color: var(--base-accent-blue);
+    transition: background-color 0.2s ease;
+
+    &:hover {
+      background-color: var(--base-accent-dark-blue);
+    }
+  }
+
+  &__circular-progressbar {
+    animation: rotate 2s linear infinite; /* Время анимации и бесконечный цикл */
+  }
+
+  &__circular-progressbar-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 32px;
+    height: 32px;
+    user-select: none;
+  }
+  
+  @keyframes rotate {
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
+  }
+  
 }

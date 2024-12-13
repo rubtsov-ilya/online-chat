@@ -3,6 +3,7 @@ import {
   Dispatch,
   FC,
   SetStateAction,
+  useEffect,
   useRef,
   useState,
 } from 'react';
@@ -11,7 +12,7 @@ import VisibilitySvg from 'src/assets/images/icons/auth-password-icons/visibilit
 import VisibilityOffSvg from 'src/assets/images/icons/auth-password-icons/visibility_off_24dp_FILL0_wght400_GRAD0_opsz24.svg?react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { IAuthValues } from 'src/interfaces/AuthValues.interface';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import {
   createUserWithEmailAndPassword,
   getAuth,
@@ -25,6 +26,7 @@ import { ref as refFirebaseDatabase, set } from 'firebase/database';
 import LogoSvg from 'src/assets/images/icons/logo-icons/Logo.svg?react';
 
 import styles from './AuthForm.module.scss';
+import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
 
 interface AuthFormProps {
   btnText: string;
@@ -42,6 +44,7 @@ const AuthForm: FC<AuthFormProps> = ({
   setIsMessageSended,
 }) => {
   /* const [addUserToDataBase] = useAddUserToDataBaseMutation(); */
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isPasswordHidden, setIsPasswordHidden] = useState(true);
   const [mailValue, setMailValue] = useState<string>('');
   const [passwordValue, setPasswordValue] = useState<string>('');
@@ -57,12 +60,22 @@ const AuthForm: FC<AuthFormProps> = ({
     mode: 'all',
   });
   const { ref } = register('password');
+
+  useEffect(() => {
+    return () => {
+      if (isLoading === true) {
+        setIsLoading(false)
+      }
+    }
+  }, [])
+  
+
   const onPasswordInputClick = () => {
     if (passwordInputRef.current) {
       passwordInputRef.current.focus();
     }
   };
-
+    
   /*   const formReset = (): void => { 
     setPasswordValue('')
     setMailValue('')
@@ -70,7 +83,7 @@ const AuthForm: FC<AuthFormProps> = ({
     setUsernameValue('')
    }
  */
-  function addUserDuringRegister(user: User, username: string) {
+  const addUserDuringRegister = async (user: User, username: string) => {
     const uid = user.uid;
 
     set(refFirebaseDatabase(firebaseDatabase, 'users/' + uid), {
@@ -92,6 +105,7 @@ const AuthForm: FC<AuthFormProps> = ({
   }
 
   const onFormSubmit: SubmitHandler<IAuthValues> = (data) => {
+    setIsLoading(true)
     const auth = getAuth();
     if (isRegister) {
       /* start firebase register */
@@ -99,7 +113,6 @@ const AuthForm: FC<AuthFormProps> = ({
         .then(({ user }) => {
           if (user) {
             addUserDuringRegister(user, data.username);
-            /* navigate('/'); */
           }
           // Signed up
         })
@@ -113,6 +126,7 @@ const AuthForm: FC<AuthFormProps> = ({
               message: 'Email адрес уже зарегистрирован',
             });
           }
+          setIsLoading(false)
         });
       /* end firebase register */
     } else if (isLogin) {
@@ -121,7 +135,6 @@ const AuthForm: FC<AuthFormProps> = ({
         .then(({ user }) => {
           // Signed in
           if (user) {
-            /* navigate('/'); */
           }
         })
         .catch((error) => {
@@ -133,6 +146,7 @@ const AuthForm: FC<AuthFormProps> = ({
               message: 'Неверный пароль',
             });
             console.log(errorMessage);
+            setIsLoading(false)
           }
         });
       /* end firebase login */
@@ -143,6 +157,7 @@ const AuthForm: FC<AuthFormProps> = ({
           if (setIsMessageSended) {
             setIsMessageSended(true);
           }
+          setIsLoading(false)
         })
         .catch((error) => {
           const errorCode = error.code;
@@ -154,6 +169,7 @@ const AuthForm: FC<AuthFormProps> = ({
             });
             console.log(errorMessage);
           }
+          setIsLoading(false)
         });
     }
     /* formReset(); */
@@ -370,7 +386,10 @@ const AuthForm: FC<AuthFormProps> = ({
                     minLengthNoSpaces: (value) => {
                       const cleanedValue = value.replace(/\s/g, ''); // удаляем пробелы
                       console.log(cleanedValue); // Для отладки
-                      return cleanedValue.length >= 3 || 'Минимальная длина 3 символа';
+                      return (
+                        cleanedValue.length >= 3 ||
+                        'Минимальная длина 3 символа'
+                      );
                     },
                   },
                   pattern: {
@@ -412,7 +431,29 @@ const AuthForm: FC<AuthFormProps> = ({
               Войти в аккаунт
             </Link>
           )}
-          <button className={styles['form__btn']}>{btnText}</button>
+          <button className={styles['form__btn']}>
+            {isLoading && (
+              <div className={styles['form__circular-progressbar-wrapper']}>
+                <CircularProgressbar
+                  className={styles['form__circular-progressbar']}
+                  value={66}
+                  styles={buildStyles({
+                    // Rotation of path and trail, in number of turns (0-1)
+                    /* rotation: 0.25, */
+                    // Whether to use rounded or flat corners on the ends - can use 'butt' or 'round'
+                    strokeLinecap: 'round',
+                    // How long animation takes to go from one percentage to another, in seconds
+                    pathTransitionDuration: 0.5,
+                    // Colors
+                    pathColor: 'rgb(255, 255, 255)',
+                    /* textColor: '#f88', */
+                    trailColor: 'none',
+                  })}
+                />
+              </div>
+            )}
+            {!isLoading && btnText}
+          </button>
         </form>
       </div>
     </>
