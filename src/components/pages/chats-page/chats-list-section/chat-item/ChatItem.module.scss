@@ -80,10 +80,13 @@
     display: flex;
     align-items: center;
     gap: 8px;
+    flex-grow: 1;
+    /* 65px взято из макета */
+    max-width: calc(100% - 65px);
   }
 
   &__user-avatar {
-    border-radius: 99999px;
+    border-radius: 999px;
     width: 40px;
     height: 40px;
     object-position: center;
@@ -96,21 +99,32 @@
   &__user-details-wrapper {
     display: flex;
     flex-direction: column;
+    flex-grow: 1;
+    /* 65px взято из макета */
+    max-width: calc(100% - 65px);
   }
 
   &__user-name {
     font-family: var(--font-family);
     font-weight: 700;
     font-size: 14px;
+    line-height: 17px;
     color: var(--base-black);
     user-select: none;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
   &__user-message {
     font-family: var(--font-family);
     font-weight: 400;
     font-size: 12px;
+    line-height: 14px;
     color: var(--base-grey);
     user-select: none;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
   &__right-wrapper {

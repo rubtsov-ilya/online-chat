@@ -22,6 +22,7 @@ const ChatPage: FC = () => {
   };
 
   const devUserData = {
+    /* в ртк активный чат закидывать эти данные */
     uid: 'yp7vuU1DFuRnGlwa5m7IGUtV7GJ6',
     avatar:
       'https://img.freepik.com/free-photo/futuristic-cat-with-goggles_23-2150969291.jpg?t=st=1723732192~exp=1723735792~hmac=a4a2681fc1de61379eaa4e0c3fa697ded740bab5de9171e7678b25df7276ff80&w=826',

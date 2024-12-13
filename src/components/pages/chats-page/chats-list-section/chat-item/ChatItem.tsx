@@ -1,4 +1,5 @@
 import { FC, useEffect, useRef, useState } from 'react';
+import { get, ref as refFirebaseDatabase } from 'firebase/database';
 import userAvatarImg from 'src/assets/images/icons/dev-icons/avatar.jpg';
 import AvatarImage from 'src/components/ui/avatar-image/AvatarImage';
 import UserBanSvg from 'src/assets/images/icons/24x24-icons/User Ban.svg?react';
@@ -9,15 +10,28 @@ import CheckedAndTimeStatuses from 'src/components/ui/checked-and-time-statuses/
 import useToggleModal from 'src/hooks/useToggleModal';
 import ModalBackdrop from 'src/components/ui/modal-backdrop/ModalBackdrop';
 import ModalActionConfirm from 'src/components/ui/modal-action-confirm/modalActionConfirm';
+import { IFirebaseRtDbChat } from 'src/interfaces/firebaseRealtimeDatabase.interface';
+import { firebaseDatabase } from 'src/firebase';
+import Skeleton, { SkeletonTheme } from 'react-loading-skeleton';
+import 'react-loading-skeleton/dist/skeleton.css';
 
 interface ChatItemProps {
   isMobileScreen: boolean;
-  chatsListRef: React.RefObject<HTMLDivElement>;
+  chatsListRef: React.RefObject<HTMLDivElement | null>;
+  chatItemData: IFirebaseRtDbChat;
+  uid: string;
 }
 
-const ChatItem: FC<ChatItemProps> = ({ isMobileScreen, chatsListRef }) => {
+const ChatItem: FC<ChatItemProps> = ({
+  isMobileScreen,
+  chatsListRef,
+  chatItemData,
+  uid,
+}) => {
   const [modalOpen, setModalOpen] = useState<'ban' | 'delete' | false>(false);
   const { toggleModal } = useToggleModal({ setCbState: setModalOpen });
+  const [chatName, setChatName] = useState<string>('');
+  const [userAvatar, setUserAvatar] = useState<string>('');
   const [isActive, setIsActive] = useState<boolean>(false);
   const [isHover, setIsHover] = useState<boolean>(false);
   const longPressTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -25,12 +39,40 @@ const ChatItem: FC<ChatItemProps> = ({ isMobileScreen, chatsListRef }) => {
   const initialTouchYRef = useRef<number | null>(null);
   const longPressDuration = 500;
 
-  const userData = {
+  useEffect(() => {
+    const getChatName = async () => {
+      // если чат не групповой
+      if (chatItemData.membersIds.length === 2) {
+        const userId = chatItemData.membersIds.find((id) => id !== uid);
+        const usernameRef = refFirebaseDatabase(
+          firebaseDatabase,
+          `users/${userId}/username`,
+        );
+        const userAvatarRef = refFirebaseDatabase(
+          firebaseDatabase,
+          `usersAvatars/${userId}`,
+        );
+        const usernameSnapshot = await get(usernameRef);
+        if (usernameSnapshot.exists()) {
+          const usernameValue = usernameSnapshot.val();
+          setChatName(usernameValue);
+        }
+        const userAvatarSnapshot = await get(userAvatarRef);
+        if (userAvatarSnapshot.exists()) {
+          const userAvatarValue = userAvatarSnapshot.val();
+          setUserAvatar(userAvatarValue);
+        }
+      }
+    };
+    getChatName();
+  }, [chatItemData]);
+
+  /*   const chatItemData = {
     lastMessage: 'The weather will be perfect for the stuses isisisisisi sas a',
     messageDateUTC: '2024-10-23T07:16:04.275Z',
     counter: 14,
     userName: 'Антон Арбузов',
-  };
+  }; */
 
   const modalActionData = {
     delete: {
@@ -214,27 +256,57 @@ const ChatItem: FC<ChatItemProps> = ({ isMobileScreen, chatsListRef }) => {
           className={`${styles['chat-item__foreground']} ${isActive ? styles['chat-item__foreground--active'] : ''} ${isHover && isMobileScreen ? styles['chat-item__foreground--hover'] : ''}`}
         >
           <div className={styles['chat-item__left-wrapper']}>
-            <AvatarImage AvatarImg={userAvatarImg} />
+            <AvatarImage AvatarImg={userAvatar} />
+
             <div className={styles['chat-item__user-details-wrapper']}>
-              <span className={styles['chat-item__user-name']}>
-                {userData.userName}
-              </span>
+              <SkeletonTheme
+                width={'40%'}
+                borderRadius={2}
+                height={17}
+                highlightColor="var(--base-white-snow)"
+                baseColor="var(--base-grey-gainsboro)"
+              >
+                <span className={styles['chat-item__user-name']}>
+                  {chatName.length > 0 && chatName}
+                  {chatName.length === 0 && <Skeleton />}
+                </span>
+              </SkeletonTheme>
               <span className={styles['chat-item__user-message']}>
-                {userData.lastMessage.length > 38
-                  ? userData.lastMessage.slice(0, 38) + '...'
-                  : userData.lastMessage}
+                <SkeletonTheme
+                  width={'70%'}
+                  borderRadius={2}
+                  height={14}
+                  highlightColor="var(--base-white-snow)"
+                  baseColor="var(--base-grey-gainsboro)"
+                >
+                  {/*                   {chatName.length > 0 &&
+                    chatItemData.lastMessageText.length > 38 &&
+                    chatItemData.lastMessageText.slice(0, 38) + '...'}
+                  {chatName.length > 0 &&
+                    chatItemData.lastMessageText.length > 0 && 
+                    chatItemData.lastMessageText.length <= 38 && 
+                    chatItemData.lastMessageText} */}
+                  {chatName.length > 0 && chatItemData.lastMessageText}
+                  {chatName.length > 0 &&
+                    chatItemData.lastMessageText.length === 0 &&
+                    'Контент'}
+                  {chatName.length === 0 && <Skeleton />}
+                </SkeletonTheme>
               </span>
             </div>
           </div>
           <div className={styles['chat-item__right-wrapper']}>
-            <div className={styles['chat-item__counter-wrapper']}>
-              <span className={styles['chat-item__counter']}>
-                {userData.counter}
-              </span>
-            </div>
+            {chatItemData.uncheckedCounter > 0 && (
+              <div className={styles['chat-item__counter-wrapper']}>
+                <span className={styles['chat-item__counter']}>
+                  {chatItemData.uncheckedCounter}
+                </span>
+              </div>
+            )}
             <CheckedAndTimeStatuses
               isChecked={true}
-              time={userData.messageDateUTC}
+              time={chatItemData.lastMessageDateUTC}
+              /* далее указаны настройки отображения */
               isLoading={false}
               isCanceled={false}
               isOwn={true}
