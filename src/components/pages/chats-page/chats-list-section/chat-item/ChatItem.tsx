@@ -1,4 +1,4 @@
-import { FC, useEffect, useRef, useState } from 'react';
+import { FC, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { get, ref as refFirebaseDatabase } from 'firebase/database';
 import userAvatarImg from 'src/assets/images/icons/dev-icons/avatar.jpg';
 import AvatarImage from 'src/components/ui/avatar-image/AvatarImage';
@@ -30,14 +30,27 @@ const ChatItem: FC<ChatItemProps> = ({
 }) => {
   const [modalOpen, setModalOpen] = useState<'ban' | 'delete' | false>(false);
   const { toggleModal } = useToggleModal({ setCbState: setModalOpen });
-  const [chatName, setChatName] = useState<string>('');
+  const [chatName, setChatName] = useState<string | null>(null);
   const [userAvatar, setUserAvatar] = useState<string>('');
   const [isActive, setIsActive] = useState<boolean>(false);
   const [isHover, setIsHover] = useState<boolean>(false);
+  const loadingTimeout = useRef<NodeJS.Timeout | null>(null);
   const longPressTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const chatItemRef = useRef<HTMLDivElement>(null);
   const initialTouchYRef = useRef<number | null>(null);
   const longPressDuration = 500;
+
+  useLayoutEffect(() => {
+    loadingTimeout.current = setTimeout(() => {
+      setChatName(''); // Меняем состояние после таймера
+    }, 1500);
+
+    return () => {
+      if (loadingTimeout.current) {
+        clearTimeout(loadingTimeout.current); // Очищаем таймер при размонтировании
+      }
+    };
+  }, []);
 
   useEffect(() => {
     const getChatName = async () => {
@@ -48,15 +61,26 @@ const ChatItem: FC<ChatItemProps> = ({
           firebaseDatabase,
           `users/${userId}/username`,
         );
-        const userAvatarRef = refFirebaseDatabase(
-          firebaseDatabase,
-          `usersAvatars/${userId}`,
-        );
         const usernameSnapshot = await get(usernameRef);
         if (usernameSnapshot.exists()) {
           const usernameValue = usernameSnapshot.val();
           setChatName(usernameValue);
+          if (loadingTimeout.current) {
+            clearTimeout(loadingTimeout.current); // Очищаем таймер при размонтировании
+          }
         }
+      }
+    };
+    const getAvatar = async () => {
+      // если чат не групповой
+      if (chatItemData.membersIds.length === 2) {
+        const userId = chatItemData.membersIds.find((id) => id !== uid);
+
+        const userAvatarRef = refFirebaseDatabase(
+          firebaseDatabase,
+          `usersAvatars/${userId}`,
+        );
+
         const userAvatarSnapshot = await get(userAvatarRef);
         if (userAvatarSnapshot.exists()) {
           const userAvatarValue = userAvatarSnapshot.val();
@@ -65,14 +89,8 @@ const ChatItem: FC<ChatItemProps> = ({
       }
     };
     getChatName();
+    getAvatar();
   }, [chatItemData]);
-
-  /*   const chatItemData = {
-    lastMessage: 'The weather will be perfect for the stuses isisisisisi sas a',
-    messageDateUTC: '2024-10-23T07:16:04.275Z',
-    counter: 14,
-    userName: 'Антон Арбузов',
-  }; */
 
   const modalActionData = {
     delete: {
@@ -267,30 +285,23 @@ const ChatItem: FC<ChatItemProps> = ({
                 baseColor="var(--base-grey-gainsboro)"
               >
                 <span className={styles['chat-item__user-name']}>
-                  {chatName.length > 0 && chatName}
-                  {chatName.length === 0 && <Skeleton />}
+                  {chatName !== null && chatName.length > 0 && chatName}
+                  {chatName !== null && chatName.length === 0 && <Skeleton />}
                 </span>
               </SkeletonTheme>
               <span className={styles['chat-item__user-message']}>
                 <SkeletonTheme
-                  width={'70%'}
+                  width={'100%'}
                   borderRadius={2}
                   height={14}
                   highlightColor="var(--base-white-snow)"
                   baseColor="var(--base-grey-gainsboro)"
                 >
-                  {/*                   {chatName.length > 0 &&
-                    chatItemData.lastMessageText.length > 38 &&
-                    chatItemData.lastMessageText.slice(0, 38) + '...'}
-                  {chatName.length > 0 &&
-                    chatItemData.lastMessageText.length > 0 && 
-                    chatItemData.lastMessageText.length <= 38 && 
-                    chatItemData.lastMessageText} */}
-                  {chatName.length > 0 && chatItemData.lastMessageText}
-                  {chatName.length > 0 &&
+                  {chatName !== null && chatName.length > 0 && chatItemData.lastMessageText}
+                  {chatName !== null && chatName.length > 0 &&
                     chatItemData.lastMessageText.length === 0 &&
                     'Контент'}
-                  {chatName.length === 0 && <Skeleton />}
+                  {chatName !== null && chatName.length === 0 && <Skeleton />}
                 </SkeletonTheme>
               </span>
             </div>
