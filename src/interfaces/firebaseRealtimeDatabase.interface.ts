@@ -21,6 +21,8 @@ export interface IFirebaseRtDbChat {
   lastMessageText: string; 
   lastMessageDateUTC: string; 
   uncheckedCounter: number; 
+  groupAvatar: string;
+  isDeleted: boolean;
 }
 
 export interface IFirebaseRtDbUserChat {

@@ -381,6 +381,42 @@ const MessageInputWrapper: FC<MessageInputWrapperProps> = ({
     }
   };
 
+  const onTextAreaPasteCapture = async (
+    e: React.ClipboardEvent<HTMLTextAreaElement>,
+  ) => {
+    const items = e.clipboardData.items;
+    const newItems = await Promise.all(
+      Array.from(items).map(async (item) => {
+        if (item.kind === 'file' && item.type.startsWith('image/')) {
+          const file = item.getAsFile();
+          if (file) {
+            if (file.size > MAX_UPLOAD_FILE_SIZE) {
+              customToastError("Максимальный размер 50MB");
+              return null; // Если файл слишком большой, возвращаем null
+            }
+            const compressedFile = await compressImage(file);
+            const url = URL.createObjectURL(compressedFile);
+            return {
+              imgUrl: url,
+              name: file.name,
+              fileObject: compressedFile,
+            };
+          }
+        }
+        return null; // Возвращаем null для несуществующих файлов
+      }),
+    );
+
+    // Фильтруем массив, убирая все null значения
+    const filteredItems = newItems.filter(
+      (item) => item !== null,
+    ) as AttachedItemType[];
+
+    if (filteredItems.length > 0) {
+      setAttachedItems((prevItems) => [...prevItems, ...filteredItems]);
+    }
+  }
+
   return (
     <div className={styles['message-input-wrapper']}>
       <AttachMenu
@@ -394,41 +430,7 @@ const MessageInputWrapper: FC<MessageInputWrapperProps> = ({
         onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
           setMessageContent(e.target.value)
         }
-        onPasteCapture={async (
-          e: React.ClipboardEvent<HTMLTextAreaElement>,
-        ) => {
-          const items = e.clipboardData.items;
-          const newItems = await Promise.all(
-            Array.from(items).map(async (item) => {
-              if (item.kind === 'file' && item.type.startsWith('image/')) {
-                const file = item.getAsFile();
-                if (file) {
-                  if (file.size > MAX_UPLOAD_FILE_SIZE) {
-                    customToastError("Максимальный размер 50MB");
-                    return null; // Если файл слишком большой, возвращаем null
-                  }
-                  const compressedFile = await compressImage(file);
-                  const url = URL.createObjectURL(compressedFile);
-                  return {
-                    imgUrl: url,
-                    name: file.name,
-                    fileObject: compressedFile,
-                  };
-                }
-              }
-              return null; // Возвращаем null для несуществующих файлов
-            }),
-          );
-
-          // Фильтруем массив, убирая все null значения
-          const filteredItems = newItems.filter(
-            (item) => item !== null,
-          ) as AttachedItemType[];
-
-          if (filteredItems.length > 0) {
-            setAttachedItems((prevItems) => [...prevItems, ...filteredItems]);
-          }
-        }}
+        onPasteCapture={onTextAreaPasteCapture}
         onKeyDown={(e: React.KeyboardEvent<HTMLTextAreaElement>) => {
           if (e.key === 'Enter' && !isMobileScreen && !e.shiftKey) {
             e.preventDefault();

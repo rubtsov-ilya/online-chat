@@ -94,18 +94,17 @@ const AuthProvider: FC = () => {
           },
         );
 
-        /* Cleanup the avatar subscription when the user signs out */
+        /* очистка подписок на изменение */
         return () => {
           unsubscribeAvatar();
           unsubscribeUsername();
         };
       } else {
-        // User is signed out
         console.log('User is signed out');
       }
     });
 
-    /* Cleanup the auth subscription on unmount */
+    /* очистка подписок на изменение */
     return () => unsubscribeAuth();
   }, []);
 

@@ -9,7 +9,9 @@ import { AttachedItemType } from 'src/interfaces/AttachedItem.interface';
 
 import imageCompression from 'browser-image-compression';
 import { MAX_UPLOAD_FILE_SIZE } from 'src/constants';
-import CustomToastContainer, { customToastError } from 'src/components/ui/custom-toast-container/CustomToastContainer';
+import CustomToastContainer, {
+  customToastError,
+} from 'src/components/ui/custom-toast-container/CustomToastContainer';
 
 interface AttachBtnProps {
   isMobileScreen: boolean;
@@ -59,6 +61,60 @@ const AttachMenu: FC<AttachBtnProps> = ({
     } catch (error) {
       console.error('Ошибка сжатия изображения:', error);
       return file;
+    }
+  };
+
+  const onMediaInputChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (files) {
+      const newItems = await Promise.all(
+        Array.from(files).map(async (file) => {
+          if (file.size > MAX_UPLOAD_FILE_SIZE) {
+            customToastError('Максимальный размер 50MB');
+            return null; // Если файл слишком большой, возвращаем null
+          }
+          if (file.type.startsWith('image/')) {
+            const compressedFile = await compressImage(file);
+            const url = URL.createObjectURL(compressedFile);
+            return {
+              imgUrl: url,
+              name: file.name,
+              fileObject: compressedFile,
+            };
+          } else if (file.type.startsWith('video/')) {
+            const url = URL.createObjectURL(file);
+            return { videoUrl: url, name: file.name, fileObject: file };
+          } else {
+            return { isFile: true, name: file.name, fileObject: file };
+          }
+        }),
+      );
+      const validItems = newItems.filter(
+        (item) => item !== null,
+      ) as AttachedItemType[];
+      if (validItems.length > 0) {
+        setAttachedItems((prevItems) => [...prevItems, ...validItems]);
+      }
+    }
+  };
+
+  const onFileInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (files) {
+      const newItems = Array.from(files).map((file) => {
+        /* const url = URL.createObjectURL(file); */
+        if (file.size > MAX_UPLOAD_FILE_SIZE) {
+          customToastError('Максимальный размер 50MB');
+          return null; // Если файл слишком большой, возвращаем null
+        }
+        return { isFile: true, name: file.name, fileObject: file };
+      });
+      const validItems = newItems.filter(
+        (item) => item !== null,
+      ) as AttachedItemType[];
+      if (validItems.length > 0) {
+        setAttachedItems((prevItems) => [...prevItems, ...validItems]);
+      }
     }
   };
 
@@ -114,66 +170,22 @@ const AttachMenu: FC<AttachBtnProps> = ({
             </button>
           </div>
         </div>
+        {/* медиа */}
         <input
           ref={mediaInputRef}
           type="file"
           accept={acceptFormats}
           multiple
           style={{ display: 'none' }}
-          onChange={async (e: React.ChangeEvent<HTMLInputElement>) => {
-            const files = e.target.files;
-            if (files) {
-              const newItems = await Promise.all(
-                Array.from(files).map(async (file) => {
-                  if (file.size > MAX_UPLOAD_FILE_SIZE) {
-                    customToastError("Максимальный размер 50MB");
-                    return null; // Если файл слишком большой, возвращаем null
-                  }
-                  if (file.type.startsWith('image/')) {
-                    const compressedFile = await compressImage(file);
-                    const url = URL.createObjectURL(compressedFile);
-                    return {
-                      imgUrl: url,
-                      name: file.name,
-                      fileObject: compressedFile,
-                    };
-                  } else if (file.type.startsWith('video/')) {
-                    const url = URL.createObjectURL(file);
-                    return { videoUrl: url, name: file.name, fileObject: file };
-                  } else {
-                    return { isFile: true, name: file.name, fileObject: file };
-                  }
-                }),
-              );
-              const validItems = newItems.filter(item => item !== null) as AttachedItemType[];
-              if (validItems.length > 0) {
-                setAttachedItems((prevItems) => [...prevItems, ...validItems]);
-              }
-            }
-          }}
+          onChange={onMediaInputChange}
         />
+        {/* файлы */}
         <input
           ref={fileInputRef}
           type="file"
           multiple
           style={{ display: 'none' }}
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-            const files = e.target.files;
-            if (files) {
-              const newItems = Array.from(files).map((file) => {
-                /* const url = URL.createObjectURL(file); */
-                if (file.size > MAX_UPLOAD_FILE_SIZE) {
-                  customToastError("Максимальный размер 50MB");
-                  return null; // Если файл слишком большой, возвращаем null
-                }
-                return { isFile: true, name: file.name, fileObject: file };
-              });
-              const validItems = newItems.filter(item => item !== null) as AttachedItemType[];
-              if (validItems.length > 0) {
-                setAttachedItems((prevItems) => [...prevItems, ...validItems]);
-              }
-            }
-          }}
+          onChange={onFileInputChange}
         />
       </div>
       {isMenuOpen && (

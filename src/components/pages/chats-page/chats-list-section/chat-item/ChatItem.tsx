@@ -30,7 +30,7 @@ const ChatItem: FC<ChatItemProps> = ({
 }) => {
   const [modalOpen, setModalOpen] = useState<'ban' | 'delete' | false>(false);
   const { toggleModal } = useToggleModal({ setCbState: setModalOpen });
-  const [chatName, setChatName] = useState<string | null>(null);
+  const [chatName, setChatName] = useState<string | null>(null); //изначально null, ничего не отображается, если '' пустая строка, то отобразится SKeleton. Длина chatName не может быть меньше 3 символов, если будет получена с бекенда
   const [userAvatar, setUserAvatar] = useState<string>('');
   const [isActive, setIsActive] = useState<boolean>(false);
   const [isHover, setIsHover] = useState<boolean>(false);
@@ -297,10 +297,12 @@ const ChatItem: FC<ChatItemProps> = ({
                   highlightColor="var(--base-white-snow)"
                   baseColor="var(--base-grey-gainsboro)"
                 >
-                  {chatName !== null && chatName.length > 0 && chatItemData.lastMessageText}
+                  {chatName !== null && chatName.length > 0 && chatItemData.isDeleted === false && chatItemData.lastMessageText.length !== 0 && chatItemData.lastMessageText}
                   {chatName !== null && chatName.length > 0 &&
-                    chatItemData.lastMessageText.length === 0 &&
+                    chatItemData.lastMessageText.length === 0 && chatItemData.isDeleted === false &&
                     'Контент'}
+                  {chatName !== null && chatName.length > 0 && chatItemData.isDeleted === true &&
+                    'Удаленный чат'}
                   {chatName !== null && chatName.length === 0 && <Skeleton />}
                 </SkeletonTheme>
               </span>
