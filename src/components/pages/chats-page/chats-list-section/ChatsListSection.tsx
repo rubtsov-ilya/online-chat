@@ -105,21 +105,21 @@ const ChatsListSection: FC<ChatsListSectionProps> = ({ isMobileScreen }) => {
               {chats?.length === 0 && isSearching === false && (
                 <EmptyChatsWrapper />
               )}
-              <div className={`${styles['chats-list__chats-wrapper']} ${isSearching ? styles['chats-list__chats-wrapper--is-searching'] : ''}`}>
-              {chats?.length !== 0 &&
+              <div
+                className={`${styles['chats-list__chats-wrapper']} ${isSearching ? styles['chats-list__chats-wrapper--is-searching'] : ''}`}
+              >
+                {chats?.length !== 0 &&
                   chats.map((chatItemData, index) => {
                     return (
-                      <>
-                        <ChatItem
-                          key={index}
-                          uid={uid!}
-                          index={index}
-                          deferredSearchInputValue={deferredSearchInputValue}
-                          chatItemData={chatItemData}
-                          chatsListRef={chatsListRef}
-                          isMobileScreen={isMobileScreen}
-                        />
-                      </>
+                      <ChatItem
+                        key={index}
+                        uid={uid!}
+                        index={index}
+                        deferredSearchInputValue={deferredSearchInputValue}
+                        chatItemData={chatItemData}
+                        chatsListRef={chatsListRef}
+                        isMobileScreen={isMobileScreen}
+                      />
                     );
                   })}
                 {isSearching === true && (

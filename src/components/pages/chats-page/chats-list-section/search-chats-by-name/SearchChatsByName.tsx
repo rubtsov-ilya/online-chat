@@ -50,7 +50,6 @@ const SearchChatsByName: FC<SearchProps> = ({
         const searchedUsers = await fakeServerFunctionGetSearchedUsers(
           deferredSearchInputValue,
         );
-        console.log(searchedUsers);
         setSearchedGlobalChats(searchedUsers);
       }
     }, 1000);
