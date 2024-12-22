@@ -16,22 +16,27 @@ import Skeleton, { SkeletonTheme } from 'react-loading-skeleton';
 import 'react-loading-skeleton/dist/skeleton.css';
 
 interface ChatItemProps {
+  index: number;
   isMobileScreen: boolean;
   chatsListRef: React.RefObject<HTMLDivElement | null>;
   chatItemData: IFirebaseRtDbChat;
+  deferredSearchInputValue: string;
   uid: string;
 }
 
 const ChatItem: FC<ChatItemProps> = ({
+  index,
   isMobileScreen,
   chatsListRef,
   chatItemData,
+  deferredSearchInputValue,
   uid,
 }) => {
   const [modalOpen, setModalOpen] = useState<'ban' | 'delete' | false>(false);
   const { toggleModal } = useToggleModal({ setCbState: setModalOpen });
   const [chatName, setChatName] = useState<string | null>(null); //изначально null, ничего не отображается, если '' пустая строка, то отобразится SKeleton. Длина chatName не может быть меньше 3 символов, если будет получена с бекенда
   const [userAvatar, setUserAvatar] = useState<string>('');
+  const [isVisible, setIsVisible] = useState<boolean>(true);
   const [isActive, setIsActive] = useState<boolean>(false);
   const [isHover, setIsHover] = useState<boolean>(false);
   const loadingTimeout = useRef<NodeJS.Timeout | null>(null);
@@ -39,58 +44,6 @@ const ChatItem: FC<ChatItemProps> = ({
   const chatItemRef = useRef<HTMLDivElement>(null);
   const initialTouchYRef = useRef<number | null>(null);
   const longPressDuration = 500;
-
-  useLayoutEffect(() => {
-    loadingTimeout.current = setTimeout(() => {
-      setChatName(''); // Меняем состояние после таймера
-    }, 1500);
-
-    return () => {
-      if (loadingTimeout.current) {
-        clearTimeout(loadingTimeout.current); // Очищаем таймер при размонтировании
-      }
-    };
-  }, []);
-
-  useEffect(() => {
-    const getChatName = async () => {
-      // если чат не групповой
-      if (chatItemData.membersIds.length === 2) {
-        const userId = chatItemData.membersIds.find((id) => id !== uid);
-        const usernameRef = refFirebaseDatabase(
-          firebaseDatabase,
-          `users/${userId}/username`,
-        );
-        const usernameSnapshot = await get(usernameRef);
-        if (usernameSnapshot.exists()) {
-          const usernameValue = usernameSnapshot.val();
-          setChatName(usernameValue);
-          if (loadingTimeout.current) {
-            clearTimeout(loadingTimeout.current); // Очищаем таймер при размонтировании
-          }
-        }
-      }
-    };
-    const getAvatar = async () => {
-      // если чат не групповой
-      if (chatItemData.membersIds.length === 2) {
-        const userId = chatItemData.membersIds.find((id) => id !== uid);
-
-        const userAvatarRef = refFirebaseDatabase(
-          firebaseDatabase,
-          `usersAvatars/${userId}`,
-        );
-
-        const userAvatarSnapshot = await get(userAvatarRef);
-        if (userAvatarSnapshot.exists()) {
-          const userAvatarValue = userAvatarSnapshot.val();
-          setUserAvatar(userAvatarValue);
-        }
-      }
-    };
-    getChatName();
-    getAvatar();
-  }, [chatItemData]);
 
   const modalActionData = {
     delete: {
@@ -110,6 +63,113 @@ const ChatItem: FC<ChatItemProps> = ({
       },
     },
   };
+
+  useLayoutEffect(() => {
+    loadingTimeout.current = setTimeout(() => {
+      setChatName(''); // Меняем состояние после таймера
+    }, 1500);
+
+    return () => {
+      if (loadingTimeout.current) {
+        clearTimeout(loadingTimeout.current); // Очищаем таймер при размонтировании
+      }
+    };
+  }, []);
+
+  useEffect(() => {
+    const getChatName = async () => {
+      // если чат не групповой
+      if (chatItemData.groupChatName.length === 0) {
+        const userId = chatItemData.membersIds.find((id) => id !== uid);
+        const usernameRef = refFirebaseDatabase(
+          firebaseDatabase,
+          `users/${userId}/username`,
+        );
+        const usernameSnapshot = await get(usernameRef);
+        if (usernameSnapshot.exists()) {
+          const usernameValue = usernameSnapshot.val();
+          setChatName(usernameValue);
+          if (loadingTimeout.current) {
+            clearTimeout(loadingTimeout.current); // Очищаем таймер при размонтировании
+          }
+        }
+      }
+      // если чат групповой
+      if (chatItemData.groupChatName.length > 0) {
+        setChatName(chatItemData.groupChatName);
+        if (loadingTimeout.current) {
+          clearTimeout(loadingTimeout.current); // Очищаем таймер при размонтировании
+        }
+      }
+    };
+    const getAvatar = async () => {
+      // если чат не групповой
+      if (chatItemData.groupChatName.length === 0) {
+        const userId = chatItemData.membersIds.find((id) => id !== uid);
+
+        const userAvatarRef = refFirebaseDatabase(
+          firebaseDatabase,
+          `usersAvatars/${userId}`,
+        );
+
+        const userAvatarSnapshot = await get(userAvatarRef);
+        if (userAvatarSnapshot.exists()) {
+          const userAvatarValue = userAvatarSnapshot.val();
+          setUserAvatar(userAvatarValue);
+        }
+      }
+      if (chatItemData.groupChatName.length > 0) {
+        setUserAvatar(chatItemData.groupAvatar);
+      }
+    };
+    getChatName();
+    getAvatar();
+  }, [chatItemData]);
+
+  useLayoutEffect(() => {
+    // если в поиске есть символы и имя чата уже найдено
+    if (chatName !== null && deferredSearchInputValue.length > 0) {
+      // если значение в поиске совпадает с именем чата
+      if (
+        chatName
+          .toLowerCase()
+          .replace(/\s+/g, '')
+          .includes(
+            deferredSearchInputValue.toLowerCase().replace(/\s+/g, ''),
+          ) &&
+        isVisible === false
+      ) {
+        setIsVisible(true);
+      } else if (
+        // если значение в поиске не совпадает с именем чата
+        chatName
+          .toLowerCase()
+          .replace(/\s+/g, '')
+          .includes(
+            deferredSearchInputValue.toLowerCase().replace(/\s+/g, ''),
+          ) === false &&
+        isVisible === true
+      ) {
+        setIsVisible(false);
+      }
+    }
+    // если поиск неактивен и чат удалён, то не отрисовывать его
+    if (
+      deferredSearchInputValue.length === 0 &&
+      chatItemData.isDeleted === true
+    ) {
+      setIsVisible(false);
+    }
+    // если поиск неактивен и чат не удалён, то отрисовать его обратно
+    if (
+      deferredSearchInputValue.length === 0 &&
+      chatItemData.isDeleted === false
+    ) {
+      setIsVisible(true);
+    }
+
+    return () => {};
+  }, [deferredSearchInputValue]);
 
   useEffect(() => {
     const onScroll = (event: Event) => {
@@ -197,137 +257,148 @@ const ChatItem: FC<ChatItemProps> = ({
 
   return (
     <>
-      <div
-        className={`${styles['chat-item']} ${isActive ? styles['chat-item--active'] : ''}`}
-        onContextMenu={(e) => {
-          if (!isMobileScreen) {
-            e.preventDefault();
-            setIsActive((prev) => !prev);
-          }
-        }}
-        ref={chatItemRef}
-      >
+      {isVisible && deferredSearchInputValue.length > 0 && <span className={styles['chat-span']}>Чаты</span>}
+      {isVisible && (
         <div
-          className={styles['chat-item__background']}
+          className={`${styles['chat-item']} ${isActive ? styles['chat-item--active'] : ''}`}
           onContextMenu={(e) => {
-            if (isMobileScreen) {
+            if (!isMobileScreen) {
               e.preventDefault();
+              setIsActive((prev) => !prev);
             }
           }}
+          ref={chatItemRef}
         >
-          <button
-            onClick={() => toggleModal('ban')}
+          <div
+            className={styles['chat-item__background']}
             onContextMenu={(e) => {
               if (isMobileScreen) {
                 e.preventDefault();
               }
             }}
-            className={styles['chat-item__background-btn']}
           >
-            <UserBanSvg className={styles['chat-item__user-ban-icon']} />
-          </button>
-          <button
-            onClick={() => toggleModal('delete')}
+            <button
+              onClick={() => toggleModal('ban')}
+              onContextMenu={(e) => {
+                if (isMobileScreen) {
+                  e.preventDefault();
+                }
+              }}
+              className={styles['chat-item__background-btn']}
+            >
+              <UserBanSvg className={styles['chat-item__user-ban-icon']} />
+            </button>
+            <button
+              onClick={() => toggleModal('delete')}
+              onContextMenu={(e) => {
+                if (isMobileScreen) {
+                  e.preventDefault();
+                }
+              }}
+              className={styles['chat-item__background-btn']}
+            >
+              <DeleteSvg className={styles['chat-item__delete-icon']} />
+            </button>
+          </div>
+          <div
             onContextMenu={(e) => {
               if (isMobileScreen) {
                 e.preventDefault();
               }
             }}
-            className={styles['chat-item__background-btn']}
+            onTouchStart={(e: React.TouchEvent) => {
+              if (isMobileScreen && !isActive) {
+                if (!isHover) {
+                  setIsHover(true);
+                }
+                initialTouchYRef.current = e.touches[0].clientY;
+                longPressTimerRef.current = setTimeout(() => {
+                  setIsActive(true);
+                }, longPressDuration);
+              }
+            }}
+            onTouchEnd={() => {
+              if (isMobileScreen) {
+                if (longPressTimerRef.current) {
+                  clearTimeout(longPressTimerRef.current);
+                  longPressTimerRef.current = null;
+                }
+                initialTouchYRef.current = null;
+              }
+            }}
+            onClick={() => {
+              if (isActive && longPressTimerRef.current !== null) {
+                setIsActive(false);
+              }
+              /* вынести в отдельную функцию и там выключать стейт при экешене нужном*/
+            }}
+            onTouchMove={onTouchMove}
+            className={`${styles['chat-item__foreground']} ${isActive ? styles['chat-item__foreground--active'] : ''} ${isHover && isMobileScreen ? styles['chat-item__foreground--hover'] : ''}`}
           >
-            <DeleteSvg className={styles['chat-item__delete-icon']} />
-          </button>
-        </div>
-        <div
-          onContextMenu={(e) => {
-            if (isMobileScreen) {
-              e.preventDefault();
-            }
-          }}
-          onTouchStart={(e: React.TouchEvent) => {
-            if (isMobileScreen && !isActive) {
-              if (!isHover) {
-                setIsHover(true);
-              }
-              initialTouchYRef.current = e.touches[0].clientY;
-              longPressTimerRef.current = setTimeout(() => {
-                setIsActive(true);
-              }, longPressDuration);
-            }
-          }}
-          onTouchEnd={() => {
-            if (isMobileScreen) {
-              if (longPressTimerRef.current) {
-                clearTimeout(longPressTimerRef.current);
-                longPressTimerRef.current = null;
-              }
-              initialTouchYRef.current = null;
-            }
-          }}
-          onClick={() => {
-            if (isActive && longPressTimerRef.current !== null) {
-              setIsActive(false);
-            }
-            /* вынести в отдельную функцию и там выключать стейт при экешене нужном*/
-          }}
-          onTouchMove={onTouchMove}
-          className={`${styles['chat-item__foreground']} ${isActive ? styles['chat-item__foreground--active'] : ''} ${isHover && isMobileScreen ? styles['chat-item__foreground--hover'] : ''}`}
-        >
-          <div className={styles['chat-item__left-wrapper']}>
-            <AvatarImage AvatarImg={userAvatar} />
+            <div className={styles['chat-item__left-wrapper']}>
+              <AvatarImage AvatarImg={userAvatar} />
 
-            <div className={styles['chat-item__user-details-wrapper']}>
-              <SkeletonTheme
-                width={'40%'}
-                borderRadius={2}
-                height={17}
-                highlightColor="var(--base-white-snow)"
-                baseColor="var(--base-grey-gainsboro)"
-              >
-                <span className={styles['chat-item__user-name']}>
-                  {chatName !== null && chatName.length > 0 && chatName}
-                  {chatName !== null && chatName.length === 0 && <Skeleton />}
-                </span>
-              </SkeletonTheme>
-              <span className={styles['chat-item__user-message']}>
+              <div className={styles['chat-item__user-details-wrapper']}>
                 <SkeletonTheme
-                  width={'100%'}
+                  width={'40%'}
                   borderRadius={2}
-                  height={14}
+                  height={17}
                   highlightColor="var(--base-white-snow)"
                   baseColor="var(--base-grey-gainsboro)"
                 >
-                  {chatName !== null && chatName.length > 0 && chatItemData.isDeleted === false && chatItemData.lastMessageText.length !== 0 && chatItemData.lastMessageText}
-                  {chatName !== null && chatName.length > 0 &&
-                    chatItemData.lastMessageText.length === 0 && chatItemData.isDeleted === false &&
-                    'Контент'}
-                  {chatName !== null && chatName.length > 0 && chatItemData.isDeleted === true &&
-                    'Удаленный чат'}
-                  {chatName !== null && chatName.length === 0 && <Skeleton />}
+                  <span className={styles['chat-item__user-name']}>
+                    {chatName !== null && chatName.length > 0 && chatName}
+                    {chatName !== null && chatName.length === 0 && <Skeleton />}
+                  </span>
                 </SkeletonTheme>
-              </span>
-            </div>
-          </div>
-          <div className={styles['chat-item__right-wrapper']}>
-            {chatItemData.uncheckedCounter > 0 && (
-              <div className={styles['chat-item__counter-wrapper']}>
-                <span className={styles['chat-item__counter']}>
-                  {chatItemData.uncheckedCounter}
+                <span className={styles['chat-item__user-message']}>
+                  <SkeletonTheme
+                    width={'100%'}
+                    borderRadius={2}
+                    height={14}
+                    highlightColor="var(--base-white-snow)"
+                    baseColor="var(--base-grey-gainsboro)"
+                  >
+                    {chatName !== null &&
+                      chatName.length > 0 &&
+                      chatItemData.isDeleted === false &&
+                      chatItemData.lastMessageText.length !== 0 &&
+                      chatItemData.lastMessageText}
+                    {chatName !== null &&
+                      chatName.length > 0 &&
+                      chatItemData.lastMessageText.length === 0 &&
+                      chatItemData.isDeleted === false &&
+                      'Контент'}
+                    {chatName !== null &&
+                      chatName.length > 0 &&
+                      chatItemData.isDeleted === true &&
+                      'Удаленный чат'}
+                    {chatName !== null && chatName.length === 0 && <Skeleton />}
+                  </SkeletonTheme>
                 </span>
               </div>
-            )}
-            <CheckedAndTimeStatuses
-              isChecked={true}
-              time={chatItemData.lastMessageDateUTC}
-              /* далее указаны настройки отображения */
-              isLoading={false}
-              isCanceled={false}
-              isOwn={true}
-            />
+            </div>
+            <div className={styles['chat-item__right-wrapper']}>
+              {chatItemData.uncheckedCounter > 0 && (
+                <div className={styles['chat-item__counter-wrapper']}>
+                  <span className={styles['chat-item__counter']}>
+                    {chatItemData.uncheckedCounter}
+                  </span>
+                </div>
+              )}
+              <CheckedAndTimeStatuses
+                isChecked={true}
+                time={chatItemData.lastMessageDateUTC}
+                /* далее указаны настройки отображения */
+                isLoading={false}
+                isCanceled={false}
+                isOwn={true}
+              />
+            </div>
           </div>
         </div>
-      </div>
-      {isActive && (
+      )}
+      {isVisible && isActive && (
         <div
           onContextMenu={(e) => {
             e.preventDefault();
@@ -349,7 +420,7 @@ const ChatItem: FC<ChatItemProps> = ({
           className={styles['chat-item__overlay']}
         />
       )}
-      {modalOpen && (
+      {isVisible && modalOpen && (
         /* аргумент number в toggleModal - длительность transition opacity в modal-backdrop */
         <ModalBackdrop
           toggleModal={() => toggleModal(false, 100)}

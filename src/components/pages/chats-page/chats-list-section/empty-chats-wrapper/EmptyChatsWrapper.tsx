@@ -6,19 +6,19 @@ import styles from './EmptyChatsWrapper.module.scss';
 
 const EmptyChatsWrapper: FC = () => {
   return (
-    <div className={styles['wrapper']}>
-      <div className={styles['icon-wrapper']}>
+    <div className={styles['empty-wrapper']}>
+      <div className={styles['empty-wrapper__icon-wrapper']}>
         <EmptySvg
           width={136}
           height={136}
           viewBox="0 0 24 24"
-          className={styles['icon-wrapper__svg']}
+          className={styles['empty-wrapper__svg']}
         />
-        <span className={styles['icon-wrapper__text']}>Начните общаться!</span>
+        <span className={styles['empty-wrapper__text']}>Начните общаться!</span>
       </div>
-      <Link to={'/'} className={styles['wrapper__link']}>
+{/*       <Link to={'/'} className={styles['wrapper__link']}>
         Начать чат
-      </Link>
+      </Link> */}
     </div>
   );
 };

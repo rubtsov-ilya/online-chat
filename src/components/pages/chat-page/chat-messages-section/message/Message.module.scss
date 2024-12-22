@@ -1,8 +1,10 @@
 @use 'src/assets/css/_mixins.scss' as *;
+
 .message {
   display: flex;
   align-items: flex-end;
   gap: 8px;
+  @include fade-in-animation;
   &__wrapper {
     display: flex;
     flex-direction: column;

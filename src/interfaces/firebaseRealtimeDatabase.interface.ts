@@ -7,11 +7,11 @@ export interface IFirebaseRtDbUser {
   blocked?: string[];
 }
 
-export interface IFirebaseRtDbUserByName {
-  [username: string]: string;
+export interface IFirebaseRtDbUserSnapshot {
+  [uid: string]: string;
 }
 
-export interface IFirebaseRtDbUserAvatar {
+export interface IFirebaseRtDbUserAvatarSnapshot {
   [uid: string]: string;
 }
 
@@ -21,6 +21,7 @@ export interface IFirebaseRtDbChat {
   lastMessageText: string; 
   lastMessageDateUTC: string; 
   uncheckedCounter: number; 
+  groupChatName: string;
   groupAvatar: string;
   isDeleted: boolean;
 }
@@ -30,12 +31,7 @@ export interface IFirebaseRtDbUserChat {
   chats: { [chatId: string]: IFirebaseRtDbChat };
 }
 
-/* export interface IFirebaseRtDbUserChats {
-  [uid: string]: IFirebaseRtDbUserChat; 
-}
- */
-
-export interface IFirebaseRtDbUserChatChats {
+export interface IFirebaseRtDbUserChatsSnapshot {
   [chatId: string]: IFirebaseRtDbUserChat; 
 }
 
@@ -45,6 +41,6 @@ export interface IFirebaseRtDbChatsChat {
   messages: { [messageId: string]: IMessage }; // Сообщения в чате, где ключ - messageId, а значение - объект IMessage
 }
 
-/* export interface IFirebaseRtDbChats {
+export interface IFirebaseRtDbChatsSnapshot {
   [chatId: string]: IFirebaseRtDbChatsChat; // Объект, где ключ - chatId, а значение - объект чата
-} */
+}

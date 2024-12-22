@@ -21,7 +21,6 @@ const MessageDateGroup: FC<MessageDateGroupProps> = ({
   chatMessagesRef,
   avatar,
 }) => {
-  // Предполагаем, что messageData и prevMessageData приходят извне, если нужно их использовать
   return (
     <div>
       <MessageStickyDate

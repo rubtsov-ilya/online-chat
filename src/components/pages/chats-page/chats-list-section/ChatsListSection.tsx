@@ -1,17 +1,21 @@
-import { FC, useLayoutEffect, useRef, useState } from 'react';
-import Search from 'src/components/ui/search/Search';
+import { FC, useDeferredValue, useLayoutEffect, useRef, useState } from 'react';
 
 import styles from './ChatsListSection.module.scss';
-import EmptyChatsWrapper from './empty-chats-wrapper/EmptyChatsWrapper';
-import ChatItem from './chat-item/ChatItem';
 import { ref as firebaseRef, onValue } from 'firebase/database';
 import { firebaseDatabase } from 'src/firebase';
+import EmptyChatsWrapper from './empty-chats-wrapper/EmptyChatsWrapper';
+import ChatItem from './chat-item/ChatItem';
 import useAuth from 'src/hooks/useAuth';
 import {
   IFirebaseRtDbChat,
+  IFirebaseRtDbUser,
   IFirebaseRtDbUserChat,
-  } from 'src/interfaces/firebaseRealtimeDatabase.interface';
-  import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
+} from 'src/interfaces/firebaseRealtimeDatabase.interface';
+import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
+import ErrorChatsWrapper from './error-chats-wrapper/ErrorChatsWrapper';
+
+import SearchChatsByName from './search-chats-by-name/SearchChatsByName';
+import SearchedGlobalChatsWrapper from './searched-global-chats-wrapper/SearchedGlobalChatsWrapper';
 
 interface ChatsListSectionProps {
   isMobileScreen: boolean;
@@ -20,12 +24,22 @@ interface ChatsListSectionProps {
 const ChatsListSection: FC<ChatsListSectionProps> = ({ isMobileScreen }) => {
   const { uid } = useAuth();
   const [chats, setChats] = useState<IFirebaseRtDbChat[]>([]);
-  const [isLoading, setIsLoading] = useState<boolean | 'error'>(true);
+  const [searchInputValue, setSearchInputValue] = useState<string>('');
+  const deferredSearchInputValue = useDeferredValue(searchInputValue);
+  /*   const [searchedChats, setSearchedChats] = useState<IFirebaseRtDbChat[]>([]); */
+  const [searchedGlobalChats, setSearchedGlobalChats] = useState<
+    IFirebaseRtDbUser[] | 'error'
+  >([]);
+  const [isSearching, setIsSearching] = useState<boolean>(false);
+  const [isChatsLoading, setIsChatsLoading] = useState<boolean | 'error'>(
+    'error',
+  );
   const chatsListRef = useRef<HTMLDivElement | null>(null);
   const ComponentTag = isMobileScreen ? 'section' : 'div';
 
   useLayoutEffect(() => {
-    setIsLoading(true);
+    /* поиск и фильтрация - по своим чатам поиска */
+    setIsChatsLoading(true);
     const userChatsRef = firebaseRef(firebaseDatabase, `userChats/${uid}`);
 
     const unsubscribeUserChats = onValue(
@@ -34,12 +48,12 @@ const ChatsListSection: FC<ChatsListSectionProps> = ({ isMobileScreen }) => {
         const userChatSnapshot: IFirebaseRtDbUserChat = snapshot.val();
         if (userChatSnapshot) {
           const chatsArray = Object.values(userChatSnapshot.chats);
-          setIsLoading(false);
+          setIsChatsLoading(false);
           setChats(chatsArray);
         }
       },
       (error) => {
-        setIsLoading('error');
+        setIsChatsLoading('error');
         console.error('Error fetching username:', error);
       },
     );
@@ -52,19 +66,17 @@ const ChatsListSection: FC<ChatsListSectionProps> = ({ isMobileScreen }) => {
   return (
     <ComponentTag
       ref={chatsListRef}
-      className={`${styles['chats-list']} ${isLoading === true ? styles['chats-list--relative'] : ''}`}
+      className={`${styles['chats-list']} ${isChatsLoading === true ? styles['chats-list--relative'] : ''}`}
     >
       <div className={'container container--height container--no-padding'}>
         <div className={styles['chats-list__content']}>
-          {isLoading === true && (
+          {isChatsLoading === true && (
             <div className={styles['chats-list__circular-progressbar-wrapper']}>
               <CircularProgressbar
                 className={styles['chats-list__circular-progressbar']}
                 value={66}
                 styles={buildStyles({
-                  // Rotation of path and trail, in number of turns (0-1)
-                  /* rotation: 0.25, */
-                  // Whether to use rounded or flat corners on the ends - can use 'butt' or 'round'
+                  // can use 'butt' or 'round'
                   strokeLinecap: 'round',
                   // How long animation takes to go from one percentage to another, in seconds
                   pathTransitionDuration: 0.5,
@@ -76,103 +88,46 @@ const ChatsListSection: FC<ChatsListSectionProps> = ({ isMobileScreen }) => {
               />
             </div>
           )}
-          {/* {isLoading === 'error' && <p>'Ошибка загрузки'</p>} */}
-          {isLoading === false && chats?.length === 0 && <EmptyChatsWrapper />}
 
-          {chats?.length !== 0 && (
+          {isChatsLoading === 'error' && <ErrorChatsWrapper />}
+          {isChatsLoading === false && (
             <>
               <div className={styles['chats-list__search-wrapper']}>
-                <Search />
+                <SearchChatsByName
+                  deferredSearchInputValue={deferredSearchInputValue}
+                  setSearchInputValue={setSearchInputValue}
+                  searchInputValue={searchInputValue}
+                  isSearching={isSearching}
+                  setIsSearching={setIsSearching}
+                  setSearchedGlobalChats={setSearchedGlobalChats}
+                />
               </div>
-              {chats.map((chatItemData, index) => {
-/*                 const chatName = chatItemData.membersIds.map((id) => {
-                  return id !== uid;
-                });
-                console.log(chatName)
-                const userRef = firebaseRef(
-                  firebaseDatabase,
-                  `users/${chatName}`,
-                );
-                const userAvatarRef = ref(firebaseDatabase, `usersAvatars/${user.uid}`);
-                const userSnapshot = await get(userRef); */
-                return (
-                  <ChatItem
-                    key={index}
-                    uid={uid!}
-                    chatItemData={chatItemData}
-                    chatsListRef={chatsListRef}
-                    isMobileScreen={isMobileScreen}
+              {chats?.length === 0 && isSearching === false && (
+                <EmptyChatsWrapper />
+              )}
+              <div className={`${styles['chats-list__chats-wrapper']} ${isSearching ? styles['chats-list__chats-wrapper--is-searching'] : ''}`}>
+              {chats?.length !== 0 &&
+                  chats.map((chatItemData, index) => {
+                    return (
+                      <>
+                        <ChatItem
+                          key={index}
+                          uid={uid!}
+                          index={index}
+                          deferredSearchInputValue={deferredSearchInputValue}
+                          chatItemData={chatItemData}
+                          chatsListRef={chatsListRef}
+                          isMobileScreen={isMobileScreen}
+                        />
+                      </>
+                    );
+                  })}
+                {isSearching === true && (
+                  <SearchedGlobalChatsWrapper
+                    searchedGlobalChats={searchedGlobalChats}
                   />
-                );
-              })}
-              {/* <ChatItem
-                chatsListRef={chatsListRef}
-                isMobileScreen={isMobileScreen}
-              />
-              <ChatItem
-                chatsListRef={chatsListRef}
-                isMobileScreen={isMobileScreen}
-              />
-              <ChatItem
-                chatsListRef={chatsListRef}
-                isMobileScreen={isMobileScreen}
-              />
-              <ChatItem
-                chatsListRef={chatsListRef}
-                isMobileScreen={isMobileScreen}
-              />
-              <ChatItem
-                chatsListRef={chatsListRef}
-                isMobileScreen={isMobileScreen}
-              />
-              <ChatItem
-                chatsListRef={chatsListRef}
-                isMobileScreen={isMobileScreen}
-              />
-              <ChatItem
-                chatsListRef={chatsListRef}
-                isMobileScreen={isMobileScreen}
-              />
-              <ChatItem
-                chatsListRef={chatsListRef}
-                isMobileScreen={isMobileScreen}
-              />
-              <ChatItem
-                chatsListRef={chatsListRef}
-                isMobileScreen={isMobileScreen}
-              />
-              <ChatItem
-                chatsListRef={chatsListRef}
-                isMobileScreen={isMobileScreen}
-              />
-              <ChatItem
-                chatsListRef={chatsListRef}
-                isMobileScreen={isMobileScreen}
-              />
-              <ChatItem
-                chatsListRef={chatsListRef}
-                isMobileScreen={isMobileScreen}
-              />
-              <ChatItem
-                chatsListRef={chatsListRef}
-                isMobileScreen={isMobileScreen}
-              />
-              <ChatItem
-                chatsListRef={chatsListRef}
-                isMobileScreen={isMobileScreen}
-              />
-              <ChatItem
-                chatsListRef={chatsListRef}
-                isMobileScreen={isMobileScreen}
-              />
-              <ChatItem
-                chatsListRef={chatsListRef}
-                isMobileScreen={isMobileScreen}
-              />
-              <ChatItem
-                chatsListRef={chatsListRef}
-                isMobileScreen={isMobileScreen}
-              /> */}
+                )}
+              </div>
             </>
           )}
         </div>

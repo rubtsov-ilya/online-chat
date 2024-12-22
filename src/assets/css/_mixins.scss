@@ -1,3 +1,5 @@
+@use 'src/assets/css/_keyframes.scss' as *;
+
 @mixin input-mixin {
   border: 1px solid var(--base-white-smoke);
   border-radius: 8px;
@@ -65,4 +67,8 @@
 
   &::-webkit-scrollbar-track {
   }
+}
+
+@mixin fade-in-animation {
+  animation: fade-in 0.15s ease-in forwards;
 }

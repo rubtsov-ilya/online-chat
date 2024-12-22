@@ -1,0 +1,26 @@
+.wrapper {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-around;
+}
+
+.icon-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+
+  &__svg {
+    path {
+      fill: var(--base-grey-gainsboro);
+    }
+  }
+  &__text {
+    font-size: 16px;
+    font-family: var(--third-family);
+    font-weight: 500;
+    color: var(--base-black);
+  }
+}

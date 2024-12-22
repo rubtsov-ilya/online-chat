@@ -1,3 +1,5 @@
+@use 'src/assets/css/_mixins.scss' as *;
+
 .search {
   display: flex;
   align-items: center;
@@ -6,6 +8,8 @@
   padding: 6px 8px;
   border: 1px solid var(--base-grey-whisper);
   border-radius: 999px;
+  @include fade-in-animation;
+  cursor: text;
 
   &__search-svg {
     width: 24px;
@@ -24,6 +28,15 @@
     font-weight: 500;
     font-size: 14px;
     color: var(--base-black);
+    &::-webkit-search-cancel-button {
+      -webkit-appearance: none;
+      appearance: none;
+    }
+    &::-ms-clear {
+      display: none;
+      width: 0;
+      height: 0;
+    }
   }
 
   &__clear-btn {

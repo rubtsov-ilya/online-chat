@@ -3,7 +3,6 @@
 .chats-list {
   height: 100%;
   overflow-y: auto;
-  padding-top: 8px;
   &--relative {
     position: relative;
   }
@@ -32,13 +31,25 @@
     height: 40px;
     user-select: none;
   }
-  
+
   @keyframes rotate {
     0% {
       transform: rotate(0deg);
     }
     100% {
       transform: rotate(360deg);
+    }
+  }
+  &__content {
+    height: 100%;
+    padding-top: 8px;
+    display: flex;
+    flex-direction: column;
+  }
+  &__chats-wrapper {
+    padding-top: 0px;
+    &--is-searching {
+      padding-top: 12px;
     }
   }
 }
