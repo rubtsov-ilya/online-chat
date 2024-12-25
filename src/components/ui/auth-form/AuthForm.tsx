@@ -86,19 +86,15 @@ const AuthForm: FC<AuthFormProps> = ({
   const addUserDuringRegister = async (user: User, username: string) => {
     const uid = user.uid;
 
+    // создать user в "userChats"
     set(refFirebaseDatabase(firebaseDatabase, 'users/' + uid), {
       uid: uid,
       email: user.email,
       username: username,
+      avatar: ''
     });
 
-    // Add user to "usersAvatars"
-    set(
-      refFirebaseDatabase(firebaseDatabase, `usersAvatars/${uid}`),
-      'default',
-    );
-
-    // Add user to "userChats"
+    // создать user в "userChats"
     set(refFirebaseDatabase(firebaseDatabase, `userChats/${uid}`), {
       uid: uid,
     });

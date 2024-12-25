@@ -13,7 +13,7 @@ interface UserAvatarProps {
 const AvatarImage: FC<UserAvatarProps> = ({ AvatarImg, isLittle }) => {
   return (
     <>
-      {AvatarImg.length === 0 && (
+      {AvatarImg == null && (
         <SkeletonTheme
           width={'40%'}
           borderRadius={999}
@@ -26,7 +26,7 @@ const AvatarImage: FC<UserAvatarProps> = ({ AvatarImg, isLittle }) => {
           />
         </SkeletonTheme>
       )}
-      {AvatarImg === 'default' && (
+      {AvatarImg?.length === 0 && (
         <div
           className={`${styles['avatar-image']} ${styles['avatar-image--svg']} ${isLittle ? styles['avatar-image--little'] : ''}`}
         >
@@ -35,7 +35,7 @@ const AvatarImage: FC<UserAvatarProps> = ({ AvatarImg, isLittle }) => {
           />
         </div>
       )}
-      {AvatarImg !== 'default' && AvatarImg.length > 0 && (
+      {AvatarImg?.length > 0 && (
         <img
           src={AvatarImg}
           alt=""

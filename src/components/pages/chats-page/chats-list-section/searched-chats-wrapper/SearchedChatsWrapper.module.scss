@@ -1,6 +1,6 @@
 @use 'src/assets/css/_mixins.scss' as *;
 
-.searched-global-chats-wrapper {
+.searched-chats-wrapper {
   display: flex;
   flex-direction: column;
   &__text {

@@ -5,6 +5,7 @@ interface IInitialState {
   uid: null | string;
   avatar: null | string;
   username: null | string;
+  blocked: null | string[];
 }
 
 const initialState: IInitialState = {
@@ -12,6 +13,7 @@ const initialState: IInitialState = {
   uid: null,
   avatar: null,
   username: null,
+  blocked: null,
 };
 
 const userSlice = createSlice({
@@ -21,22 +23,23 @@ const userSlice = createSlice({
     selectUser: (state) => state,
   },
   reducers: {
-    setUserWithoutUsername(state, action: PayloadAction<Omit<IInitialState, 'username'>>) {
+    setUser(state, action: PayloadAction<IInitialState>) {
       state.email = action.payload.email;
       state.uid = action.payload.uid;
       state.avatar = action.payload.avatar;
-    },
-    setUsername(state, action: PayloadAction<Pick<IInitialState, 'username'>>) {
       state.username = action.payload.username;
+      state.blocked = action.payload.blocked;
     },
     removeUser(state) {
       state.email = null;
       state.uid = null;
       state.avatar = null;
+      state.username = null;
+      state.blocked = null;
     },
   },
 });
 
-export const { setUsername, setUserWithoutUsername, removeUser } = userSlice.actions;
+export const { setUser, removeUser } = userSlice.actions;
 export const { selectUser } = userSlice.selectors;
 export default userSlice.reducer;

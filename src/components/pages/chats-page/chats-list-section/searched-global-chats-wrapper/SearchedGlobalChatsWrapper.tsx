@@ -2,10 +2,10 @@ import { FC } from 'react';
 import styles from './SearchedGlobalChatsWrapper.module.scss';
 import { IFirebaseRtDbUser } from 'src/interfaces/firebaseRealtimeDatabase.interface';
 
-interface SearchedChatsWrapperProps {
+interface SearchedGlobalChatsWrapperProps {
   searchedGlobalChats: 'error' | IFirebaseRtDbUser[];
 }
-const SearchedGlobalChatsWrapper: FC<SearchedChatsWrapperProps> = ({
+const SearchedGlobalChatsWrapper: FC<SearchedGlobalChatsWrapperProps> = ({
   searchedGlobalChats,
 }) => {
   console.log(searchedGlobalChats)

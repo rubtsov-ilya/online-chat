@@ -3,6 +3,7 @@ import { IMessage } from "./Message.interface";
 export interface IFirebaseRtDbUser {
   uid: string;
   email: string;
+  avatar: string;
   username: string;
   blocked?: string[];
 }
@@ -21,7 +22,7 @@ export interface IFirebaseRtDbChat {
   lastMessageText: string; 
   lastMessageDateUTC: string; 
   uncheckedCounter: number; 
-  groupChatName: string;
+  groupChatname: string;
   groupAvatar: string;
   isDeleted: boolean;
 }

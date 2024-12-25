@@ -94,7 +94,7 @@ const UploadAvatar: FC<UploadAvatarProps> = ({ userAvatar, uid }) => {
       const firebaseUrl = await firebaseStorageFileUpload(compressedFile);
       if (typeof firebaseUrl === 'string' ) {
         set(
-          refFirebaseDatabase(firebaseDatabase, `usersAvatars/${uid}`),
+          refFirebaseDatabase(firebaseDatabase, `users/${uid}/avatar`),
           firebaseUrl,
         );
       }

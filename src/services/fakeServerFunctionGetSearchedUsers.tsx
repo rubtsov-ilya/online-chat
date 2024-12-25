@@ -21,7 +21,7 @@ export const fakeServerFunctionGetSearchedUsers = async (
           .replace(/\s+/g, '')
           .includes(searchInputValue.toLowerCase().replace(/\s+/g, '')),
       )
-      .slice(0, 10);
+      .slice(0, 10); // ограничение в количестве результатов - 10
     return filteredUsers;
   } else {
     return 'error';

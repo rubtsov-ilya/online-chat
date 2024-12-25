@@ -1,4 +1,4 @@
-import { FC, useEffect, useRef } from 'react';
+import { FC, useDeferredValue, useEffect, useRef, useState } from 'react';
 
 import DeleteCircleSvg from 'src/assets/images/icons/24x24-icons/Delete cirlce.svg?react';
 import SearchSvg from 'src/assets/images/icons/24x24-icons/Search.svg?react';
@@ -8,27 +8,25 @@ import {
   IFirebaseRtDbUser,
 } from 'src/interfaces/firebaseRealtimeDatabase.interface';
 import { fakeServerFunctionGetSearchedUsers } from 'src/services/fakeServerFunctionGetSearchedUsers';
-interface SearchProps {
-  setSearchInputValue: React.Dispatch<React.SetStateAction<string>>
+import { IChatsWithImageAndName } from 'src/interfaces/chatsWithImageAndName.interface';
+interface SearchChatsByNameProps {
   setSearchedGlobalChats: React.Dispatch<
   React.SetStateAction<IFirebaseRtDbUser[] | 'error'>
   >;
+  setSearchedChats: React.Dispatch<React.SetStateAction<IChatsWithImageAndName[]>>;
   setIsSearching: React.Dispatch<React.SetStateAction<boolean>>;
-  searchInputValue: string
-  deferredSearchInputValue: string
   isSearching: boolean;
 }
 
-const SearchChatsByName: FC<SearchProps> = ({
-  setSearchInputValue,
+const SearchChatsByName: FC<SearchChatsByNameProps> = ({
   setSearchedGlobalChats,
+  setSearchedChats,
   setIsSearching,
-  searchInputValue,
-  deferredSearchInputValue,
   isSearching,
 }) => {
+  const [searchInputValue, setSearchInputValue] = useState<string>('');
+  const deferredSearchInputValue = useDeferredValue(searchInputValue);
   const searchRef = useRef<HTMLInputElement>(null);
-
   const onClearButtonClick = (): void => {
     setSearchInputValue('');
   };

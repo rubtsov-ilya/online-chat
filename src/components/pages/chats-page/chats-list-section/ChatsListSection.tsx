@@ -1,7 +1,7 @@
-import { FC, useDeferredValue, useLayoutEffect, useRef, useState } from 'react';
+import { FC, useLayoutEffect, useRef, useState } from 'react';
 
 import styles from './ChatsListSection.module.scss';
-import { ref as firebaseRef, onValue } from 'firebase/database';
+import { ref as refFirebaseDatabase, onValue, get } from 'firebase/database';
 import { firebaseDatabase } from 'src/firebase';
 import EmptyChatsWrapper from './empty-chats-wrapper/EmptyChatsWrapper';
 import ChatItem from './chat-item/ChatItem';
@@ -17,19 +17,27 @@ import ErrorChatsWrapper from './error-chats-wrapper/ErrorChatsWrapper';
 import SearchChatsByName from './search-chats-by-name/SearchChatsByName';
 import SearchedGlobalChatsWrapper from './searched-global-chats-wrapper/SearchedGlobalChatsWrapper';
 
+import SearchedChatsWrapper from './searched-chats-wrapper/SearchedChatsWrapper';
+import {
+  IChatsWithDetails,
+  IMemberDetails,
+} from 'src/interfaces/chatsWithDetails.interface';
+
 interface ChatsListSectionProps {
   isMobileScreen: boolean;
 }
 
 const ChatsListSection: FC<ChatsListSectionProps> = ({ isMobileScreen }) => {
-  const { uid } = useAuth();
+  const { uid, avatar, username, blocked } = useAuth();
   const [chats, setChats] = useState<IFirebaseRtDbChat[]>([]);
-  const [searchInputValue, setSearchInputValue] = useState<string>('');
-  const deferredSearchInputValue = useDeferredValue(searchInputValue);
+  const [chatsWithDetails, setChatsWithDetails] = useState<IChatsWithDetails[]>(
+    [],
+  );
   /*   const [searchedChats, setSearchedChats] = useState<IFirebaseRtDbChat[]>([]); */
   const [searchedGlobalChats, setSearchedGlobalChats] = useState<
     IFirebaseRtDbUser[] | 'error'
   >([]);
+  const [searchedChats, setSearchedChats] = useState<IChatsWithDetails[]>([]);
   const [isSearching, setIsSearching] = useState<boolean>(false);
   const [isChatsLoading, setIsChatsLoading] = useState<boolean | 'error'>(
     'error',
@@ -38,17 +46,19 @@ const ChatsListSection: FC<ChatsListSectionProps> = ({ isMobileScreen }) => {
   const ComponentTag = isMobileScreen ? 'section' : 'div';
 
   useLayoutEffect(() => {
-    /* поиск и фильтрация - по своим чатам поиска */
+    // поиск и фильтрация - по своим чатам поиска
     setIsChatsLoading(true);
-    const userChatsRef = firebaseRef(firebaseDatabase, `userChats/${uid}`);
+    const userChatsRef = refFirebaseDatabase(
+      firebaseDatabase,
+      `userChats/${uid}`,
+    );
 
     const unsubscribeUserChats = onValue(
       userChatsRef,
       (snapshot) => {
-        const userChatSnapshot: IFirebaseRtDbUserChat = snapshot.val();
-        if (userChatSnapshot) {
-          const chatsArray = Object.values(userChatSnapshot.chats);
-          setIsChatsLoading(false);
+        const userChatsSnapshot: IFirebaseRtDbUserChat = snapshot.val();
+        if (userChatsSnapshot) {
+          const chatsArray = Object.values(userChatsSnapshot.chats);
           setChats(chatsArray);
         }
       },
@@ -62,6 +72,98 @@ const ChatsListSection: FC<ChatsListSectionProps> = ({ isMobileScreen }) => {
       unsubscribeUserChats();
     };
   }, []);
+
+  useLayoutEffect(() => {
+    const getChatsWithDetails = async () => {
+      if (chats.length > 0 && uid !== null) {
+        try {
+          const existingChatIds = new Set(
+            chatsWithDetails.map((chat) => chat.chatId),
+          );
+
+          const newChats: IChatsWithDetails[] = await Promise.all(
+            chats.map(async (chat) => {
+              // если чат уже существует, обновить только измененные ключи, оставляя username и userAvatar
+              if (existingChatIds.has(chat.chatId)) {
+                const existingChat = chatsWithDetails.find(
+                  (c) => c.chatId === chat.chatId,
+                )!;
+                return {
+                  ...chat,
+                  membersDetails: existingChat.membersDetails,
+                };
+              }
+
+              const membersDetails: IMemberDetails[] = await Promise.all(
+                chat.membersIds.map(async (memberId) => {
+                  if (memberId === uid) {
+                    // Для текущего пользователя
+                    return {
+                      uid: memberId,
+                      username: username as string,
+                      avatar: avatar as string,
+                      blocked: blocked as string[],
+                    };
+                  } else {
+                    // Для других участников
+                    try {
+                      const userRef = refFirebaseDatabase(
+                        firebaseDatabase,
+                        `users/${memberId}`,
+                      );
+                      const userSnapshot = await get(userRef);
+
+                      if (userSnapshot.exists()) {
+                        const userValue =
+                          userSnapshot.val() as IFirebaseRtDbUser;
+                        return {
+                          uid: memberId,
+                          username:
+                            userValue.username || 'Неизвестный пользователь',
+                          avatar: userValue.avatar || '',
+                          blocked: userValue.blocked || [],
+                        };
+                      } else {
+                        return {
+                          uid: memberId,
+                          username: 'Неизвестный пользователь',
+                          avatar: '',
+                          blocked: [],
+                        };
+                      }
+                    } catch (error) {
+                      console.error(
+                        `Ошибка при получении данных для пользователя ${memberId}:`,
+                        error,
+                      );
+                      return {
+                        uid: memberId,
+                        username: 'Неизвестный пользователь',
+                        avatar: '',
+                        blocked: [],
+                      };
+                    }
+                  }
+                }),
+              );
+
+              return {
+                ...chat,
+                membersDetails,
+              };
+            }),
+          );
+          setChatsWithDetails(newChats);
+          setIsChatsLoading(false);
+        } catch (error) {
+          setIsChatsLoading('error');
+          console.error('Error getting chats with details:', error);
+        }
+      }
+    };
+
+    getChatsWithDetails();
+  }, [chats]);
 
   return (
     <ComponentTag
@@ -94,35 +196,64 @@ const ChatsListSection: FC<ChatsListSectionProps> = ({ isMobileScreen }) => {
             <>
               <div className={styles['chats-list__search-wrapper']}>
                 <SearchChatsByName
-                  deferredSearchInputValue={deferredSearchInputValue}
-                  setSearchInputValue={setSearchInputValue}
-                  searchInputValue={searchInputValue}
                   isSearching={isSearching}
                   setIsSearching={setIsSearching}
+                  setSearchedChats={setSearchedChats}
                   setSearchedGlobalChats={setSearchedGlobalChats}
                 />
               </div>
-              {chats?.length === 0 && isSearching === false && (
+              {chatsWithDetails?.length === 0 && isSearching === false && (
                 <EmptyChatsWrapper />
               )}
               <div
                 className={`${styles['chats-list__chats-wrapper']} ${isSearching ? styles['chats-list__chats-wrapper--is-searching'] : ''}`}
               >
-                {chats?.length !== 0 &&
-                  chats.map((chatItemData, index) => {
+                {chatsWithDetails?.length !== 0 &&
+                  isSearching === false &&
+                  chatsWithDetails.map((chatItemData, index) => {
+                    // не отрисовывать удалённый чат, если поиск неактивен
+                    if (
+                      chatItemData.isDeleted === true &&
+                      isSearching === false
+                    ) {
+                      return null;
+                    }
+
+                    // Выбираем пользователя из membersDetails, чей uid не равен текущему uid, нужно, если чат не групповой
+                    const otherMember =
+                      chatItemData.groupChatname.length === 0 &&
+                      chatItemData.membersDetails.length === 2 &&
+                      chatItemData.membersDetails.find(
+                        (member) => member.uid !== uid,
+                      )!;
+
                     return (
                       <ChatItem
                         key={index}
-                        uid={uid!}
-                        index={index}
-                        deferredSearchInputValue={deferredSearchInputValue}
                         chatItemData={chatItemData}
                         chatsListRef={chatsListRef}
                         isMobileScreen={isMobileScreen}
+                        chatName={
+                          otherMember === false
+                            ? chatItemData.groupChatname
+                            : otherMember.username
+                        }
+                        chatAvatar={
+                          otherMember === false
+                            ? chatItemData.groupAvatar
+                            : otherMember?.avatar
+                        }
                       />
                     );
                   })}
-                {isSearching === true && (
+                {isSearching === true && searchedChats.length > 0 && (
+                  <SearchedChatsWrapper
+                    isMobileScreen={isMobileScreen}
+                    chatsListRef={chatsListRef}
+                    searchedChats={searchedChats}
+                  />
+                )}
+                {isSearching === true && searchedGlobalChats.length > 0 && (
                   <SearchedGlobalChatsWrapper
                     searchedGlobalChats={searchedGlobalChats}
                   />

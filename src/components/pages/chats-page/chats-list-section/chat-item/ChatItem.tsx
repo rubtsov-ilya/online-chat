@@ -1,6 +1,5 @@
 import { FC, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { get, ref as refFirebaseDatabase } from 'firebase/database';
-import userAvatarImg from 'src/assets/images/icons/dev-icons/avatar.jpg';
 import AvatarImage from 'src/components/ui/avatar-image/AvatarImage';
 import UserBanSvg from 'src/assets/images/icons/24x24-icons/User Ban.svg?react';
 import DeleteSvg from 'src/assets/images/icons/24x24-icons/Delete.svg?react';
@@ -11,35 +10,32 @@ import useToggleModal from 'src/hooks/useToggleModal';
 import ModalBackdrop from 'src/components/ui/modal-backdrop/ModalBackdrop';
 import ModalActionConfirm from 'src/components/ui/modal-action-confirm/modalActionConfirm';
 import { IFirebaseRtDbChat } from 'src/interfaces/firebaseRealtimeDatabase.interface';
-import { firebaseDatabase } from 'src/firebase';
 import Skeleton, { SkeletonTheme } from 'react-loading-skeleton';
 import 'react-loading-skeleton/dist/skeleton.css';
 
 interface ChatItemProps {
-  index: number;
   isMobileScreen: boolean;
   chatsListRef: React.RefObject<HTMLDivElement | null>;
   chatItemData: IFirebaseRtDbChat;
-  deferredSearchInputValue: string;
-  uid: string;
+  chatAvatar: string;
+  chatName: string;
 }
 
 const ChatItem: FC<ChatItemProps> = ({
-  index,
   isMobileScreen,
   chatsListRef,
   chatItemData,
-  deferredSearchInputValue,
-  uid,
+  chatAvatar,
+  chatName,
 }) => {
   const [modalOpen, setModalOpen] = useState<'ban' | 'delete' | false>(false);
   const { toggleModal } = useToggleModal({ setCbState: setModalOpen });
-  const [chatName, setChatName] = useState<string | null>(null); //изначально null, ничего не отображается, если '' пустая строка, то отобразится SKeleton. Длина chatName не может быть меньше 3 символов, если будет получена с бекенда
-  const [userAvatar, setUserAvatar] = useState<string>('');
-  const [isVisible, setIsVisible] = useState<boolean>(true);
+ /*  const [chatName, setChatName] = useState<string | null>(null); //изначально null, ничего не отображается, если '' пустая строка, то отобразится SKeleton. Длина chatName не может быть меньше 3 символов, если будет получена с бекенда */
+/*   const [chatAvatar, setChatAvatar] = useState<string>('');
+  const [isVisible, setIsVisible] = useState<boolean>(true); */
   const [isActive, setIsActive] = useState<boolean>(false);
   const [isHover, setIsHover] = useState<boolean>(false);
-  const loadingTimeout = useRef<NodeJS.Timeout | null>(null);
+/*   const loadingTimeout = useRef<NodeJS.Timeout | null>(null); */
   const longPressTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const chatItemRef = useRef<HTMLDivElement>(null);
   const initialTouchYRef = useRef<number | null>(null);
@@ -64,7 +60,7 @@ const ChatItem: FC<ChatItemProps> = ({
     },
   };
 
-  useLayoutEffect(() => {
+/*   useLayoutEffect(() => {
     loadingTimeout.current = setTimeout(() => {
       setChatName(''); // Меняем состояние после таймера
     }, 1500);
@@ -75,8 +71,8 @@ const ChatItem: FC<ChatItemProps> = ({
       }
     };
   }, []);
-
-  useEffect(() => {
+ */
+/*   useEffect(() => {
     const getChatName = async () => {
       // если чат не групповой
       if (chatItemData.groupChatName.length === 0) {
@@ -107,26 +103,26 @@ const ChatItem: FC<ChatItemProps> = ({
       if (chatItemData.groupChatName.length === 0) {
         const userId = chatItemData.membersIds.find((id) => id !== uid);
 
-        const userAvatarRef = refFirebaseDatabase(
+        const chatAvatarRef = refFirebaseDatabase(
           firebaseDatabase,
           `usersAvatars/${userId}`,
         );
 
-        const userAvatarSnapshot = await get(userAvatarRef);
-        if (userAvatarSnapshot.exists()) {
-          const userAvatarValue = userAvatarSnapshot.val();
-          setUserAvatar(userAvatarValue);
+        const chatAvatarSnapshot = await get(chatAvatarRef);
+        if (chatAvatarSnapshot.exists()) {
+          const chatAvatarValue = chatAvatarSnapshot.val();
+          setChatAvatar(chatAvatarValue);
         }
       }
       if (chatItemData.groupChatName.length > 0) {
-        setUserAvatar(chatItemData.groupAvatar);
+        setChatAvatar(chatItemData.groupAvatar);
       }
     };
     getChatName();
     getAvatar();
-  }, [chatItemData]);
+  }, [chatItemData]); */
 
-  useLayoutEffect(() => {
+/*   useLayoutEffect(() => {
     // если в поиске есть символы и имя чата уже найдено
     if (chatName !== null && deferredSearchInputValue.length > 0) {
       // если значение в поиске совпадает с именем чата
@@ -169,7 +165,7 @@ const ChatItem: FC<ChatItemProps> = ({
     }
 
     return () => {};
-  }, [deferredSearchInputValue]);
+  }, [deferredSearchInputValue]); */
 
   useEffect(() => {
     const onScroll = (event: Event) => {
@@ -257,8 +253,6 @@ const ChatItem: FC<ChatItemProps> = ({
 
   return (
     <>
-      {isVisible && deferredSearchInputValue.length > 0 && <span className={styles['chat-span']}>Чаты</span>}
-      {isVisible && (
         <div
           className={`${styles['chat-item']} ${isActive ? styles['chat-item--active'] : ''}`}
           onContextMenu={(e) => {
@@ -336,7 +330,7 @@ const ChatItem: FC<ChatItemProps> = ({
             className={`${styles['chat-item__foreground']} ${isActive ? styles['chat-item__foreground--active'] : ''} ${isHover && isMobileScreen ? styles['chat-item__foreground--hover'] : ''}`}
           >
             <div className={styles['chat-item__left-wrapper']}>
-              <AvatarImage AvatarImg={userAvatar} />
+              <AvatarImage AvatarImg={chatAvatar} />
 
               <div className={styles['chat-item__user-details-wrapper']}>
                 <SkeletonTheme
@@ -397,8 +391,7 @@ const ChatItem: FC<ChatItemProps> = ({
             </div>
           </div>
         </div>
-      )}
-      {isVisible && isActive && (
+      {isActive && (
         <div
           onContextMenu={(e) => {
             e.preventDefault();
@@ -420,7 +413,7 @@ const ChatItem: FC<ChatItemProps> = ({
           className={styles['chat-item__overlay']}
         />
       )}
-      {isVisible && modalOpen && (
+      {modalOpen && (
         /* аргумент number в toggleModal - длительность transition opacity в modal-backdrop */
         <ModalBackdrop
           toggleModal={() => toggleModal(false, 100)}
@@ -432,7 +425,7 @@ const ChatItem: FC<ChatItemProps> = ({
             subtitle={modalActionData[modalOpen].subtitle}
             actionBtnText={modalActionData[modalOpen].actionBtnText}
             action={modalActionData[modalOpen].action}
-            avatar={userAvatarImg}
+            avatar={chatAvatar}
           />
         </ModalBackdrop>
       )}
