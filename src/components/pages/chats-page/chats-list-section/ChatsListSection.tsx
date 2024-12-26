@@ -33,12 +33,12 @@ const ChatsListSection: FC<ChatsListSectionProps> = ({ isMobileScreen }) => {
   const [chatsWithDetails, setChatsWithDetails] = useState<IChatWithDetails[]>(
     [],
   );
-  /*   const [searchedChats, setSearchedChats] = useState<IFirebaseRtDbChat[]>([]); */
   const [searchedGlobalChats, setSearchedGlobalChats] = useState<
     IFirebaseRtDbUser[] | 'error'
   >([]);
   const [searchedChats, setSearchedChats] = useState<IChatWithDetails[]>([]);
-  const [isSearching, setIsSearching] = useState<boolean>(false);
+  const [isSearching, setIsSearching] = useState<boolean>(false); // состояние использования поиска
+  const [isLoading, setIsLoading] = useState<boolean>(false); // состояние загрузки пользователей из глобального поиска
   const [isChatsLoading, setIsChatsLoading] = useState<boolean | 'error'>(
     'error',
   );
@@ -83,7 +83,7 @@ const ChatsListSection: FC<ChatsListSectionProps> = ({ isMobileScreen }) => {
 
           const newChats: IChatWithDetails[] = await Promise.all(
             chats.map(async (chat) => {
-              // если чат уже существует, обновить только измененные ключи, оставляя username и userAvatar
+              // если чат уже существует, обновить только измененные ключи, оставляя username и avatar
               if (existingChatIds.has(chat.chatId)) {
                 const existingChat = chatsWithDetails.find(
                   (c) => c.chatId === chat.chatId,
@@ -153,7 +153,15 @@ const ChatsListSection: FC<ChatsListSectionProps> = ({ isMobileScreen }) => {
               };
             }),
           );
-          setChatsWithDetails(newChats);
+
+          // сортировать чаты по `lastMessageDateUTC`
+          const sortedChats = newChats.sort((a, b) => {
+            const dateA = new Date(a.lastMessageDateUTC).getTime();
+            const dateB = new Date(b.lastMessageDateUTC).getTime();
+            return dateB - dateA; // Сортировка по убыванию (последние сообщения первыми)
+          });
+          
+          setChatsWithDetails(sortedChats);
           setIsChatsLoading(false);
         } catch (error) {
           setIsChatsLoading('error');
@@ -196,7 +204,9 @@ const ChatsListSection: FC<ChatsListSectionProps> = ({ isMobileScreen }) => {
             <>
               <div className={styles['chats-list__search-wrapper']}>
                 <SearchChatsByName
+                  isLoading={isLoading}
                   isSearching={isSearching}
+                  setIsLoading={setIsLoading}
                   setIsSearching={setIsSearching}
                   setSearchedChats={setSearchedChats}
                   setSearchedGlobalChats={setSearchedGlobalChats}
@@ -204,44 +214,39 @@ const ChatsListSection: FC<ChatsListSectionProps> = ({ isMobileScreen }) => {
                 />
               </div>
               {chatsWithDetails?.length === 0 && isSearching === false && (
-                <EmptyChatsWrapper />
+                <EmptyChatsWrapper text={'Начните общаться!'} />
               )}
               <div
                 className={`${styles['chats-list__chats-wrapper']} ${isSearching ? styles['chats-list__chats-wrapper--is-searching'] : ''}`}
               >
                 {chatsWithDetails?.length !== 0 &&
                   isSearching === false &&
-                  chatsWithDetails.map((chatItemData, index) => {
+                  chatsWithDetails.map((chat, index) => {
                     // не отрисовывать удалённый чат, если поиск неактивен
-                    if (
-                      chatItemData.isDeleted === true &&
-                      isSearching === false
-                    ) {
+                    if (chat.isDeleted === true && isSearching === false) {
                       return null;
                     }
 
                     // Выбираем пользователя из membersDetails, чей uid не равен текущему uid, нужно, если чат не групповой
                     const otherMember =
-                      chatItemData.groupChatname.length === 0 &&
-                      chatItemData.membersDetails.length === 2 &&
-                      chatItemData.membersDetails.find(
-                        (member) => member.uid !== uid,
-                      )!;
+                      chat.groupChatname.length === 0 &&
+                      chat.membersDetails.length === 2 &&
+                      chat.membersDetails.find((member) => member.uid !== uid)!;
 
                     return (
                       <ChatItem
                         key={index}
-                        chatItemData={chatItemData}
+                        chatItemData={chat}
                         chatsListRef={chatsListRef}
                         isMobileScreen={isMobileScreen}
                         chatName={
                           otherMember === false
-                            ? chatItemData.groupChatname
+                            ? chat.groupChatname
                             : otherMember.username
                         }
                         chatAvatar={
                           otherMember === false
-                            ? chatItemData.groupAvatar
+                            ? chat.groupAvatar
                             : otherMember?.avatar
                         }
                       />
@@ -257,10 +262,17 @@ const ChatsListSection: FC<ChatsListSectionProps> = ({ isMobileScreen }) => {
                 )}
                 {isSearching === true && searchedGlobalChats.length > 0 && (
                   <SearchedGlobalChatsWrapper
+                    isMobileScreen={isMobileScreen}
                     searchedGlobalChats={searchedGlobalChats}
                   />
                 )}
               </div>
+              {isSearching === true &&
+                isLoading === false &&
+                searchedGlobalChats.length === 0 &&
+                searchedChats.length === 0 && (
+                  <EmptyChatsWrapper text={'Нет результатов'} />
+                )}
             </>
           )}
         </div>

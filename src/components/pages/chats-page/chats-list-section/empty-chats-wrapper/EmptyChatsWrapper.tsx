@@ -1,10 +1,13 @@
 import { FC } from 'react';
 import EmptySvg from 'src/assets/images/icons/24x24-icons/Message.svg?react';
-import { Link } from 'react-router-dom';
 
 import styles from './EmptyChatsWrapper.module.scss';
 
-const EmptyChatsWrapper: FC = () => {
+interface EmptyChatsWrapperProps {
+  text: string;
+}
+
+const EmptyChatsWrapper: FC<EmptyChatsWrapperProps> = ({ text }) => {
   return (
     <div className={styles['empty-wrapper']}>
       <div className={styles['empty-wrapper__icon-wrapper']}>
@@ -14,9 +17,9 @@ const EmptyChatsWrapper: FC = () => {
           viewBox="0 0 24 24"
           className={styles['empty-wrapper__svg']}
         />
-        <span className={styles['empty-wrapper__text']}>Начните общаться!</span>
+        <span className={styles['empty-wrapper__text']}>{text}</span>
       </div>
-{/*       <Link to={'/'} className={styles['wrapper__link']}>
+      {/*       <Link to={'/'} className={styles['wrapper__link']}>
         Начать чат
       </Link> */}
     </div>

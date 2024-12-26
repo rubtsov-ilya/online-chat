@@ -30,12 +30,12 @@ const ChatItem: FC<ChatItemProps> = ({
 }) => {
   const [modalOpen, setModalOpen] = useState<'ban' | 'delete' | false>(false);
   const { toggleModal } = useToggleModal({ setCbState: setModalOpen });
- /*  const [chatName, setChatName] = useState<string | null>(null); //изначально null, ничего не отображается, если '' пустая строка, то отобразится SKeleton. Длина chatName не может быть меньше 3 символов, если будет получена с бекенда */
-/*   const [chatAvatar, setChatAvatar] = useState<string>('');
+  /*  const [chatName, setChatName] = useState<string | null>(null); //изначально null, ничего не отображается, если '' пустая строка, то отобразится SKeleton. Длина chatName не может быть меньше 3 символов, если будет получена с бекенда */
+  /*   const [chatAvatar, setChatAvatar] = useState<string>('');
   const [isVisible, setIsVisible] = useState<boolean>(true); */
   const [isActive, setIsActive] = useState<boolean>(false);
   const [isHover, setIsHover] = useState<boolean>(false);
-/*   const loadingTimeout = useRef<NodeJS.Timeout | null>(null); */
+  /*   const loadingTimeout = useRef<NodeJS.Timeout | null>(null); */
   const longPressTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const chatItemRef = useRef<HTMLDivElement>(null);
   const initialTouchYRef = useRef<number | null>(null);
@@ -60,7 +60,7 @@ const ChatItem: FC<ChatItemProps> = ({
     },
   };
 
-/*   useLayoutEffect(() => {
+  /*   useLayoutEffect(() => {
     loadingTimeout.current = setTimeout(() => {
       setChatName(''); // Меняем состояние после таймера
     }, 1500);
@@ -72,7 +72,7 @@ const ChatItem: FC<ChatItemProps> = ({
     };
   }, []);
  */
-/*   useEffect(() => {
+  /*   useEffect(() => {
     const getChatName = async () => {
       // если чат не групповой
       if (chatItemData.groupChatName.length === 0) {
@@ -122,7 +122,7 @@ const ChatItem: FC<ChatItemProps> = ({
     getAvatar();
   }, [chatItemData]); */
 
-/*   useLayoutEffect(() => {
+  /*   useLayoutEffect(() => {
     // если в поиске есть символы и имя чата уже найдено
     if (chatName !== null && deferredSearchInputValue.length > 0) {
       // если значение в поиске совпадает с именем чата
@@ -253,125 +253,126 @@ const ChatItem: FC<ChatItemProps> = ({
 
   return (
     <>
+      <div
+        className={`${styles['chat-item']} ${isActive ? styles['chat-item--active'] : ''}`}
+        onContextMenu={(e) => {
+          if (!isMobileScreen) {
+            e.preventDefault();
+            setIsActive((prev) => !prev);
+          }
+        }}
+        ref={chatItemRef}
+      >
         <div
-          className={`${styles['chat-item']} ${isActive ? styles['chat-item--active'] : ''}`}
+          className={styles['chat-item__background']}
           onContextMenu={(e) => {
-            if (!isMobileScreen) {
+            if (isMobileScreen) {
               e.preventDefault();
-              setIsActive((prev) => !prev);
             }
           }}
-          ref={chatItemRef}
         >
-          <div
-            className={styles['chat-item__background']}
+          <button
+            onClick={() => toggleModal('ban')}
             onContextMenu={(e) => {
               if (isMobileScreen) {
                 e.preventDefault();
               }
             }}
+            className={styles['chat-item__background-btn']}
           >
-            <button
-              onClick={() => toggleModal('ban')}
-              onContextMenu={(e) => {
-                if (isMobileScreen) {
-                  e.preventDefault();
-                }
-              }}
-              className={styles['chat-item__background-btn']}
-            >
-              <UserBanSvg className={styles['chat-item__user-ban-icon']} />
-            </button>
-            <button
-              onClick={() => toggleModal('delete')}
-              onContextMenu={(e) => {
-                if (isMobileScreen) {
-                  e.preventDefault();
-                }
-              }}
-              className={styles['chat-item__background-btn']}
-            >
-              <DeleteSvg className={styles['chat-item__delete-icon']} />
-            </button>
-          </div>
-          <div
+            <UserBanSvg className={styles['chat-item__user-ban-icon']} />
+          </button>
+          <button
+            onClick={() => toggleModal('delete')}
             onContextMenu={(e) => {
               if (isMobileScreen) {
                 e.preventDefault();
               }
             }}
-            onTouchStart={(e: React.TouchEvent) => {
-              if (isMobileScreen && !isActive) {
-                if (!isHover) {
-                  setIsHover(true);
-                }
-                initialTouchYRef.current = e.touches[0].clientY;
-                longPressTimerRef.current = setTimeout(() => {
-                  setIsActive(true);
-                }, longPressDuration);
-              }
-            }}
-            onTouchEnd={() => {
-              if (isMobileScreen) {
-                if (longPressTimerRef.current) {
-                  clearTimeout(longPressTimerRef.current);
-                  longPressTimerRef.current = null;
-                }
-                initialTouchYRef.current = null;
-              }
-            }}
-            onClick={() => {
-              if (isActive && longPressTimerRef.current !== null) {
-                setIsActive(false);
-              }
-              /* вынести в отдельную функцию и там выключать стейт при экешене нужном*/
-            }}
-            onTouchMove={onTouchMove}
-            className={`${styles['chat-item__foreground']} ${isActive ? styles['chat-item__foreground--active'] : ''} ${isHover && isMobileScreen ? styles['chat-item__foreground--hover'] : ''}`}
+            className={styles['chat-item__background-btn']}
           >
-            <div className={styles['chat-item__left-wrapper']}>
-              <AvatarImage AvatarImg={chatAvatar} />
+            <DeleteSvg className={styles['chat-item__delete-icon']} />
+          </button>
+        </div>
+        <div
+          onContextMenu={(e) => {
+            if (isMobileScreen) {
+              e.preventDefault();
+            }
+          }}
+          onTouchStart={(e: React.TouchEvent) => {
+            if (isMobileScreen && !isActive) {
+              if (!isHover) {
+                setIsHover(true);
+              }
+              initialTouchYRef.current = e.touches[0].clientY;
+              longPressTimerRef.current = setTimeout(() => {
+                setIsActive(true);
+              }, longPressDuration);
+            }
+          }}
+          onTouchEnd={() => {
+            if (isMobileScreen) {
+              if (longPressTimerRef.current) {
+                clearTimeout(longPressTimerRef.current);
+                longPressTimerRef.current = null;
+              }
+              initialTouchYRef.current = null;
+            }
+          }}
+          onClick={() => {
+            if (isActive && longPressTimerRef.current !== null) {
+              setIsActive(false);
+            }
+            /* вынести в отдельную функцию и там выключать стейт при экешене нужном*/
+          }}
+          onTouchMove={onTouchMove}
+          className={`${styles['chat-item__foreground']} ${isActive ? styles['chat-item__foreground--active'] : ''} ${isHover && isMobileScreen ? styles['chat-item__foreground--hover'] : ''}`}
+        >
+          <div className={styles['chat-item__left-wrapper']}>
+            <AvatarImage AvatarImg={chatAvatar} />
 
-              <div className={styles['chat-item__user-details-wrapper']}>
+            <div className={styles['chat-item__user-details-wrapper']}>
+              <SkeletonTheme
+                width={'40%'}
+                borderRadius={2}
+                height={17}
+                highlightColor="var(--base-white-snow)"
+                baseColor="var(--base-grey-gainsboro)"
+              >
+                <span className={styles['chat-item__user-name']}>
+                  {chatName !== null && chatName.length > 0 && chatName}
+                  {chatName !== null && chatName.length === 0 && <Skeleton />}
+                </span>
+              </SkeletonTheme>
+              <span className={styles['chat-item__user-message']}>
                 <SkeletonTheme
-                  width={'40%'}
+                  width={'100%'}
                   borderRadius={2}
-                  height={17}
+                  height={14}
                   highlightColor="var(--base-white-snow)"
                   baseColor="var(--base-grey-gainsboro)"
                 >
-                  <span className={styles['chat-item__user-name']}>
-                    {chatName !== null && chatName.length > 0 && chatName}
-                    {chatName !== null && chatName.length === 0 && <Skeleton />}
-                  </span>
+                  {chatName !== null &&
+                    chatName.length > 0 &&
+                    chatItemData.isDeleted === false &&
+                    chatItemData.lastMessageText.length !== 0 &&
+                    chatItemData.lastMessageText}
+                  {chatName !== null &&
+                    chatName.length > 0 &&
+                    chatItemData.lastMessageText.length === 0 &&
+                    chatItemData.isDeleted === false &&
+                    'Контент'}
+                  {chatName !== null &&
+                    chatName.length > 0 &&
+                    chatItemData.isDeleted === true &&
+                    'Удаленный чат'}
+                  {chatName !== null && chatName.length === 0 && <Skeleton />}
                 </SkeletonTheme>
-                <span className={styles['chat-item__user-message']}>
-                  <SkeletonTheme
-                    width={'100%'}
-                    borderRadius={2}
-                    height={14}
-                    highlightColor="var(--base-white-snow)"
-                    baseColor="var(--base-grey-gainsboro)"
-                  >
-                    {chatName !== null &&
-                      chatName.length > 0 &&
-                      chatItemData.isDeleted === false &&
-                      chatItemData.lastMessageText.length !== 0 &&
-                      chatItemData.lastMessageText}
-                    {chatName !== null &&
-                      chatName.length > 0 &&
-                      chatItemData.lastMessageText.length === 0 &&
-                      chatItemData.isDeleted === false &&
-                      'Контент'}
-                    {chatName !== null &&
-                      chatName.length > 0 &&
-                      chatItemData.isDeleted === true &&
-                      'Удаленный чат'}
-                    {chatName !== null && chatName.length === 0 && <Skeleton />}
-                  </SkeletonTheme>
-                </span>
-              </div>
+              </span>
             </div>
+          </div>
+          {chatItemData.isDeleted !== true && (
             <div className={styles['chat-item__right-wrapper']}>
               {chatItemData.uncheckedCounter > 0 && (
                 <div className={styles['chat-item__counter-wrapper']}>
@@ -389,8 +390,9 @@ const ChatItem: FC<ChatItemProps> = ({
                 isOwn={true}
               />
             </div>
-          </div>
+          )}
         </div>
+      </div>
       {isActive && (
         <div
           onContextMenu={(e) => {

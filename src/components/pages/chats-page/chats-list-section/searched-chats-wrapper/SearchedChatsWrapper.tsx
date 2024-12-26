@@ -20,26 +20,26 @@ const SearchedChatsWrapper: FC<SearchedChatsWrapperProps> = ({
   return (
     <div className={styles['searched-chats-wrapper']}>
       <span className={styles['searched-chats-wrapper__text']}>Чаты</span>
-      {searchedChats.map((chatItemData, index) => {
+      {searchedChats.map((chat, index) => {
         const otherMember =
-          chatItemData.groupChatname.length === 0 &&
-          chatItemData.membersDetails.length === 2 &&
-          chatItemData.membersDetails.find((member) => member.uid !== uid)!;
+        chat.groupChatname.length === 0 &&
+          chat.membersDetails.length === 2 &&
+          chat.membersDetails.find((member) => member.uid !== uid)!;
 
         return (
           <ChatItem
             key={index}
-            chatItemData={chatItemData}
+            chatItemData={chat}
             chatsListRef={chatsListRef}
             isMobileScreen={isMobileScreen}
             chatName={
               otherMember === false
-                ? chatItemData.groupChatname
+                ? chat.groupChatname
                 : otherMember.username
             }
             chatAvatar={
               otherMember === false
-                ? chatItemData.groupAvatar
+                ? chat.groupAvatar
                 : otherMember?.avatar
             }
           />

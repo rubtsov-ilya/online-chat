@@ -16,7 +16,9 @@ interface SearchChatsByNameProps {
   >;
   setSearchedChats: React.Dispatch<React.SetStateAction<IChatWithDetails[]>>;
   setIsSearching: React.Dispatch<React.SetStateAction<boolean>>;
+  setIsLoading: React.Dispatch<React.SetStateAction<boolean>>;
   isSearching: boolean;
+  isLoading: boolean;
   chatsWithDetails: IChatWithDetails[];
 }
 
@@ -24,12 +26,13 @@ const SearchChatsByName: FC<SearchChatsByNameProps> = ({
   setSearchedGlobalChats,
   setSearchedChats,
   setIsSearching,
+  setIsLoading,
   isSearching,
+  isLoading,
   chatsWithDetails,
 }) => {
   const { uid } = useAuth();
   const [searchInputValue, setSearchInputValue] = useState<string>('');
-  const [isLoading, setIsLoading] = useState<boolean>(false);
   const deferredSearchInputValue = useDeferredValue(searchInputValue);
   const searchRef = useRef<HTMLInputElement>(null);
   const onClearButtonClick = (): void => {
@@ -48,7 +51,7 @@ const SearchChatsByName: FC<SearchChatsByNameProps> = ({
       setIsSearching(true);
       setIsLoading(true);
 
-      const searchedChats = chatsWithDetails.filter(
+      const filteredChats = chatsWithDetails.filter(
         (chat: IChatWithDetails) => {
           if (
             chat.membersDetails.length === 2 &&
@@ -73,8 +76,7 @@ const SearchChatsByName: FC<SearchChatsByNameProps> = ({
           }
         },
       );
-
-      setSearchedChats(searchedChats);
+      setSearchedChats(filteredChats);
     }
     let timeout: NodeJS.Timeout | null = null;
     timeout = setTimeout(async () => {
@@ -83,8 +85,24 @@ const SearchChatsByName: FC<SearchChatsByNameProps> = ({
           const searchedGlobalUsers = await fakeServerFunctionGetSearchedUsers(
             deferredSearchInputValue,
           );
+
+          const existingChatIds = Array.from(
+            new Set(
+              chatsWithDetails
+                .filter((chat) => chat.membersDetails.length === 2) // фильтровать чаты с двумя участниками
+                .flatMap((chat) => chat.membersDetails.map((member) => member.uid))
+            )
+          );
+
+          const filteredGlobalUsers = Array.isArray(searchedGlobalUsers)
+            ? searchedGlobalUsers.filter(
+                (user: IFirebaseRtDbUser) =>
+                  !existingChatIds.includes(user.uid),
+              )
+            : 'error';
+
           setIsLoading(false);
-          setSearchedGlobalChats(searchedGlobalUsers);
+          setSearchedGlobalChats(filteredGlobalUsers);
         } catch (error) {
           setIsLoading(false);
           setSearchedGlobalChats('error');
