@@ -1,22 +1,31 @@
 import { FC } from 'react';
 import styles from './SearchedChatsWrapper.module.scss';
-import { IChatsWithImageAndName } from 'src/interfaces/chatsWithImageAndName.interface';
+
+import { IChatWithDetails } from 'src/interfaces/chatsWithDetails.interface';
+
 import ChatItem from '../chat-item/ChatItem';
 
 interface SearchedChatsWrapperProps {
-  searchedChats: IChatsWithImageAndName[];
+  searchedChats: IChatWithDetails[];
   chatsListRef: React.RefObject<HTMLDivElement | null>;
   isMobileScreen: boolean;
+  uid: string | null;
 }
 const SearchedChatsWrapper: FC<SearchedChatsWrapperProps> = ({
   searchedChats,
   chatsListRef,
   isMobileScreen,
+  uid,
 }) => {
   return (
     <div className={styles['searched-chats-wrapper']}>
       <span className={styles['searched-chats-wrapper__text']}>Чаты</span>
       {searchedChats.map((chatItemData, index) => {
+        const otherMember =
+          chatItemData.groupChatname.length === 0 &&
+          chatItemData.membersDetails.length === 2 &&
+          chatItemData.membersDetails.find((member) => member.uid !== uid)!;
+
         return (
           <ChatItem
             key={index}
@@ -24,14 +33,14 @@ const SearchedChatsWrapper: FC<SearchedChatsWrapperProps> = ({
             chatsListRef={chatsListRef}
             isMobileScreen={isMobileScreen}
             chatName={
-              chatItemData.groupChatName.length > 0
-                ? chatItemData.groupChatName
-                : chatItemData.username
+              otherMember === false
+                ? chatItemData.groupChatname
+                : otherMember.username
             }
             chatAvatar={
-              chatItemData.groupChatName.length > 0
+              otherMember === false
                 ? chatItemData.groupAvatar
-                : chatItemData.userAvatar
+                : otherMember?.avatar
             }
           />
         );

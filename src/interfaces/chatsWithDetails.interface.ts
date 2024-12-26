@@ -9,6 +9,6 @@ export interface IMemberDetails {
   blocked: string[];
 }
 
-export interface IChatsWithDetails extends IFirebaseRtDbChat {
+export interface IChatWithDetails extends IFirebaseRtDbChat {
   membersDetails: IMemberDetails[]
 }

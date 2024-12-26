@@ -9,6 +9,9 @@ const SearchedGlobalChatsWrapper: FC<SearchedGlobalChatsWrapperProps> = ({
   searchedGlobalChats,
 }) => {
   console.log(searchedGlobalChats)
+
+  // отработку 'error сделать?'
+  
   return (
     <div className={styles['searched-global-chats-wrapper']}>
       <span className={styles['searched-global-chats-wrapper__text']}>Глобальный поиск</span>

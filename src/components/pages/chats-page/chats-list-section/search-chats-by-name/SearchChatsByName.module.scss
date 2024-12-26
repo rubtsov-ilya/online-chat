@@ -16,10 +16,36 @@
     height: 24px;
     min-width: 24px;
     min-height: 24px;
+    @include fade-in-animation;
     path {
       fill: var(--base-black);
     }
   }
+
+  &__circular-progressbar {
+    animation: rotate 2s linear infinite; /* Время анимации и бесконечный цикл */
+  }
+
+  &__circular-progressbar-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 24px !important;
+    height: 24px !important;
+    flex-shrink: 0;
+    user-select: none;
+    @include fade-in-animation;
+  }
+
+  @keyframes rotate {
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
+  }
+
 
   &__input {
     width: 100%;

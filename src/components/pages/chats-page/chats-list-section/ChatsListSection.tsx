@@ -19,7 +19,7 @@ import SearchedGlobalChatsWrapper from './searched-global-chats-wrapper/Searched
 
 import SearchedChatsWrapper from './searched-chats-wrapper/SearchedChatsWrapper';
 import {
-  IChatsWithDetails,
+  IChatWithDetails,
   IMemberDetails,
 } from 'src/interfaces/chatsWithDetails.interface';
 
@@ -30,14 +30,14 @@ interface ChatsListSectionProps {
 const ChatsListSection: FC<ChatsListSectionProps> = ({ isMobileScreen }) => {
   const { uid, avatar, username, blocked } = useAuth();
   const [chats, setChats] = useState<IFirebaseRtDbChat[]>([]);
-  const [chatsWithDetails, setChatsWithDetails] = useState<IChatsWithDetails[]>(
+  const [chatsWithDetails, setChatsWithDetails] = useState<IChatWithDetails[]>(
     [],
   );
   /*   const [searchedChats, setSearchedChats] = useState<IFirebaseRtDbChat[]>([]); */
   const [searchedGlobalChats, setSearchedGlobalChats] = useState<
     IFirebaseRtDbUser[] | 'error'
   >([]);
-  const [searchedChats, setSearchedChats] = useState<IChatsWithDetails[]>([]);
+  const [searchedChats, setSearchedChats] = useState<IChatWithDetails[]>([]);
   const [isSearching, setIsSearching] = useState<boolean>(false);
   const [isChatsLoading, setIsChatsLoading] = useState<boolean | 'error'>(
     'error',
@@ -81,7 +81,7 @@ const ChatsListSection: FC<ChatsListSectionProps> = ({ isMobileScreen }) => {
             chatsWithDetails.map((chat) => chat.chatId),
           );
 
-          const newChats: IChatsWithDetails[] = await Promise.all(
+          const newChats: IChatWithDetails[] = await Promise.all(
             chats.map(async (chat) => {
               // если чат уже существует, обновить только измененные ключи, оставляя username и userAvatar
               if (existingChatIds.has(chat.chatId)) {
@@ -200,6 +200,7 @@ const ChatsListSection: FC<ChatsListSectionProps> = ({ isMobileScreen }) => {
                   setIsSearching={setIsSearching}
                   setSearchedChats={setSearchedChats}
                   setSearchedGlobalChats={setSearchedGlobalChats}
+                  chatsWithDetails={chatsWithDetails}
                 />
               </div>
               {chatsWithDetails?.length === 0 && isSearching === false && (
@@ -248,6 +249,7 @@ const ChatsListSection: FC<ChatsListSectionProps> = ({ isMobileScreen }) => {
                   })}
                 {isSearching === true && searchedChats.length > 0 && (
                   <SearchedChatsWrapper
+                    uid={uid}
                     isMobileScreen={isMobileScreen}
                     chatsListRef={chatsListRef}
                     searchedChats={searchedChats}
