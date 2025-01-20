@@ -11,7 +11,6 @@ const SearchedGlobalChatsWrapper: FC<SearchedGlobalChatsWrapperProps> = ({
   searchedGlobalChats,
   isMobileScreen,
 }) => {
-  console.log(searchedGlobalChats);
 
   // отработку 'error сделать?'
 

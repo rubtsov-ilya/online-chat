@@ -5,11 +5,11 @@ import SearchSvg from 'src/assets/images/icons/24x24-icons/Search.svg?react';
 
 import styles from './SearchChatsByName.module.scss';
 import { IFirebaseRtDbUser } from 'src/interfaces/FirebaseRealtimeDatabase.interface';
-import { fakeServerFunctionGetSearchedUsers } from 'src/services/fakeServerFunctionGetSearchedUsers';
 import { IChatWithDetails } from 'src/interfaces/ChatsWithDetails.interface';
 import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
 import useAuth from 'src/hooks/useAuth';
 import { CIRCULAR_LOADING_PERCENT_VALUE } from 'src/constants';
+import { getSearchedUsersService } from 'src/services/getSearchedUsers';
 
 interface SearchChatsByNameProps {
   setSearchedGlobalChats: React.Dispatch<
@@ -55,9 +55,7 @@ const SearchChatsByName: FC<SearchChatsByNameProps> = ({
       // локальный поиск
       const filteredChats = chatsWithDetails.filter(
         (chat: IChatWithDetails) => {
-          if (
-            chat.isGroup === false
-          ) {
+          if (chat.isGroup === false) {
             const otherMember = chat.membersDetails.find(
               (member) => member.uid !== uid,
             );
@@ -85,22 +83,25 @@ const SearchChatsByName: FC<SearchChatsByNameProps> = ({
     timeout = setTimeout(async () => {
       if (deferredSearchInputValue.length > 0) {
         try {
-          const searchedGlobalUsers = await fakeServerFunctionGetSearchedUsers(
-            deferredSearchInputValue,
+          const searchedGlobalUsers = await getSearchedUsersService(
+            deferredSearchInputValue.toLowerCase().replace(/\s+/g, ''),
           );
 
           const existingChatIds = Array.from(
             new Set(
               chatsWithDetails
                 .filter((chat) => chat.isGroup === false) // фильтровать не групповые
-                .flatMap((chat) => chat.membersDetails.map((member) => member.uid))
-            )
+                .flatMap((chat) =>
+                  chat.membersDetails.map((member) => member.uid),
+                ),
+            ),
           );
 
           const filteredGlobalUsers = Array.isArray(searchedGlobalUsers)
             ? searchedGlobalUsers.filter(
                 (user: IFirebaseRtDbUser) =>
-                  !existingChatIds.includes(user.uid),
+                  user.uid !== uid && // исключить себя
+                  !existingChatIds.includes(user.uid), // исключить уже существующие чаты
               )
             : 'error';
 

@@ -42,7 +42,11 @@ import { ILocationChatPage } from 'src/interfaces/LocationChatPage.interface';
 import useGetActiveChat from 'src/hooks/useGetActiveChat';
 import { IFirebaseRtDbChat } from 'src/interfaces/FirebaseRealtimeDatabase.interface';
 import { setActiveChatId } from 'src/redux/slices/ActiveChatSlice';
-import { clearChatInputValue, setChatInputValue, updateChatInputValue } from 'src/redux/slices/ChatInputValues';
+import {
+  clearChatInputValue,
+  setChatInputValue,
+  updateChatInputValue,
+} from 'src/redux/slices/ChatInputValues';
 import useGetChatInputValues from 'src/hooks/useGetChatInputValues';
 
 interface MessageInputWrapperProps {
@@ -69,9 +73,9 @@ const MessageInputWrapper: FC<MessageInputWrapperProps> = ({
   const dispatch = useDispatch();
 
   const messageText =
-  activeChatId !== null && chatInputValues[activeChatId] != null
-    ? chatInputValues[activeChatId].messageText
-    : chatInputValues['localeState'].messageText; // localeState - initialState if (chatId === null)
+    activeChatId !== null && chatInputValues[activeChatId] != null
+      ? chatInputValues[activeChatId].messageText
+      : chatInputValues['localeState'].messageText; // localeState - initialState if (chatId === null)
 
   useAutosizeTextArea(textAreaRef.current, messageText, 130);
 
@@ -489,17 +493,12 @@ const MessageInputWrapper: FC<MessageInputWrapperProps> = ({
       return;
     }
     if (
-      (sendedMessageText.trim().length === 0 && sendedAttachedItemsLocale.length === 0) ||
+      (sendedMessageText.trim().length === 0 &&
+        sendedAttachedItemsLocale.length === 0) ||
       isSubscribeLoading === true
     ) {
       return;
     }
-    let chatId: string | null;
-    // создать чат, если страница chat открыта переходом из глобального поиска, т.е. не созданный ранее чат
-    if (locationState !== null && activeChatId === null) {
-      chatId = await createNewChat(sendedMessageText); // вернёт либо айди имеющегося уже чата. либо созданного, либо null в случае ошибки
-    }
-
     const messageWithLocaleUrls: ILoadingMessage | undefined =
       await createMessageObjectWithLocaleUrl(
         sendedMessageText,
@@ -517,6 +516,14 @@ const MessageInputWrapper: FC<MessageInputWrapperProps> = ({
         messageWithLocaleUrls,
       ); */
 
+      if (messageWithFirebaseUrls !== undefined) {
+        let chatId: string | null;
+        // создать чат, если страница chat открыта переходом из глобального поиска, т.е. не созданный ранее чат
+        if (locationState !== null && activeChatId === null) {
+          chatId = await createNewChat(sendedMessageText); // вернёт либо айди имеющегося уже чата. либо созданного, либо null в случае ошибки
+        }
+      }
+
       /* добавить дату отправки повторно перед отправкой */
       /* console.log(messageWithFirebaseUrls); */
     }
@@ -533,10 +540,12 @@ const MessageInputWrapper: FC<MessageInputWrapperProps> = ({
         rows={1}
         ref={textAreaRef}
         onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
-          dispatch(updateChatInputValue({
-            chatId: activeChatId,
-            messageText: e.target.value,
-          }))
+          dispatch(
+            updateChatInputValue({
+              chatId: activeChatId,
+              messageText: e.target.value,
+            }),
+          )
         }
         onPasteCapture={onTextAreaPasteCapture}
         onKeyDown={(e: React.KeyboardEvent<HTMLTextAreaElement>) => {
