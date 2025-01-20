@@ -5,9 +5,10 @@ import LoadingSvg from 'src/assets/images/icons/24x24-icons/Clock loading.svg?re
 
 import styles from './CheckedAndTimeStatuses.module.scss';
 import { FC } from 'react';
+import { IMessage } from 'src/interfaces/Message.interface';
 
 interface CheckedAndTimeStatusesProps {
-  time: string;
+  time: IMessage['messageDateUTC'];
   isChecked: boolean;
   isForImage?: boolean;
   isOwn: boolean;
@@ -23,7 +24,7 @@ const CheckedAndTimeStatuses: FC<CheckedAndTimeStatusesProps> = ({
   isCanceled,
   isLoading,
 }) => {
-  const timeDate = new Date(time);
+  const timeDate = new Date(time as number);
   const formattedTime = `${timeDate.getHours().toString().padStart(2, '0')}:${timeDate.getMinutes().toString().padStart(2, '0')}`;
   return (
     <div className={styles['checked-and-time-statuses']}>

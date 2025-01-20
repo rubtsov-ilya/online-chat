@@ -19,13 +19,13 @@ export interface IFile {
 
 export interface IMessage {
   messageText: string;
-  messageDateUTC: string;
+  messageDateUTC: number | object | string;
   messageId: string;
+  senderUid: string;
   isDeleted: boolean;
   isChecked: boolean;
   isLoading: boolean;
   isEdited: boolean;
-  senderUid: string;
   media: (IImgMedia | IVideoMedia)[];
   files: IFile[];
 }

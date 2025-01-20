@@ -6,7 +6,7 @@ import ResetPasswordSection from './reset-password-section/ResetPasswordSection'
 import AlertSendedSection from './alert-sended-section/AlertSendedSection';
 
 const ResetPasswordPage: FC = () => {
-  const { isAuth } = useAuth();
+  // const { isAuth } = useAuth();
   /*  if (isAuth) {
     return <Navigate to="/" replace />;
   } */

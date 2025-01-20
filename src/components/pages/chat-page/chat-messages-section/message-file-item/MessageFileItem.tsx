@@ -4,15 +4,16 @@ import FileSvg from 'src/assets/images/icons/files-icons/filetype=generic.svg?re
 import DownloadSvg from 'src/assets/images/icons/24x24-icons/Download.svg?react';
 import CheckedAndTimeStatuses from 'src/components/ui/checked-and-time-statuses/CheckedAndTimeStatuses';
 import CircularLoadingProgressbar from 'src/components/ui/circular-loading-progressbar/CircularLoadingProgressbar';
+import { IFile, IMessage } from 'src/interfaces/Message.interface';
 
 interface MessageFileItemProps {
-  fileUrl: string;
-  fileName: string;
-  fileSize: number;
+  fileUrl: IFile['fileUrl'];
+  fileName: IFile['fileName'];
+  fileSize: IFile['fileSize'];
   isStatusesVisible?: boolean;
   isCheckedStatus: boolean;
   isLoadingStatus: boolean;
-  timeStatus: string;
+  timeStatus: IMessage['messageDateUTC'];
   isCanceledStatus?: boolean;
   isMessageOwn: boolean;
   progress: number | undefined;

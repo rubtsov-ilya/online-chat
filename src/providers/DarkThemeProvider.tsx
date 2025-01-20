@@ -43,7 +43,7 @@ const DarkThemeProvider: FC<DarkThemeProviderProps> = ({ children }) => {
 
   const value: IValueDarkTheme = { isDarkTheme, changeDarkThemeState };
   // получение в компонентах
-  // const {isDarkTheme, changeDarkThemeState} = useDarkTheme()
+  // const {isDarkTheme, changeDarkThemeState} = useDarkThemeContext()
   return (
     <darkThemeContext.Provider value={value}>
       {children}

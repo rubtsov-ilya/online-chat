@@ -4,7 +4,6 @@ import BodyLockProvider from 'src/providers/BodyLockProvider.tsx';
 import ScrollToTopProvider from 'src/providers/ScrollToTopProvider.tsx';
 import DarkThemeProvider from 'src/providers/DarkThemeProvider.tsx';
 import AuthProvider from 'src/providers/AuthProvider.tsx';
-import HomePage from 'src/components/pages/home-page/HomePage.tsx';
 import LoginPage from 'src/components/pages/login-page/LoginPage.tsx';
 import RegisterPage from 'src/components/pages/register-page/RegisterPage.tsx';
 import ResetPasswordPage from 'src/components/pages/reset-password-page/ResetPasswordPage.tsx';
@@ -21,31 +20,32 @@ export default function App() {
     <BodyLockProvider>
       <DarkThemeProvider>
         <ScrollToTopProvider />
-        <AuthProvider />
-        <Routes>
+        <AuthProvider>
+          <Routes>
           {/* <Route path="/" element={<Layout />}>
-              <Route index element={<HomePage />} />
-              <Route path="cart" element={<ProductsCartPage />} />
-              <Route path="*" element={<NotfoundPage />} />
-              <Route path="*" element={<Navigate to="/" replace/>} />
-            </Route> */}
-          <Route path="/">
-            <Route index element={isAuth ? <Navigate to="/chats" replace/> : <Navigate to="/login" replace/>} />
-            <Route path="login" element={isAuth ? <Navigate to="/chats" replace/> : <LoginPage />} />
-            <Route path="register" element={isAuth ? <Navigate to="/chats" replace/> : <RegisterPage />} />
-            <Route path="reset-password" element={isAuth ? <Navigate to="/chats" replace/> : <ResetPasswordPage />} />
-            <Route
-              path="chats"
-              element={isAuth ? <ChatsPage isMobileScreen={isMobileScreen} /> : <Navigate to="/login" replace/>}
-            >
-              {!isMobileScreen && <Route path="chat" element={isAuth ? <ChatPage /> : <Navigate to="/login" replace/>} />}
+                <Route index element={<HomePage />} />
+                <Route path="cart" element={<ProductsCartPage />} />
+                <Route path="*" element={<NotfoundPage />} />
+                <Route path="*" element={<Navigate to="/" replace/>} />
+              </Route> */}
+            <Route path="/">
+              <Route index element={isAuth ? <Navigate to="/chats" replace/> : <Navigate to="/login" replace/>} />
+              <Route path="login" element={isAuth ? <Navigate to="/chats" replace/> : <LoginPage />} />
+              <Route path="register" element={isAuth ? <Navigate to="/chats" replace/> : <RegisterPage />} />
+              <Route path="reset-password" element={isAuth ? <Navigate to="/chats" replace/> : <ResetPasswordPage />} />
+              <Route
+                path="chats"
+                element={isAuth ? <ChatsPage isMobileScreen={isMobileScreen} /> : <Navigate to="/login" replace/>}
+              >
+                {!isMobileScreen && <Route path="chat" element={isAuth ? <ChatPage /> : <Navigate to="/login" replace/>} />}
+              </Route>
+              {isMobileScreen && (
+                <Route path="chats/chat" element={isAuth ? <ChatPage /> : <Navigate to="/login" replace/>} />
+              )}
+              <Route path="*" element={isAuth ? <Navigate to="/chats" replace/> : <Navigate to="/login" replace/>} />
             </Route>
-            {isMobileScreen && (
-              <Route path="chats/chat" element={isAuth ? <ChatPage /> : <Navigate to="/login" replace/>} />
-            )}
-            <Route path="*" element={isAuth ? <Navigate to="/chats" replace/> : <Navigate to="/login" replace/>} />
-          </Route>
-        </Routes>
+          </Routes>
+        </AuthProvider>
       </DarkThemeProvider>
     </BodyLockProvider>
   );

@@ -1,20 +1,21 @@
 import { FC, useState } from 'react';
 import styles from './MessageMediaItem.module.scss';
 import ModalGallery from 'src/components/ui/modal-gallery/ModalGallery';
-import useBodyLock from 'src/hooks/useBodyLock';
 import PlaySvg from 'src/assets/images/icons/misc/Play.svg?react';
-import { IMessage } from 'src/interfaces/Message.interface';
+import { IImgMedia, IMessage, IVideoMedia } from 'src/interfaces/Message.interface';
 import CircularLoadingProgressbar from 'src/components/ui/circular-loading-progressbar/CircularLoadingProgressbar';
+import { ILoadingVideoMedia } from 'src/interfaces/LoadingMessage.interface';
+import useBodyLockContext from 'src/hooks/useBodyLockContext';
 
 interface MessageMediaItemProps {
   width: '100%' | '50%' | '33.33%' | '66.66%';
-  imgUrl?: string;
-  videoUrl?: string;
-  videoPreview?: string;
+  imgUrl?: IImgMedia['imgUrl'];
+  videoUrl?: IVideoMedia['videoUrl'];
+  videoPreview?: IVideoMedia['videoPreview'];
   messageData: IMessage;
   index: number;
-  progress: number | undefined;
-  progressPreview: number | undefined;
+  progress: ILoadingVideoMedia['progress'] | undefined;
+  progressPreview: ILoadingVideoMedia['progressPreview'] | undefined;
   cancelUploads: () => void;
 }
 
@@ -29,7 +30,7 @@ const MessageMediaItem: FC<MessageMediaItemProps> = ({
   index,
   cancelUploads,
 }) => {
-  const { toggleBodyLock } = useBodyLock();
+  const { toggleBodyLock } = useBodyLockContext();
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 
   const toggleModal = (timer?: number): void => {

@@ -1,5 +1,4 @@
-import { FC, useEffect, useLayoutEffect, useRef, useState } from 'react';
-import { get, ref as refFirebaseDatabase } from 'firebase/database';
+import { FC, useEffect, useRef, useState } from 'react';
 import AvatarImage from 'src/components/ui/avatar-image/AvatarImage';
 import UserBanSvg from 'src/assets/images/icons/24x24-icons/User Ban.svg?react';
 import DeleteSvg from 'src/assets/images/icons/24x24-icons/Delete.svg?react';
@@ -9,16 +8,24 @@ import CheckedAndTimeStatuses from 'src/components/ui/checked-and-time-statuses/
 import useToggleModal from 'src/hooks/useToggleModal';
 import ModalBackdrop from 'src/components/ui/modal-backdrop/ModalBackdrop';
 import ModalActionConfirm from 'src/components/ui/modal-action-confirm/modalActionConfirm';
-import { IFirebaseRtDbChat } from 'src/interfaces/firebaseRealtimeDatabase.interface';
 import Skeleton, { SkeletonTheme } from 'react-loading-skeleton';
 import 'react-loading-skeleton/dist/skeleton.css';
+import { IChatWithDetails } from 'src/interfaces/ChatsWithDetails.interface';
+import { useDispatch } from 'react-redux';
+import {
+  setActiveChat,
+  setActiveChatnameAndAvatar,
+} from 'src/redux/slices/ActiveChatSlice';
+import { useNavigate } from 'react-router-dom';
+import useGetActiveChat from 'src/hooks/useGetActiveChat';
 
 interface ChatItemProps {
   isMobileScreen: boolean;
   chatsListRef: React.RefObject<HTMLDivElement | null>;
-  chatItemData: IFirebaseRtDbChat;
+  chatItemData: IChatWithDetails;
   chatAvatar: string;
-  chatName: string;
+  chatname: string;
+  uid: string;
 }
 
 const ChatItem: FC<ChatItemProps> = ({
@@ -26,20 +33,20 @@ const ChatItem: FC<ChatItemProps> = ({
   chatsListRef,
   chatItemData,
   chatAvatar,
-  chatName,
+  chatname,
+  uid,
 }) => {
   const [modalOpen, setModalOpen] = useState<'ban' | 'delete' | false>(false);
   const { toggleModal } = useToggleModal({ setCbState: setModalOpen });
-  /*  const [chatName, setChatName] = useState<string | null>(null); //изначально null, ничего не отображается, если '' пустая строка, то отобразится SKeleton. Длина chatName не может быть меньше 3 символов, если будет получена с бекенда */
-  /*   const [chatAvatar, setChatAvatar] = useState<string>('');
-  const [isVisible, setIsVisible] = useState<boolean>(true); */
   const [isActive, setIsActive] = useState<boolean>(false);
   const [isHover, setIsHover] = useState<boolean>(false);
-  /*   const loadingTimeout = useRef<NodeJS.Timeout | null>(null); */
   const longPressTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const chatItemRef = useRef<HTMLDivElement>(null);
   const initialTouchYRef = useRef<number | null>(null);
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
   const longPressDuration = 500;
+  const { activeChatAvatar, activeChatname, activeChatId } = useGetActiveChat();
 
   const modalActionData = {
     delete: {
@@ -60,112 +67,22 @@ const ChatItem: FC<ChatItemProps> = ({
     },
   };
 
-  /*   useLayoutEffect(() => {
-    loadingTimeout.current = setTimeout(() => {
-      setChatName(''); // Меняем состояние после таймера
-    }, 1500);
-
-    return () => {
-      if (loadingTimeout.current) {
-        clearTimeout(loadingTimeout.current); // Очищаем таймер при размонтировании
+  useEffect(() => {
+    if (chatItemData.chatId === activeChatId) {
+      const updates: Partial<{ activeChatAvatar: string; activeChatname: string }> = {};
+  
+      if (chatAvatar !== activeChatAvatar) {
+        updates.activeChatAvatar = chatAvatar;
       }
-    };
-  }, []);
- */
-  /*   useEffect(() => {
-    const getChatName = async () => {
-      // если чат не групповой
-      if (chatItemData.groupChatName.length === 0) {
-        const userId = chatItemData.membersIds.find((id) => id !== uid);
-        const usernameRef = refFirebaseDatabase(
-          firebaseDatabase,
-          `users/${userId}/username`,
-        );
-        const usernameSnapshot = await get(usernameRef);
-        if (usernameSnapshot.exists()) {
-          const usernameValue = usernameSnapshot.val();
-          setChatName(usernameValue);
-          if (loadingTimeout.current) {
-            clearTimeout(loadingTimeout.current); // Очищаем таймер при размонтировании
-          }
-        }
+      if (chatname !== activeChatname) {
+        updates.activeChatname = chatname;
       }
-      // если чат групповой
-      if (chatItemData.groupChatName.length > 0) {
-        setChatName(chatItemData.groupChatName);
-        if (loadingTimeout.current) {
-          clearTimeout(loadingTimeout.current); // Очищаем таймер при размонтировании
-        }
-      }
-    };
-    const getAvatar = async () => {
-      // если чат не групповой
-      if (chatItemData.groupChatName.length === 0) {
-        const userId = chatItemData.membersIds.find((id) => id !== uid);
-
-        const chatAvatarRef = refFirebaseDatabase(
-          firebaseDatabase,
-          `usersAvatars/${userId}`,
-        );
-
-        const chatAvatarSnapshot = await get(chatAvatarRef);
-        if (chatAvatarSnapshot.exists()) {
-          const chatAvatarValue = chatAvatarSnapshot.val();
-          setChatAvatar(chatAvatarValue);
-        }
-      }
-      if (chatItemData.groupChatName.length > 0) {
-        setChatAvatar(chatItemData.groupAvatar);
-      }
-    };
-    getChatName();
-    getAvatar();
-  }, [chatItemData]); */
-
-  /*   useLayoutEffect(() => {
-    // если в поиске есть символы и имя чата уже найдено
-    if (chatName !== null && deferredSearchInputValue.length > 0) {
-      // если значение в поиске совпадает с именем чата
-      if (
-        chatName
-          .toLowerCase()
-          .replace(/\s+/g, '')
-          .includes(
-            deferredSearchInputValue.toLowerCase().replace(/\s+/g, ''),
-          ) &&
-        isVisible === false
-      ) {
-        setIsVisible(true);
-      } else if (
-        // если значение в поиске не совпадает с именем чата
-        chatName
-          .toLowerCase()
-          .replace(/\s+/g, '')
-          .includes(
-            deferredSearchInputValue.toLowerCase().replace(/\s+/g, ''),
-          ) === false &&
-        isVisible === true
-      ) {
-        setIsVisible(false);
+  
+      if (Object.keys(updates).length > 0) {
+        dispatch(setActiveChatnameAndAvatar(updates));
       }
     }
-    // если поиск неактивен и чат удалён, то не отрисовывать его
-    if (
-      deferredSearchInputValue.length === 0 &&
-      chatItemData.isDeleted === true
-    ) {
-      setIsVisible(false);
-    }
-    // если поиск неактивен и чат не удалён, то отрисовать его обратно
-    if (
-      deferredSearchInputValue.length === 0 &&
-      chatItemData.isDeleted === false
-    ) {
-      setIsVisible(true);
-    }
-
-    return () => {};
-  }, [deferredSearchInputValue]); */
+  }, [chatAvatar, chatname]);
 
   useEffect(() => {
     const onScroll = (event: Event) => {
@@ -251,6 +168,29 @@ const ChatItem: FC<ChatItemProps> = ({
     }
   };
 
+  const onChatItemForegroundClick = () => {
+    setIsActive(false);
+    const chatBlocked =
+      chatItemData.isGroup === false
+        ? chatItemData.membersDetails.find((member) => {
+            return member.uid !== uid;
+          })?.blocked || []
+        : [];
+
+    dispatch(
+      setActiveChat({
+        activeChatId: chatItemData.chatId,
+        activeChatname: chatname,
+        activeChatAvatar: chatAvatar,
+        activeChatBlocked: chatBlocked,
+        activeChatIsGroup: chatItemData.isGroup,
+        activeChatMembers: chatItemData.membersDetails,
+      }),
+    );
+    navigate('/chats/chat');
+    // вынести в отдельную функцию и там выключать стейт при экешене нужном
+  };
+
   return (
     <>
       <div
@@ -320,12 +260,7 @@ const ChatItem: FC<ChatItemProps> = ({
               initialTouchYRef.current = null;
             }
           }}
-          onClick={() => {
-            if (isActive && longPressTimerRef.current !== null) {
-              setIsActive(false);
-            }
-            /* вынести в отдельную функцию и там выключать стейт при экешене нужном*/
-          }}
+          onClick={onChatItemForegroundClick}
           onTouchMove={onTouchMove}
           className={`${styles['chat-item__foreground']} ${isActive ? styles['chat-item__foreground--active'] : ''} ${isHover && isMobileScreen ? styles['chat-item__foreground--hover'] : ''}`}
         >
@@ -341,8 +276,8 @@ const ChatItem: FC<ChatItemProps> = ({
                 baseColor="var(--base-grey-gainsboro)"
               >
                 <span className={styles['chat-item__user-name']}>
-                  {chatName !== null && chatName.length > 0 && chatName}
-                  {chatName !== null && chatName.length === 0 && <Skeleton />}
+                  {chatname !== null && chatname.length > 0 && chatname}
+                  {chatname !== null && chatname.length === 0 && <Skeleton />}
                 </span>
               </SkeletonTheme>
               <span className={styles['chat-item__user-message']}>
@@ -353,44 +288,36 @@ const ChatItem: FC<ChatItemProps> = ({
                   highlightColor="var(--base-white-snow)"
                   baseColor="var(--base-grey-gainsboro)"
                 >
-                  {chatName !== null &&
-                    chatName.length > 0 &&
-                    chatItemData.isDeleted === false &&
+                  {chatname !== null &&
+                    chatname.length > 0 &&
                     chatItemData.lastMessageText.length !== 0 &&
                     chatItemData.lastMessageText}
-                  {chatName !== null &&
-                    chatName.length > 0 &&
+                  {chatname !== null &&
+                    chatname.length > 0 &&
                     chatItemData.lastMessageText.length === 0 &&
-                    chatItemData.isDeleted === false &&
                     'Контент'}
-                  {chatName !== null &&
-                    chatName.length > 0 &&
-                    chatItemData.isDeleted === true &&
-                    'Удаленный чат'}
-                  {chatName !== null && chatName.length === 0 && <Skeleton />}
+                  {chatname !== null && chatname.length === 0 && <Skeleton />}
                 </SkeletonTheme>
               </span>
             </div>
           </div>
-          {chatItemData.isDeleted !== true && (
-            <div className={styles['chat-item__right-wrapper']}>
-              {chatItemData.uncheckedCounter > 0 && (
-                <div className={styles['chat-item__counter-wrapper']}>
-                  <span className={styles['chat-item__counter']}>
-                    {chatItemData.uncheckedCounter}
-                  </span>
-                </div>
-              )}
-              <CheckedAndTimeStatuses
-                isChecked={true}
-                time={chatItemData.lastMessageDateUTC}
-                /* далее указаны настройки отображения */
-                isLoading={false}
-                isCanceled={false}
-                isOwn={true}
-              />
-            </div>
-          )}
+          <div className={styles['chat-item__right-wrapper']}>
+            {chatItemData.uncheckedCounter > 0 && (
+              <div className={styles['chat-item__counter-wrapper']}>
+                <span className={styles['chat-item__counter']}>
+                  {chatItemData.uncheckedCounter}
+                </span>
+              </div>
+            )}
+            <CheckedAndTimeStatuses
+              isChecked={chatItemData.lastMessageIsChecked}
+              time={chatItemData.lastMessageDateUTC}
+              isOwn={chatItemData.lastMessageSenderUid === uid}
+              /* далее указаны настройки отображения */
+              isLoading={false}
+              isCanceled={false}
+            />
+          </div>
         </div>
       </div>
       {isActive && (

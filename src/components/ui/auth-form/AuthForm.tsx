@@ -21,12 +21,14 @@ import {
   User,
 } from 'firebase/auth';
 import { firebaseDatabase } from 'src/firebase';
-import { ref as refFirebaseDatabase, set } from 'firebase/database';
+import { ref as refFirebaseDatabase, update } from 'firebase/database';
 /* import { useAddUserToDataBaseMutation } from 'src/redux'; */
 import LogoSvg from 'src/assets/images/icons/logo-icons/Logo.svg?react';
 
 import styles from './AuthForm.module.scss';
 import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
+import { USER_AVATAR_DEFAULT_VALUE } from 'src/constants';
+import useAuthContext from 'src/hooks/useAuthContext';
 
 interface AuthFormProps {
   btnText: string;
@@ -51,6 +53,7 @@ const AuthForm: FC<AuthFormProps> = ({
   const [confirmPasswordValue, setConfirmPasswordValue] = useState<string>('');
   const [usernameValue, setUsernameValue] = useState<string>('');
   const passwordInputRef = useRef<HTMLInputElement | null>(null);
+  const { setRegisterUsername } = useAuthContext()
   const {
     register,
     formState: { errors },
@@ -64,18 +67,17 @@ const AuthForm: FC<AuthFormProps> = ({
   useEffect(() => {
     return () => {
       if (isLoading === true) {
-        setIsLoading(false)
+        setIsLoading(false);
       }
-    }
-  }, [])
-  
+    };
+  }, []);
 
   const onPasswordInputClick = () => {
     if (passwordInputRef.current) {
       passwordInputRef.current.focus();
     }
   };
-    
+
   /*   const formReset = (): void => { 
     setPasswordValue('')
     setMailValue('')
@@ -83,32 +85,39 @@ const AuthForm: FC<AuthFormProps> = ({
     setUsernameValue('')
    }
  */
-  const addUserDuringRegister = async (user: User, username: string) => {
+
+/*   const addUserDuringRegister = async (user: User, username: string) => {
     const uid = user.uid;
 
-    // создать user в "userChats"
-    set(refFirebaseDatabase(firebaseDatabase, 'users/' + uid), {
-      uid: uid,
-      email: user.email,
-      username: username,
-      avatar: ''
-    });
+    const updates = {
+      // создать user в "users"
+      [`users/${uid}`]: {
+        uid: uid,
+        email: user.email,
+        username: username,
+        usernameNormalized: username.toLowerCase().replace(/\s+/g, ''),
+        avatar: USER_AVATAR_DEFAULT_VALUE,
+      },
+      // создать user в "userChats"
+      [`userChats/${uid}`]: {
+        uid: uid,
+      },
+    };
 
-    // создать user в "userChats"
-    set(refFirebaseDatabase(firebaseDatabase, `userChats/${uid}`), {
-      uid: uid,
-    });
-  }
+    // Выполнить обновление базы данных одним вызовом
+    await update(refFirebaseDatabase(firebaseDatabase), updates);
+  }; */
 
   const onFormSubmit: SubmitHandler<IAuthValues> = (data) => {
-    setIsLoading(true)
+    setIsLoading(true);
     const auth = getAuth();
     if (isRegister) {
-      /* start firebase register */
+      // start firebase register
       createUserWithEmailAndPassword(auth, data.email, data.password)
-        .then(({ user }) => {
+        .then(async ({ user }) => {
           if (user) {
-            addUserDuringRegister(user, data.username);
+            setRegisterUsername(data.username)
+            // await addUserDuringRegister(user, data.username);
           }
           // Signed up
         })
@@ -122,17 +131,16 @@ const AuthForm: FC<AuthFormProps> = ({
               message: 'Email адрес уже зарегистрирован',
             });
           }
-          setIsLoading(false)
+          setIsLoading(false);
         });
-      /* end firebase register */
+      // end firebase register
     } else if (isLogin) {
-      /* start firebase login */
+      // start firebase login
       signInWithEmailAndPassword(auth, data.email, data.password)
-        .then(({ user }) => {
-          // Signed in
-          if (user) {
-          }
-        })
+        //.then(({ user }) => {
+        //  // Signed in
+        //  //if (user) {}
+        //})
         .catch((error) => {
           const errorCode = error.code;
           const errorMessage = error.message;
@@ -142,10 +150,10 @@ const AuthForm: FC<AuthFormProps> = ({
               message: 'Неверный пароль',
             });
             console.log(errorMessage);
-            setIsLoading(false)
+            setIsLoading(false);
           }
         });
-      /* end firebase login */
+      // end firebase login
     } else if (isResetPassword) {
       sendPasswordResetEmail(auth, data.email)
         .then(() => {
@@ -153,7 +161,7 @@ const AuthForm: FC<AuthFormProps> = ({
           if (setIsMessageSended) {
             setIsMessageSended(true);
           }
-          setIsLoading(false)
+          setIsLoading(false);
         })
         .catch((error) => {
           const errorCode = error.code;
@@ -165,11 +173,11 @@ const AuthForm: FC<AuthFormProps> = ({
             });
             console.log(errorMessage);
           }
-          setIsLoading(false)
+          setIsLoading(false);
         });
     }
-    /* formReset(); */
-    /* navigate('/', { state: data }); */
+    // formReset(); 
+    // navigate('/', { state: data }); 
   };
 
   return (
@@ -381,7 +389,6 @@ const AuthForm: FC<AuthFormProps> = ({
                     // Проверка на минимальную длину, игнорируя пробелы
                     minLengthNoSpaces: (value) => {
                       const cleanedValue = value.replace(/\s/g, ''); // удаляем пробелы
-                      console.log(cleanedValue); // Для отладки
                       return (
                         cleanedValue.length >= 3 ||
                         'Минимальная длина 3 символа'

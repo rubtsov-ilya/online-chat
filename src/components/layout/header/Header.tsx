@@ -3,7 +3,7 @@ import { FC } from 'react';
 
 import Logo from '../../../assets/images/home-page-icons/Logo.svg?react';
 import DarkModeBtn from '../../ui/dark-mode-btn/DarkModeBtn';
-import useBodyLock from '../../../hooks/useBodyLock';
+import useBodyLock from '../../../hooks/useBodyLockContext';
 
 import styles from './Header.module.scss';
 

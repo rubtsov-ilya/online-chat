@@ -1,7 +1,7 @@
 import { FC } from 'react';
 import styles from './SearchedChatsWrapper.module.scss';
 
-import { IChatWithDetails } from 'src/interfaces/chatsWithDetails.interface';
+import { IChatWithDetails } from 'src/interfaces/ChatsWithDetails.interface';
 
 import ChatItem from '../chat-item/ChatItem';
 
@@ -22,17 +22,17 @@ const SearchedChatsWrapper: FC<SearchedChatsWrapperProps> = ({
       <span className={styles['searched-chats-wrapper__text']}>Чаты</span>
       {searchedChats.map((chat, index) => {
         const otherMember =
-        chat.groupChatname.length === 0 &&
-          chat.membersDetails.length === 2 &&
+        chat.isGroup === false &&
           chat.membersDetails.find((member) => member.uid !== uid)!;
 
         return (
           <ChatItem
             key={index}
+            uid={uid!}
             chatItemData={chat}
             chatsListRef={chatsListRef}
             isMobileScreen={isMobileScreen}
-            chatName={
+            chatname={
               otherMember === false
                 ? chat.groupChatname
                 : otherMember.username

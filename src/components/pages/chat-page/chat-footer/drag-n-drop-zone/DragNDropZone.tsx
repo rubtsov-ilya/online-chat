@@ -9,13 +9,13 @@ import { customToastError } from 'src/components/ui/custom-toast-container/Custo
 interface DragNDropZoneProps {
   isDrag: boolean;
   setIsDrag: React.Dispatch<React.SetStateAction<boolean>>;
-  setAttachedItems: React.Dispatch<React.SetStateAction<AttachedItemType[]>>;
+  updateAttachedItems: (state: AttachedItemType[]) => void
 }
 
 const DragNDropZone: FC<DragNDropZoneProps> = ({
   setIsDrag,
   isDrag,
-  setAttachedItems,
+  updateAttachedItems,
 }) => {
   const [fileType, setFileType] = useState<'media' | 'file' | null>(null);
   const [isDragOnDropWrapper, setIsDragOnDropWrapper] = useState<
@@ -93,7 +93,7 @@ const DragNDropZone: FC<DragNDropZoneProps> = ({
       );
       const validItems = newItems.filter(item => item !== null) as AttachedItemType[];
       if (validItems.length > 0) {
-        setAttachedItems((prevItems) => [...prevItems, ...validItems]);
+        updateAttachedItems(validItems);
       }
     }
     setIsDrag(false);
@@ -113,7 +113,7 @@ const DragNDropZone: FC<DragNDropZoneProps> = ({
       });
       const validItems = newItems.filter(item => item !== null) as AttachedItemType[];
       if (validItems.length > 0) {
-        setAttachedItems((prevItems) => [...prevItems, ...validItems]);
+        updateAttachedItems(validItems);
       }
     }
     setIsDrag(false);

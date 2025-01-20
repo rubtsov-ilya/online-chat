@@ -1,6 +1,6 @@
 import { firebaseDatabase } from 'src/firebase';
 import { get, ref as refFirebaseDatabase } from 'firebase/database';
-import { IFirebaseRtDbUser } from 'src/interfaces/firebaseRealtimeDatabase.interface';
+import { IFirebaseRtDbUser } from 'src/interfaces/FirebaseRealtimeDatabase.interface';
 
 export const fakeServerFunctionGetSearchedUsers = async (
   searchInputValue: string,

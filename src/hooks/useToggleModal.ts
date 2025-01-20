@@ -1,4 +1,4 @@
-import useBodyLock from './useBodyLock';
+import useBodyLock from './useBodyLockContext';
 
 interface UseToggleModalProps<T> {
   setCbState: (value: React.SetStateAction<T>) => void;

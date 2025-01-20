@@ -9,9 +9,8 @@ import { IUploadTasksRef } from 'src/interfaces/UploadTasks.interface';
 interface MessageDateGroupProps {
   messagesArray: (IMessage | ILoadingMessage)[];
   uploadTasksRef: React.MutableRefObject<IUploadTasksRef>;
-  uid: string | null;
+  uid: string;
   chatMessagesRef: React.RefObject<HTMLDivElement | null>;
-  avatar: string;
 }
 
 const MessageDateGroup: FC<MessageDateGroupProps> = ({
@@ -19,7 +18,6 @@ const MessageDateGroup: FC<MessageDateGroupProps> = ({
   uid,
   uploadTasksRef,
   chatMessagesRef,
-  avatar,
 }) => {
   return (
     <div>
@@ -33,7 +31,6 @@ const MessageDateGroup: FC<MessageDateGroupProps> = ({
             <Message
               key={index}
               uid={uid}
-              avatar={avatar}
               uploadTasksRef={uploadTasksRef}
               messageData={messageData}
               messageIndex={index}

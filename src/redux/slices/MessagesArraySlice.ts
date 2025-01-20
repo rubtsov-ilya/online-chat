@@ -20,7 +20,7 @@ const messagesArraySlice = createSlice({
     addInitialMessagesArray(state, action: PayloadAction<IMessage[]>) {
       state.messagesArray = action.payload.map((item) => ({
         ...item,
-        messageDateUTC: `${new Date(item.messageDateUTC)}`,
+        messageDateUTC: `${new Date(item.messageDateUTC as string | number)}`,
       }));
     },
     addLoadingMessage(state, action: PayloadAction<ILoadingMessage>) {
@@ -28,7 +28,7 @@ const messagesArraySlice = createSlice({
         ...state.messagesArray,
         {
           ...action.payload,
-          messageDateUTC: `${new Date(action.payload.messageDateUTC)}`,
+          messageDateUTC: `${new Date(action.payload.messageDateUTC as string | number)}`,
         },
       ];
     },

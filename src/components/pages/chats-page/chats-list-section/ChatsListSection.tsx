@@ -10,7 +10,7 @@ import {
   IFirebaseRtDbChat,
   IFirebaseRtDbUser,
   IFirebaseRtDbUserChat,
-} from 'src/interfaces/firebaseRealtimeDatabase.interface';
+} from 'src/interfaces/FirebaseRealtimeDatabase.interface';
 import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
 import ErrorChatsWrapper from './error-chats-wrapper/ErrorChatsWrapper';
 
@@ -21,7 +21,13 @@ import SearchedChatsWrapper from './searched-chats-wrapper/SearchedChatsWrapper'
 import {
   IChatWithDetails,
   IMemberDetails,
-} from 'src/interfaces/chatsWithDetails.interface';
+} from 'src/interfaces/ChatsWithDetails.interface';
+import useGetActiveChat from 'src/hooks/useGetActiveChat';
+import {
+  CIRCULAR_LOADING_PERCENT_VALUE,
+  USERNAME_DEFAULT_VALUE,
+  USER_AVATAR_DEFAULT_VALUE,
+} from 'src/constants';
 
 interface ChatsListSectionProps {
   isMobileScreen: boolean;
@@ -29,6 +35,28 @@ interface ChatsListSectionProps {
 
 const ChatsListSection: FC<ChatsListSectionProps> = ({ isMobileScreen }) => {
   const { uid, avatar, username, blocked } = useAuth();
+  const {
+    activeChatId,
+    activeChatAvatar,
+    activeChatBlocked,
+    activeChatname,
+    activeChatMembers,
+    activeChatIsGroup,
+  } = useGetActiveChat();
+  console.log(
+    'activeChatId',
+    activeChatId,
+    'activeChatAvatar',
+    activeChatAvatar,
+    'activeChatBlocked',
+    activeChatBlocked,
+    'activeChatname',
+    activeChatname,
+    'activeChatMembers',
+    activeChatMembers,
+    'activeChatIsGroup',
+    activeChatIsGroup,
+  );
   const [chats, setChats] = useState<IFirebaseRtDbChat[]>([]);
   const [chatsWithDetails, setChatsWithDetails] = useState<IChatWithDetails[]>(
     [],
@@ -40,13 +68,12 @@ const ChatsListSection: FC<ChatsListSectionProps> = ({ isMobileScreen }) => {
   const [isSearching, setIsSearching] = useState<boolean>(false); // состояние использования поиска
   const [isLoading, setIsLoading] = useState<boolean>(false); // состояние загрузки пользователей из глобального поиска
   const [isChatsLoading, setIsChatsLoading] = useState<boolean | 'error'>(
-    'error',
+    false,
   );
   const chatsListRef = useRef<HTMLDivElement | null>(null);
   const ComponentTag = isMobileScreen ? 'section' : 'div';
 
   useLayoutEffect(() => {
-    // поиск и фильтрация - по своим чатам поиска
     setIsChatsLoading(true);
     const userChatsRef = refFirebaseDatabase(
       firebaseDatabase,
@@ -56,10 +83,14 @@ const ChatsListSection: FC<ChatsListSectionProps> = ({ isMobileScreen }) => {
     const unsubscribeUserChats = onValue(
       userChatsRef,
       (snapshot) => {
-        const userChatsSnapshot: IFirebaseRtDbUserChat = snapshot.val();
-        if (userChatsSnapshot) {
-          const chatsArray = Object.values(userChatsSnapshot.chats);
-          setChats(chatsArray);
+        const userChatsSnapshotValue: IFirebaseRtDbUserChat = snapshot.val();
+        if (userChatsSnapshotValue) {
+          if ('chats' in userChatsSnapshotValue) {
+            const chatsArray = Object.values(userChatsSnapshotValue.chats);
+            setChats(chatsArray);
+          } else {
+            setIsChatsLoading(false);
+          }
         }
       },
       (error) => {
@@ -75,7 +106,7 @@ const ChatsListSection: FC<ChatsListSectionProps> = ({ isMobileScreen }) => {
 
   useLayoutEffect(() => {
     const getChatsWithDetails = async () => {
-      if (chats.length > 0 && uid !== null) {
+      if (chats.length > 0) {
         try {
           const existingChatIds = new Set(
             chatsWithDetails.map((chat) => chat.chatId),
@@ -94,79 +125,91 @@ const ChatsListSection: FC<ChatsListSectionProps> = ({ isMobileScreen }) => {
                 };
               }
 
-              const membersDetails: IMemberDetails[] = await Promise.all(
-                chat.membersIds.map(async (memberId) => {
-                  if (memberId === uid) {
-                    // Для текущего пользователя
-                    return {
-                      uid: memberId,
-                      username: username as string,
-                      avatar: avatar as string,
-                      blocked: blocked as string[],
-                    };
-                  } else {
-                    // Для других участников
-                    try {
-                      const userRef = refFirebaseDatabase(
-                        firebaseDatabase,
-                        `users/${memberId}`,
-                      );
-                      const userSnapshot = await get(userRef);
+              const membersDetails: (IMemberDetails | null)[] =
+                await Promise.all(
+                  chat.membersIds.map(async (memberId) => {
+                    if (memberId === uid) {
+                      // Для текущего пользователя
+                      return {
+                        uid: memberId,
+                        username: username as string,
+                        avatar: avatar as string,
+                        blocked: blocked as string[],
+                      };
+                    } else {
+                      // если чат групповой, то не делать запрос на объект. Эти данные получатся в самом чате при его открытии
+                      if (chat.isGroup === true) return null;
 
-                      if (userSnapshot.exists()) {
-                        const userValue =
-                          userSnapshot.val() as IFirebaseRtDbUser;
+                      // Для других участников
+                      try {
+                        const userRef = refFirebaseDatabase(
+                          firebaseDatabase,
+                          `users/${memberId}`,
+                        );
+                        const userSnapshot = await get(userRef);
+
+                        if (userSnapshot.exists()) {
+                          const userValue =
+                            userSnapshot.val() as IFirebaseRtDbUser;
+                          return {
+                            uid: memberId,
+                            username:
+                              userValue.username || USERNAME_DEFAULT_VALUE,
+                            avatar:
+                              userValue.avatar || USER_AVATAR_DEFAULT_VALUE,
+                            blocked: userValue.blocked || [],
+                          };
+                        } else {
+                          return {
+                            uid: memberId,
+                            username: USERNAME_DEFAULT_VALUE,
+                            avatar: USER_AVATAR_DEFAULT_VALUE,
+                            blocked: [],
+                          };
+                        }
+                      } catch (error) {
+                        console.error(
+                          `Ошибка при получении данных для пользователя ${memberId}:`,
+                          error,
+                        );
                         return {
                           uid: memberId,
-                          username:
-                            userValue.username || 'Неизвестный пользователь',
-                          avatar: userValue.avatar || '',
-                          blocked: userValue.blocked || [],
-                        };
-                      } else {
-                        return {
-                          uid: memberId,
-                          username: 'Неизвестный пользователь',
-                          avatar: '',
+                          username: USERNAME_DEFAULT_VALUE,
+                          avatar: USER_AVATAR_DEFAULT_VALUE,
                           blocked: [],
                         };
                       }
-                    } catch (error) {
-                      console.error(
-                        `Ошибка при получении данных для пользователя ${memberId}:`,
-                        error,
-                      );
-                      return {
-                        uid: memberId,
-                        username: 'Неизвестный пользователь',
-                        avatar: '',
-                        blocked: [],
-                      };
                     }
-                  }
-                }),
-              );
+                  }),
+                );
+
+              const filteredMembersDetails: IMemberDetails[] =
+                membersDetails.filter((member): member is IMemberDetails => {
+                  return member !== null;
+                });
 
               return {
                 ...chat,
-                membersDetails,
+                membersDetails: filteredMembersDetails,
               };
             }),
           );
 
           // сортировать чаты по `lastMessageDateUTC`
           const sortedChats = newChats.sort((a, b) => {
-            const dateA = new Date(a.lastMessageDateUTC).getTime();
-            const dateB = new Date(b.lastMessageDateUTC).getTime();
+            const dateA = new Date(a.lastMessageDateUTC as number).getTime();
+            const dateB = new Date(b.lastMessageDateUTC as number).getTime();
             return dateB - dateA; // Сортировка по убыванию (последние сообщения первыми)
           });
-          
+
           setChatsWithDetails(sortedChats);
           setIsChatsLoading(false);
         } catch (error) {
           setIsChatsLoading('error');
           console.error('Error getting chats with details:', error);
         }
+      } else {
+        /* setIsChatsLoading(false); */
       }
     };
 
@@ -184,7 +227,7 @@ const ChatsListSection: FC<ChatsListSectionProps> = ({ isMobileScreen }) => {
             <div className={styles['chats-list__circular-progressbar-wrapper']}>
               <CircularProgressbar
                 className={styles['chats-list__circular-progressbar']}
-                value={66}
+                value={CIRCULAR_LOADING_PERCENT_VALUE}
                 styles={buildStyles({
                   // can use 'butt' or 'round'
                   strokeLinecap: 'round',
@@ -222,32 +265,30 @@ const ChatsListSection: FC<ChatsListSectionProps> = ({ isMobileScreen }) => {
                 {chatsWithDetails?.length !== 0 &&
                   isSearching === false &&
                   chatsWithDetails.map((chat, index) => {
-                    // не отрисовывать удалённый чат, если поиск неактивен
-                    if (chat.isDeleted === true && isSearching === false) {
-                      return null;
-                    }
-
                     // Выбираем пользователя из membersDetails, чей uid не равен текущему uid, нужно, если чат не групповой
                     const otherMember =
-                      chat.groupChatname.length === 0 &&
-                      chat.membersDetails.length === 2 &&
-                      chat.membersDetails.find((member) => member.uid !== uid)!;
+                      chat.isGroup === false
+                        ? chat.membersDetails.find(
+                            (member) => member.uid !== uid,
+                          )!
+                        : null;
 
                     return (
                       <ChatItem
                         key={index}
+                        uid={uid!}
                         chatItemData={chat}
                         chatsListRef={chatsListRef}
                         isMobileScreen={isMobileScreen}
-                        chatName={
-                          otherMember === false
+                        chatname={
+                          otherMember === null
                             ? chat.groupChatname
                             : otherMember.username
                         }
                         chatAvatar={
-                          otherMember === false
+                          otherMember === null
                             ? chat.groupAvatar
-                            : otherMember?.avatar
+                            : otherMember.avatar
                         }
                       />
                     );

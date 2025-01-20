@@ -1,6 +1,6 @@
 import { FC } from 'react';
 import styles from './SearchedGlobalChatsWrapper.module.scss';
-import { IFirebaseRtDbUser } from 'src/interfaces/firebaseRealtimeDatabase.interface';
+import { IFirebaseRtDbUser } from 'src/interfaces/FirebaseRealtimeDatabase.interface';
 import ChatGlobalItem from '../chat-global-item/ChatGlobalItem';
 
 interface SearchedGlobalChatsWrapperProps {
@@ -25,8 +25,9 @@ const SearchedGlobalChatsWrapper: FC<SearchedGlobalChatsWrapperProps> = ({
           return (
             <ChatGlobalItem
               key={index}
+              userUid={globalChat.uid}
               isMobileScreen={isMobileScreen}
-              chatName={globalChat.username}
+              chatname={globalChat.username}
               chatAvatar={globalChat.avatar}
             />
           );

@@ -6,14 +6,20 @@ import AttachMenu from '../attach-menu/AttachMenu';
 import { AttachedItemType } from 'src/interfaces/AttachedItem.interface';
 import useAuth from 'src/hooks/useAuth';
 import { getDownloadURL, ref, uploadBytesResumable } from 'firebase/storage';
-import { firebaseStorage } from 'src/firebase';
-
+import {
+  ref as refFirebaseDatabase,
+  get,
+  update,
+  serverTimestamp,
+} from 'firebase/database';
+import { firebaseDatabase, firebaseStorage } from 'src/firebase';
 import { v4 as uuidv4 } from 'uuid';
 import imageCompression from 'browser-image-compression';
 import { useDispatch } from 'react-redux';
 import {
   IFile,
   IImgMedia,
+  IMessage,
   IVideoMedia,
 } from 'src/interfaces/Message.interface';
 import {
@@ -32,26 +38,42 @@ import { IUploadTasksRef } from 'src/interfaces/UploadTasks.interface';
 import useAutosizeTextArea from 'src/hooks/useAutosizeTextArea';
 import { MAX_UPLOAD_FILE_SIZE } from 'src/constants';
 import { customToastError } from 'src/components/ui/custom-toast-container/CustomToastContainer';
+import { ILocationChatPage } from 'src/interfaces/LocationChatPage.interface';
+import useGetActiveChat from 'src/hooks/useGetActiveChat';
+import { IFirebaseRtDbChat } from 'src/interfaces/FirebaseRealtimeDatabase.interface';
+import { setActiveChatId } from 'src/redux/slices/ActiveChatSlice';
+import { clearChatInputValue, setChatInputValue, updateChatInputValue } from 'src/redux/slices/ChatInputValues';
+import useGetChatInputValues from 'src/hooks/useGetChatInputValues';
 
 interface MessageInputWrapperProps {
+  isSubscribeLoading: boolean;
   isMobileScreen: boolean;
-  setAttachedItems: React.Dispatch<React.SetStateAction<AttachedItemType[]>>;
   attachedItems: AttachedItemType[];
   uploadTasksRef: React.MutableRefObject<IUploadTasksRef>;
+  locationState: ILocationChatPage | null;
+  updateAttachedItems: (state: AttachedItemType[]) => void;
 }
 
 const MessageInputWrapper: FC<MessageInputWrapperProps> = ({
+  isSubscribeLoading,
   isMobileScreen,
-  setAttachedItems,
   attachedItems,
   uploadTasksRef,
+  locationState,
+  updateAttachedItems,
 }) => {
-  const [messageContent, setMessageContent] = useState<string>('');
-  const textAreaRef = useRef<HTMLTextAreaElement>(null);
   const { uid } = useAuth();
+  const { activeChatId } = useGetActiveChat();
+  const { chatInputValues } = useGetChatInputValues();
+  const textAreaRef = useRef<HTMLTextAreaElement>(null);
   const dispatch = useDispatch();
 
-  useAutosizeTextArea(textAreaRef.current, messageContent, 130);
+  const messageText =
+  activeChatId !== null && chatInputValues[activeChatId] != null
+    ? chatInputValues[activeChatId].messageText
+    : chatInputValues['localeState'].messageText; // localeState - initialState if (chatId === null)
+
+  useAutosizeTextArea(textAreaRef.current, messageText, 130);
 
   const firebaseStorageFileUpload = async (
     file: File | Blob,
@@ -120,7 +142,7 @@ const MessageInputWrapper: FC<MessageInputWrapperProps> = ({
 
   const createMessageObjectWithFirebaseUrl = async (
     messageWithLocaleUrl: ILoadingMessage,
-  ) => {
+  ): Promise<IMessage | undefined> => {
     if (!uid) {
       return;
     }
@@ -233,7 +255,7 @@ const MessageInputWrapper: FC<MessageInputWrapperProps> = ({
         : [];
     return {
       messageText: messageWithLocaleUrl.messageText,
-      messageDateUTC: messageWithLocaleUrl.messageDateUTC,
+      messageDateUTC: serverTimestamp(),
       messageId: messageWithLocaleUrl.messageId,
       isDeleted: messageWithLocaleUrl.isDeleted,
       isChecked: messageWithLocaleUrl.isChecked,
@@ -251,9 +273,9 @@ const MessageInputWrapper: FC<MessageInputWrapperProps> = ({
   };
 
   const createMessageObjectWithLocaleUrl = async (
-    messageContentLocale: string,
+    messageTextLocale: string,
     attachedItemsLocale: AttachedItemType[],
-  ) => {
+  ): Promise<ILoadingMessage> => {
     /* создание полноценного массива объектов загруженных с устройства  */
     const newAttachedItems: (
       | ILoadingImgMedia
@@ -320,8 +342,8 @@ const MessageInputWrapper: FC<MessageInputWrapperProps> = ({
           )
         : [];
     return {
-      messageText: messageContentLocale,
-      messageDateUTC: new Date().toISOString(),
+      messageText: messageTextLocale,
+      messageDateUTC: Date.now(),
       messageId: uuidv4(),
       isDeleted: false,
       isChecked: false,
@@ -339,28 +361,70 @@ const MessageInputWrapper: FC<MessageInputWrapperProps> = ({
     };
   };
 
-  const sendMessage = async (
-    sendMessageContent: string,
-    sendAttachedItemsLocale: AttachedItemType[],
-  ) => {
-    if (!uid) {
-      return;
-    }
-
-    const messageWithLocaleUrls: ILoadingMessage | undefined =
-      await createMessageObjectWithLocaleUrl(
-        sendMessageContent,
-        sendAttachedItemsLocale,
+  const createNewChat = async (
+    sendedMessageText: string,
+  ): Promise<string | null> => {
+    // функция вызывается только если locationState !== null
+    // возвращает string если пользователь найден и чат либо создан, либо уже существовал
+    // возвращает null в случае ошибок, либо не найден пользователь, либо catch
+    try {
+      const existingChatsByUser = refFirebaseDatabase(
+        firebaseDatabase,
+        `userChats/${uid}/chats`,
       );
-    console.log(messageWithLocaleUrls);
-    if (messageWithLocaleUrls !== undefined) {
-      dispatch(addLoadingMessage(messageWithLocaleUrls));
-      /* const messageWithFirebaseUrls = await createMessageObjectWithFirebaseUrl(
-        messageWithLocaleUrls,
-      ); */
+      const existingChatsByUserSnapshot = await get(existingChatsByUser);
 
-      /* добавить дату отправки повторно перед отправкой */
-      /* console.log(messageWithFirebaseUrls); */
+      if (existingChatsByUserSnapshot.exists()) {
+        const existingChatsByUserValue = Object.values(
+          existingChatsByUserSnapshot.val(),
+        ) as IFirebaseRtDbChat[];
+
+        const existingChatWithUser = existingChatsByUserValue.find(
+          (chat) =>
+            chat.isGroup === false &&
+            chat.membersIds.includes(locationState!.userUidFromGlobalSearch),
+        );
+        // если чат существует, установить его айди в активный чат rtk и вернуть айди
+        if (existingChatWithUser !== undefined) {
+          dispatch(
+            setActiveChatId({ activeChatId: existingChatWithUser.chatId }),
+          );
+          return existingChatWithUser.chatId;
+        }
+        // если чата нет, создать новый
+        const newChatId = uuidv4();
+        const newChatData: IFirebaseRtDbChat = {
+          chatId: newChatId,
+          membersIds: [uid!, locationState!.userUidFromGlobalSearch],
+          lastMessageText: sendedMessageText,
+          lastMessageDateUTC: serverTimestamp(),
+          lastMessageIsChecked: false,
+          lastMessageSenderUid: uid!,
+          groupChatname: '',
+          groupAvatar: '',
+          groupAdminUid: '',
+          isGroup: false,
+        };
+
+        const updates = {
+          [`userChats/${uid!}/chats/${newChatId}`]: newChatData,
+          [`userChats/${locationState!.userUidFromGlobalSearch}/chats/${newChatId}`]:
+            newChatData,
+        };
+
+        await update(refFirebaseDatabase(firebaseDatabase), updates);
+
+        dispatch(setActiveChatId({ activeChatId: newChatId }));
+
+        return newChatId;
+
+        // проверить есть ли чат не групповой где только ты и он. Затем создать чат и тебе и ему. Иначе ретёрн. Можно даже отправку смс прервать в случае ошибки благодаря ретёрну с 'error'
+      } else {
+        return null;
+      }
+    } catch (error) {
+      console.error(`Ошибка при получении данных о чатах пользователя`, error);
+      return null;
     }
   };
 
@@ -391,7 +455,7 @@ const MessageInputWrapper: FC<MessageInputWrapperProps> = ({
           const file = item.getAsFile();
           if (file) {
             if (file.size > MAX_UPLOAD_FILE_SIZE) {
-              customToastError("Максимальный размер 50MB");
+              customToastError('Максимальный размер 50MB');
               return null; // Если файл слишком большой, возвращаем null
             }
             const compressedFile = await compressImage(file);
@@ -413,14 +477,55 @@ const MessageInputWrapper: FC<MessageInputWrapperProps> = ({
     ) as AttachedItemType[];
 
     if (filteredItems.length > 0) {
-      setAttachedItems((prevItems) => [...prevItems, ...filteredItems]);
+      updateAttachedItems(filteredItems);
     }
-  }
+  };
+
+  const sendMessage = async (
+    sendedMessageText: string,
+    sendedAttachedItemsLocale: AttachedItemType[],
+  ) => {
+    if (!uid) {
+      return;
+    }
+    if (
+      (sendedMessageText.trim().length === 0 && sendedAttachedItemsLocale.length === 0) ||
+      isSubscribeLoading === true
+    ) {
+      return;
+    }
+    let chatId: string | null;
+    // создать чат, если страница chat открыта переходом из глобального поиска, т.е. не созданный ранее чат
+    if (locationState !== null && activeChatId === null) {
+      chatId = await createNewChat(sendedMessageText); // вернёт либо айди имеющегося уже чата. либо созданного, либо null в случае ошибки
+    }
+
+    const messageWithLocaleUrls: ILoadingMessage | undefined =
+      await createMessageObjectWithLocaleUrl(
+        sendedMessageText,
+        sendedAttachedItemsLocale,
+      );
+    console.log(messageWithLocaleUrls);
+    if (messageWithLocaleUrls !== undefined) {
+      dispatch(addLoadingMessage(messageWithLocaleUrls));
+      dispatch(
+        clearChatInputValue({
+          chatId: activeChatId,
+        }),
+      );
+      /* const messageWithFirebaseUrls = await createMessageObjectWithFirebaseUrl(
+        messageWithLocaleUrls,
+      ); */
+
+      /* добавить дату отправки повторно перед отправкой */
+      /* console.log(messageWithFirebaseUrls); */
+    }
+  };
 
   return (
     <div className={styles['message-input-wrapper']}>
       <AttachMenu
-        setAttachedItems={setAttachedItems}
+        updateAttachedItems={updateAttachedItems}
         isAttachedItems={attachedItems.length > 0}
         isMobileScreen={isMobileScreen}
       />
@@ -428,47 +533,35 @@ const MessageInputWrapper: FC<MessageInputWrapperProps> = ({
         rows={1}
         ref={textAreaRef}
         onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
-          setMessageContent(e.target.value)
+          dispatch(updateChatInputValue({
+            chatId: activeChatId,
+            messageText: e.target.value,
+          }))
         }
         onPasteCapture={onTextAreaPasteCapture}
         onKeyDown={(e: React.KeyboardEvent<HTMLTextAreaElement>) => {
           if (e.key === 'Enter' && !isMobileScreen && !e.shiftKey) {
             e.preventDefault();
-            if (
-              messageContent.trim().length === 0 &&
-              attachedItems.length === 0
-            ) {
-              return;
-            }
-            sendMessage(messageContent, attachedItems);
-            setAttachedItems([]);
-            setMessageContent('');
+            sendMessage(messageText, attachedItems);
           }
         }}
-        value={messageContent}
+        value={messageText}
         placeholder="Сообщение"
         className={styles['message-input-wrapper__textarea']}
       />
       <button
         disabled={
-          messageContent.trim().length === 0 && attachedItems.length === 0
+          (messageText.trim().length === 0 && attachedItems.length === 0) ||
+          isSubscribeLoading === true
         }
         className={styles['message-input-wrapper__btn']}
         onClick={() => {
-          if (
-            messageContent.trim().length === 0 &&
-            attachedItems.length === 0
-          ) {
-            return;
-          }
-          sendMessage(messageContent, attachedItems);
-          setAttachedItems([]);
-          setMessageContent('');
+          sendMessage(messageText, attachedItems);
         }}
       >
         <ArrowCircleSvg
           className={
-            messageContent.trim().length === 0 && attachedItems.length === 0
+            messageText.trim().length === 0 && attachedItems.length === 0
               ? styles['message-input-wrapper__arrow-icon']
               : `${styles['message-input-wrapper__arrow-icon']} ${styles['active']}`
           }

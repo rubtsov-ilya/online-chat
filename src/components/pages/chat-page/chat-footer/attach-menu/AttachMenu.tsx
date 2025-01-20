@@ -15,13 +15,13 @@ import CustomToastContainer, {
 
 interface AttachBtnProps {
   isMobileScreen: boolean;
-  setAttachedItems: React.Dispatch<React.SetStateAction<AttachedItemType[]>>;
+  updateAttachedItems: (state: AttachedItemType[]) => void;
   isAttachedItems: boolean;
 }
 
 const AttachMenu: FC<AttachBtnProps> = ({
   isMobileScreen,
-  setAttachedItems,
+  updateAttachedItems,
   isAttachedItems,
 }) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -93,7 +93,7 @@ const AttachMenu: FC<AttachBtnProps> = ({
         (item) => item !== null,
       ) as AttachedItemType[];
       if (validItems.length > 0) {
-        setAttachedItems((prevItems) => [...prevItems, ...validItems]);
+        updateAttachedItems(validItems);
       }
     }
   };
@@ -113,7 +113,7 @@ const AttachMenu: FC<AttachBtnProps> = ({
         (item) => item !== null,
       ) as AttachedItemType[];
       if (validItems.length > 0) {
-        setAttachedItems((prevItems) => [...prevItems, ...validItems]);
+        updateAttachedItems(validItems);
       }
     }
   };

@@ -1,10 +1,12 @@
-import { FC } from 'react';
+import { FC, useEffect } from 'react';
 import ChatsHeader from 'src/components/pages/chats-page/chats-header/ChatsHeader';
 import ChatsListSection from 'src/components/pages/chats-page/chats-list-section/ChatsListSection';
 import { Outlet, useLocation } from 'react-router-dom';
 
 import styles from './ChatsPage.module.scss';
 import ChatsDefaultSection from './chats-default-section/ChatsDefaultSection';
+import { useDispatch } from 'react-redux';
+import { removeActiveChat } from 'src/redux/slices/ActiveChatSlice';
 
 interface ChatsPageProps {
   isMobileScreen: boolean;
@@ -12,8 +14,15 @@ interface ChatsPageProps {
 
 const ChatsPage: FC<ChatsPageProps> = ({ isMobileScreen }) => {
   const location = useLocation();
+  const dispatch = useDispatch();
   const isChatPathName = location.pathname === '/chats/chat';
 
+  useEffect(() => {
+    if (location.pathname === '/chats') {
+      dispatch(removeActiveChat());
+    }
+  }, [location]);
+  
   return (
     <main className={styles['main']}>
       {!isMobileScreen && (

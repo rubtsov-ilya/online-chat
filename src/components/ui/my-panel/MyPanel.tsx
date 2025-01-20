@@ -1,4 +1,3 @@
-import useBodyLock from 'src/hooks/useBodyLock';
 import { FC, useState } from 'react';
 import { createPortal } from 'react-dom';
 import PencilSvg from 'src/assets/images/icons/24x24-icons/Pencil New.svg?react';
@@ -18,6 +17,7 @@ import ModalInputConfirm from '../modal-input-confirm/ModalInputConfirm';
 import useAuth from 'src/hooks/useAuth';
 import { firebaseDatabase } from 'src/firebase';
 import { ref, update } from 'firebase/database';
+import useBodyLockContext from 'src/hooks/useBodyLockContext';
 
 interface MyPanelProps {
   isPanelOpen: boolean;
@@ -35,7 +35,7 @@ const MyPanel: FC<MyPanelProps> = ({
   const [inputValue, setInputValue] = useState<string>('');
   const dispatch = useDispatch();
   const auth = getAuth();
-  const { toggleBodyLock } = useBodyLock();
+  const { toggleBodyLock } = useBodyLockContext();
   const { toggleModal } = useToggleModal({ setCbState: setModalOpen });
 
   const onBackdropClick = (): void => {
@@ -49,6 +49,7 @@ const MyPanel: FC<MyPanelProps> = ({
         // Sign-out successful.
         console.log('Sign-out successful.');
         dispatch(removeUser());
+        localStorage.removeItem('existingDataByUser');
       })
       .catch((error) => {
         console.log(error);
@@ -60,6 +61,7 @@ const MyPanel: FC<MyPanelProps> = ({
     const userRef = ref(firebaseDatabase, `users/${uid}`);
     await update(userRef, {
       username: inputValue,
+      usernameNormalized: inputValue.toLowerCase().replace(/\s+/g, '')
     });
     setInputValue('');
   };
@@ -67,9 +69,9 @@ const MyPanel: FC<MyPanelProps> = ({
   const validateInput = (value: string): string => {
     if (value.replace(/\s/g, '').length < 3) return 'Минимальная длина 3 символа';
     if (value.replace(/\s/g, '').length > 32) return 'Максимальная длина 32 символа';
-    const regex = /^[a-zA-Zа-яА-Я0-9\s]+$/; // только латиница и кириллица буквы + цифры + пробелы
+    const regex = /^[a-zA-Zа-яА-ЯёЁ0-9\s]+$/; // только латиница и кириллица буквы + цифры + пробелы
     if (!regex.test(value)) return 'Допускаются только буквы и цифры';
-    /* нет ошибки */
+    // если нет ошибки
     return '';
   };
 

@@ -4,11 +4,12 @@ import DeleteCircleSvg from 'src/assets/images/icons/24x24-icons/Delete cirlce.s
 import SearchSvg from 'src/assets/images/icons/24x24-icons/Search.svg?react';
 
 import styles from './SearchChatsByName.module.scss';
-import { IFirebaseRtDbUser } from 'src/interfaces/firebaseRealtimeDatabase.interface';
+import { IFirebaseRtDbUser } from 'src/interfaces/FirebaseRealtimeDatabase.interface';
 import { fakeServerFunctionGetSearchedUsers } from 'src/services/fakeServerFunctionGetSearchedUsers';
-import { IChatWithDetails } from 'src/interfaces/chatsWithDetails.interface';
+import { IChatWithDetails } from 'src/interfaces/ChatsWithDetails.interface';
 import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
 import useAuth from 'src/hooks/useAuth';
+import { CIRCULAR_LOADING_PERCENT_VALUE } from 'src/constants';
 
 interface SearchChatsByNameProps {
   setSearchedGlobalChats: React.Dispatch<
@@ -46,16 +47,16 @@ const SearchChatsByName: FC<SearchChatsByNameProps> = ({
   };
 
   useEffect(() => {
-    /* поиск и фильтрация - глобального поиска */
+    // поиск и фильтрация
     if (deferredSearchInputValue.length > 0) {
       setIsSearching(true);
       setIsLoading(true);
-
+      setSearchedGlobalChats([]);
+      // локальный поиск
       const filteredChats = chatsWithDetails.filter(
         (chat: IChatWithDetails) => {
           if (
-            chat.membersDetails.length === 2 &&
-            chat.groupChatname.length === 0
+            chat.isGroup === false
           ) {
             const otherMember = chat.membersDetails.find(
               (member) => member.uid !== uid,
@@ -78,6 +79,8 @@ const SearchChatsByName: FC<SearchChatsByNameProps> = ({
       );
       setSearchedChats(filteredChats);
     }
+
+    // глобальный поиск
     let timeout: NodeJS.Timeout | null = null;
     timeout = setTimeout(async () => {
       if (deferredSearchInputValue.length > 0) {
@@ -89,7 +92,7 @@ const SearchChatsByName: FC<SearchChatsByNameProps> = ({
           const existingChatIds = Array.from(
             new Set(
               chatsWithDetails
-                .filter((chat) => chat.membersDetails.length === 2) // фильтровать чаты с двумя участниками
+                .filter((chat) => chat.isGroup === false) // фильтровать не групповые
                 .flatMap((chat) => chat.membersDetails.map((member) => member.uid))
             )
           );
@@ -140,7 +143,7 @@ const SearchChatsByName: FC<SearchChatsByNameProps> = ({
         <div className={styles['search__circular-progressbar-wrapper']}>
           <CircularProgressbar
             className={styles['search__circular-progressbar']}
-            value={66}
+            value={CIRCULAR_LOADING_PERCENT_VALUE}
             styles={buildStyles({
               // can use 'butt' or 'round'
               strokeLinecap: 'round',

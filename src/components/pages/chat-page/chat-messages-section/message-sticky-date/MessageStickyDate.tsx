@@ -71,7 +71,7 @@ const MessageStickyDate: FC<MessageStickyDateProps> = ({
     };
   }, []);
 
-  const currentDate = new Date(messageData.messageDateUTC).toLocaleDateString(
+  const currentDate = new Date(messageData.messageDateUTC as number).toLocaleDateString(
     'ru-RU',
     {
       day: 'numeric',

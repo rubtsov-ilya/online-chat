@@ -1,16 +1,11 @@
 import { FC, createContext, useEffect, useState } from 'react';
-
-interface IValue {
-  isBodyLock: boolean;
-  lockPaddingValue: number;
-  toggleBodyLock: () => void;
-}
+import { IValueBodyLock } from 'src/interfaces/BodyLockValue.interface';
 
 interface BodyLockProviderProps {
   children: React.ReactNode;
 }
 
-export const bodyLockContext = createContext<IValue | null>(null);
+export const bodyLockContext = createContext<IValueBodyLock | null>(null);
 
 const BodyLockProvider: FC<BodyLockProviderProps> = ({ children }) => {
   const bodyTag = document.querySelector('body') as HTMLBodyElement;
@@ -37,12 +32,12 @@ const BodyLockProvider: FC<BodyLockProviderProps> = ({ children }) => {
 
   /* console.log(lockPaddingValue, isBodyLock) */
 
-  const value: IValue = { isBodyLock, lockPaddingValue, toggleBodyLock };
+  const value: IValueBodyLock = { isBodyLock, lockPaddingValue, toggleBodyLock };
 
   // style for section
   // style={ isBodyLock ? { paddingRight: `${lockPaddingValue}px` } : {}}
   // get in components
-  // const {isBodyLock, lockPaddingValue, toggleBodyLock} = useBodyLock()
+  // const {isBodyLock, lockPaddingValue, toggleBodyLock} = useBodyLockContext()
   return (
     <bodyLockContext.Provider value={value}>
       {children}

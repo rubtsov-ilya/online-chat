@@ -14,18 +14,17 @@ import { ILoadingMessage } from 'src/interfaces/LoadingMessage.interface';
 interface ChatMessagesSectionProps {
   isMobileScreen?: boolean;
   uploadTasksRef: React.MutableRefObject<IUploadTasksRef>;
-  avatar: string;
+  activeChatId: string | null
 }
 
 const ChatMessagesSection: FC<ChatMessagesSectionProps> = ({
   isMobileScreen,
   uploadTasksRef,
-  avatar,
+  activeChatId,
 }) => {
   const ComponentTag = isMobileScreen ? 'section' : 'div';
   /* const [messagesArray, setMessagesArray] = useState([]); */
   const { uid } = useAuth();
-
   const { messagesArray } = useGetMessagesFromRtk();
   const endRef = useRef<HTMLDivElement>(null);
   const chatMessagesRef = useRef<HTMLDivElement>(null);
@@ -48,7 +47,7 @@ const ChatMessagesSection: FC<ChatMessagesSectionProps> = ({
       messageText: 'sdsdg',
       messageDateUTC: '2024-10-20T09:02:04.275Z',
       messageId: '2f44f109-7661-485c-bb23-ef5068e2bcd9',
-      isChecked: false,
+      isChecked: true,
       senderUid: 'yp7vuU1DFuRnGlwa5m7IGUtV7GJ6',
       isDeleted: false,
       isLoading: false,
@@ -61,7 +60,7 @@ const ChatMessagesSection: FC<ChatMessagesSectionProps> = ({
         'Lorem Ipsum - это текст-"рыба", часто используемый вasffsfasfasfa asf f asf фы ывп укр оа печати и вэб-дизайне. Lorem Ipsum является стандартной "рыбой" для текстов на латинице с начала XVI века. оапппп fgswtst аармсмти пофвфаы цйццаа фыафыаафыаыsf ',
       messageDateUTC: '2024-10-20T09:03:04.275Z',
       messageId: 'ee2a85a2-f7e3-4430-908a-599f2b88901b',
-      isChecked: true,
+      isChecked: false,
       senderUid: uid!,
       isDeleted: false,
       isLoading: false,
@@ -175,7 +174,7 @@ const ChatMessagesSection: FC<ChatMessagesSectionProps> = ({
         'Lorem Ipsum - это текст-"рыбой "рыбой" для текстов на латинице с начала XVI века. оапппп fgswtst аармсмти пофвфаы цйццаа фыафыаафыаыsf ',
       messageDateUTC: '2024-10-22T09:05:04.275Z',
       messageId: '28af7d4a-af65-4640-92be-6873e72e7689',
-      isChecked: true,
+      isChecked: false,
       senderUid: uid!,
       isDeleted: false,
       isLoading: false,
@@ -233,7 +232,7 @@ const ChatMessagesSection: FC<ChatMessagesSectionProps> = ({
         'Lorem Ipsum - это текст-"рыбой "рыбой" для текстов на латиницеаы цйццаа фыафыаафыаыsf ',
       messageDateUTC: '2024-10-23T09:07:04.275Z',
       messageId: '93bbffa4-90b0-4a31-8dbd-8fe86f76f08a',
-      isChecked: true,
+      isChecked: false,
       senderUid: uid!,
       isDeleted: false,
       isLoading: false,
@@ -258,7 +257,7 @@ const ChatMessagesSection: FC<ChatMessagesSectionProps> = ({
       messageText: '',
       messageDateUTC: '2024-10-23T09:07:04.275Z',
       messageId: '3d3cf30e-1adb-4ed2-b585-866000ef70e3',
-      isChecked: false,
+      isChecked: true,
       senderUid: 'yp7vuU1DFuRnGlwa5m7IGUtV7GJ6',
       isDeleted: false,
       isLoading: false,
@@ -315,7 +314,7 @@ const ChatMessagesSection: FC<ChatMessagesSectionProps> = ({
         'Lorem Ipsum - это текст-"рыба", часто используемый https://www.npmjs.com/package/linkify-react и https://web.telegram.org/a/',
       messageDateUTC: '2024-10-23T09:10:04.275Z',
       messageId: '8c9480a9-5e6b-4940-bd71-e180a7764329',
-      isChecked: true,
+      isChecked: false,
       senderUid: 'yp7vuU1DFuRnGlwa5m7IGUtV7GJ6',
       isDeleted: false,
       isLoading: false,
@@ -354,7 +353,7 @@ const ChatMessagesSection: FC<ChatMessagesSectionProps> = ({
       messageText: '',
       messageDateUTC: '2024-10-23T09:13:04.275Z',
       messageId: '66354598-bba7-4ae7-9940-9aba88f93cac',
-      isChecked: true,
+      isChecked: false,
       senderUid: 'yp7vuU1DFuRnGlwa5m7IGUtV7GJ6',
       isDeleted: false,
       isLoading: false,
@@ -410,7 +409,7 @@ const ChatMessagesSection: FC<ChatMessagesSectionProps> = ({
       messageDateUTC: '2024-10-24T10:03:04.275Z',
       messageId: '9ec08cd0-7be2-488d-8bfd-a5a0b6d165e0',
       isChecked: true,
-      senderUid: 'yp7vuU1DFuRnGlwa5m7IGUtV7GJ6',
+      senderUid: 'qUVScdkpzHWlTIzQy281u2ZnLrj2',
       isDeleted: false,
       isLoading: false,
       isEdited: false,
@@ -430,51 +429,30 @@ const ChatMessagesSection: FC<ChatMessagesSectionProps> = ({
       ],
     },
   ];
-  const [devMessagesArray, setDevMessagesArray] =
+  const [initialMessagesArray, setInitialMessagesArray] =
     useState(devMessagesArrayInit);
-
-  /* запрос сообщений из фаербейз первый либо тут либо в юзэффекте */
-
-  console.log(messagesArray);
+  
+  /* console.log(messagesArray); */
 
   useLayoutEffect(() => {
-    /* первый запрос для установки initialstate в rtk */
-    dispatch(addInitialMessagesArray(devMessagesArray));
+    // здесь подписку сделать на обновления чата из фаербейза
+    // если есть стейт в ртк то подписку делаем и ставит она стейт
+
+    if (activeChatId !== null) {
+      dispatch(addInitialMessagesArray(initialMessagesArray));
+    }
+    // если нет стейта ртк, то не делать подписку и тогда чат пустой будет
+    if (activeChatId === null) {
+      dispatch(addInitialMessagesArray([]));
+    }
+
     setDoScroll(true);
     return () => {};
-  }, []);
-
-  /* ТЕСТОВАЯ ФУНКЦИЯ, ЕЁ НАДО УДАЛИТЬ. Изменяет сообщение, чтобы проверить синхронизацию статусов нужных*/
-  const first = () => {
-    // Проверяем, что массив имеет как минимум 2 элемента для доступа к предпоследнему элементу
-    if (devMessagesArray.length < 2) return;
-
-    // Создаем новый массив, копируя все элементы devMessagesArray
-    const updatedDevMessagesArray = devMessagesArray.map((item, index) =>
-      index === devMessagesArray.length - 2
-        ? {
-            ...item,
-            messageText:
-              'Lorem Ipsum - это текст-"рыба", часто используемый https://www.npmjs.com/package/linkify-react и https://web.telegram.org/a/',
-            messageDateUTC: '2024-10-23T09:10:04.275Z',
-            messageId: '8c9480a9-5e6b-4940-bd71-e180a7764329',
-            isChecked: true,
-            senderUid: 'yp7vuU1DFuRnGlwa5m7IGUtV7GJ6',
-            isDeleted: false,
-            isLoading: false,
-            isEdited: false,
-            media: [],
-            files: [],
-          }
-        : item,
-    );
-
-    // Устанавливаем обновленный массив
-    setDevMessagesArray(updatedDevMessagesArray);
-  };
+  }, [activeChatId]);
 
   useLayoutEffect(() => {
     /*  скролл вниз секции */
+    /* логику изменить. прокручивать до непрочитанного чата надо будет, а не вниз. но если таких нет, то вниз */
     endRef.current?.scrollIntoView({ behavior: 'auto' });
     return () => {};
   }, [doScroll]);
@@ -485,7 +463,7 @@ const ChatMessagesSection: FC<ChatMessagesSectionProps> = ({
       const animationLength = 80;
       const scrollCoefficient = 2.8;
       const { scrollTop, clientHeight, scrollHeight } = chatMessagesCurrent;
-      /* if логика = высота всего див минус прокрученное расстояние от верха > высота viewport умноженная на коэффициент (колво экранов заданное вручную) */
+      //if логика = высота всего div минус прокрученное расстояние от верха > высота viewport умноженная на коэффициент (колво экранов заданное вручную)
       if (scrollHeight - scrollTop > clientHeight * scrollCoefficient) {
         const scrollPosition = scrollHeight - clientHeight - animationLength;
         chatMessagesCurrent.scrollTo({ top: scrollPosition, behavior: 'auto' });
@@ -497,7 +475,7 @@ const ChatMessagesSection: FC<ChatMessagesSectionProps> = ({
   };
 
   useEffect(() => {
-    /* прокрутка секции вниз при отправке смс со стороны пользователя */
+    // прокрутка секции вниз при отправке смс со стороны пользователя
     if (messagesArray.length > 0) {
       if (messagesArray[messagesArray.length - 1].senderUid === uid) {
         scrollToBottom();
@@ -527,7 +505,7 @@ const ChatMessagesSection: FC<ChatMessagesSectionProps> = ({
               messagesArray.reduce(
                 (acc, message) => {
                   const dateKey = new Date(
-                    message.messageDateUTC,
+                    message.messageDateUTC as number,
                   ).toLocaleDateString();
                   if (!acc[dateKey]) {
                     acc[dateKey] = []; // Инициализируем новый массив, если такой даты еще нет
@@ -540,9 +518,8 @@ const ChatMessagesSection: FC<ChatMessagesSectionProps> = ({
             ).map(([date, messages]) => (
               <MessageDateGroup
                 key={date}
-                avatar={avatar}
                 messagesArray={messages}
-                uid={uid}
+                uid={uid!}
                 uploadTasksRef={uploadTasksRef}
                 chatMessagesRef={chatMessagesRef}
               />
@@ -560,7 +537,6 @@ const ChatMessagesSection: FC<ChatMessagesSectionProps> = ({
           </div>
         </div>
         <div ref={endRef}></div>
-        {/* <button onClick={first}>fffffffffffff</button> */}
       </div>
     </ComponentTag>
   );

@@ -1,10 +1,10 @@
 import { useContext } from 'react';
 import { bodyLockContext } from 'src/providers/BodyLockProvider';
 
-export default function useBodyLock() {
+export default function useBodyLockContext() {
   const context = useContext(bodyLockContext);
   if (!context) {
-    throw new Error('useBodyLock is null');
+    throw new Error('useBodyLockContext is null');
   }
   return context;
 }

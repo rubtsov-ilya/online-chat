@@ -13,15 +13,17 @@ import {
   IUploadTasksRef,
 } from 'src/interfaces/UploadTasks.interface';
 import { deleteObject } from 'firebase/storage';
+import useGetActiveChat from 'src/hooks/useGetActiveChat';
+import { USER_AVATAR_DEFAULT_VALUE } from 'src/constants';
+import { IFirebaseRtDbUser } from 'src/interfaces/FirebaseRealtimeDatabase.interface';
 
 interface MessageProps {
   messageData: IMessage | ILoadingMessage;
   isLastOfGroup: boolean;
   isFirstOfGroup: boolean;
   uploadTasksRef: React.MutableRefObject<IUploadTasksRef>;
-  uid: string | null;
+  uid: string;
   messageIndex: number;
-  avatar: string;
 }
 
 const Message: FC<MessageProps> = ({
@@ -31,8 +33,16 @@ const Message: FC<MessageProps> = ({
   isFirstOfGroup,
   uploadTasksRef,
   messageIndex,
-  avatar,
 }) => {
+  const {
+    activeChatMembers,
+    activeChatAvatar,
+    activeChatIsGroup,
+  } = useGetActiveChat();
+
+/*   const avatar: IFirebaseRtDbUser['avatar'] = activeChatIsGroup === false ? activeChatAvatar : activeChatMembers?.find((member) => member.uid === messageData.senderUid)?.avatar || USER_AVATAR_DEFAULT_VALUE; */
+  const avatar: IFirebaseRtDbUser['avatar'] = activeChatIsGroup !== null && activeChatIsGroup === false && activeChatAvatar !== null ? activeChatAvatar : activeChatMembers?.find((member) => member.uid === messageData.senderUid)?.avatar || USER_AVATAR_DEFAULT_VALUE;
+
   const cancelUploadsForMessage = (messageId: string) => {
     if (uploadTasksRef.current[messageId]) {
       /* Отмена загрузки каждого файла */

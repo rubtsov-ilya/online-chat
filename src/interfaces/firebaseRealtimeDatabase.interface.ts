@@ -5,6 +5,7 @@ export interface IFirebaseRtDbUser {
   email: string;
   avatar: string;
   username: string;
+  usernameNormalized: string;
   blocked?: string[];
 }
 
@@ -20,11 +21,23 @@ export interface IFirebaseRtDbChat {
   chatId: string;
   membersIds: string[]; 
   lastMessageText: string; 
-  lastMessageDateUTC: string; 
-  uncheckedCounter: number; 
+  lastMessageDateUTC: number | object; 
+  lastMessageIsChecked: boolean;
+  lastMessageSenderUid: string; 
   groupChatname: string;
   groupAvatar: string;
-  isDeleted: boolean;
+  groupAdminUid: string;
+  isGroup: boolean;
+}
+
+/* unreadMessages: {
+  [uid: string] : {
+    [messageId: string]: boolean
+  }
+} */
+
+export interface IFirebaseRtDbChatWithCounter extends IFirebaseRtDbChat{
+  uncheckedCounter: number; 
 }
 
 export interface IFirebaseRtDbUserChat {

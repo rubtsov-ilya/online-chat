@@ -1,43 +1,27 @@
-export interface ILoadingImgMedia {
-  imgUrl: string;
-  isHorizontal: boolean;
-  isSquare: boolean;
+import { IFile, IImgMedia, IMessage, IVideoMedia } from "./Message.interface";
+
+export interface ILoadingImgMedia extends IImgMedia {
   fileObject: File;
   progress: number;
   loadingId: string;
 }
 
-export interface ILoadingVideoMedia {
-  videoUrl: string;
-  videoPreview: string;
+export interface ILoadingVideoMedia extends IVideoMedia {
   videoName: string;
-  isHorizontal: boolean;
-  isSquare: boolean;
   fileObject: File;
   progress: number;
   progressPreview: number;
   loadingId: string;
 }
 
-export interface ILoadingFile {
-  fileUrl: string;
-  fileName: string;
-  fileSize: number;
+export interface ILoadingFile extends IFile {
   fileObject: File;
   progress: number;
   loadingId: string;
 }
 
-export interface ILoadingMessage {
-  messageText: string;
-  messageDateUTC: string;
-  messageId: string;
-  isChecked: boolean;
-  senderUid: string;
-  isDeleted: boolean;
-  isLoading: boolean;
+export interface ILoadingMessage extends IMessage {
   isCanceled: boolean;
-  isEdited: boolean;
   media: (ILoadingImgMedia | ILoadingVideoMedia)[];
   files: ILoadingFile[];
 }
