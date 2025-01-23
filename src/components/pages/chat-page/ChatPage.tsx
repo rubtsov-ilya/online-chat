@@ -41,14 +41,16 @@ const ChatPage: FC = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const location = useLocation();
+  const locationState = location.state as ILocationChatPage | null; // null, если стейта нет
   const {
     activeChatId,
     activeChatAvatar,
     activeChatname,
     activeChatMembers,
     activeChatIsGroup,
-  } = useActiveChat();
-  const locationState = location.state as ILocationChatPage | null; // null, если стейта нет
+    } = useActiveChat();
+
+    console.log(isSubscribeLoading)
 
   useLayoutEffect(() => {
     if (activeChatId != null) {
@@ -235,6 +237,7 @@ const ChatPage: FC = () => {
     <ComponentTag onDragEnter={onDragEnter} className={styles['main']}>
       <ChatHeader
         isMobileScreen={isMobileScreen}
+        isSubscribeLoading={isSubscribeLoading}
         avatar={
           activeChatAvatar !== null
             ? activeChatAvatar

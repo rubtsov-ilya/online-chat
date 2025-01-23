@@ -69,15 +69,18 @@ const ChatItem: FC<ChatItemProps> = ({
 
   useEffect(() => {
     if (chatItemData.chatId === activeChatId) {
-      const updates: Partial<{ activeChatAvatar: string; activeChatname: string }> = {};
-  
+      const updates: Partial<{
+        activeChatAvatar: string;
+        activeChatname: string;
+      }> = {};
+
       if (chatAvatar !== activeChatAvatar) {
         updates.activeChatAvatar = chatAvatar;
       }
       if (chatname !== activeChatname) {
         updates.activeChatname = chatname;
       }
-  
+
       if (Object.keys(updates).length > 0) {
         dispatch(setActiveChatnameAndAvatar(updates));
       }
@@ -176,19 +179,19 @@ const ChatItem: FC<ChatItemProps> = ({
             return member.uid !== uid;
           })?.blocked || []
         : [];
-
-    dispatch(
-      setActiveChat({
-        activeChatId: chatItemData.chatId,
-        activeChatname: chatname,
-        activeChatAvatar: chatAvatar,
-        activeChatBlocked: chatBlocked,
-        activeChatIsGroup: chatItemData.isGroup,
-        activeChatMembers: chatItemData.membersDetails,
-      }),
-    );
+    if (activeChatId !== chatItemData.chatId) {
+      dispatch(
+        setActiveChat({
+          activeChatId: chatItemData.chatId,
+          activeChatname: chatname,
+          activeChatAvatar: chatAvatar,
+          activeChatBlocked: chatBlocked,
+          activeChatIsGroup: chatItemData.isGroup,
+          activeChatMembers: chatItemData.membersDetails,
+        }),
+      );
+    }
     navigate('/chats/chat');
-    // вынести в отдельную функцию и там выключать стейт при экешене нужном
   };
 
   return (

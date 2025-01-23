@@ -3,7 +3,7 @@ import { FC, createContext, useLayoutEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { firebaseAuth, firebaseDatabase } from 'src/firebase';
 import { setUser } from 'src/redux/slices/UserSlice';
-import { get, onValue, ref, update } from 'firebase/database';
+import { get, onDisconnect, onValue, ref, update } from 'firebase/database';
 import { IFirebaseRtDbUser } from 'src/interfaces/FirebaseRealtimeDatabase.interface';
 import { USER_AVATAR_DEFAULT_VALUE } from 'src/constants';
 import { IValueAuth } from 'src/interfaces/AuthValue.interface';
@@ -40,6 +40,7 @@ const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
       updates[userRef] = {
         uid: user.uid,
         email: user.email,
+        isOnline: false,
         username: userEmailPrefix, // создаётся username на основе данных с формы или email
         usernameNormalized: userEmailPrefix,
         avatar: USER_AVATAR_DEFAULT_VALUE,
@@ -110,7 +111,9 @@ const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
         }
 
         const userRef = ref(firebaseDatabase, `users/${user.uid}`);
-        
+
+        update(userRef, { isOnline: true }); // установка статуса онлайн
+        onDisconnect(userRef).update({ isOnline: false }); // установка статуса оффлайн
 
         unsubscribeUser = onValue(
           userRef,

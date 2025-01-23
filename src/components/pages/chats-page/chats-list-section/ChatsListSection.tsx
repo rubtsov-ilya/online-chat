@@ -27,6 +27,7 @@ import {
   USERNAME_DEFAULT_VALUE,
   USER_AVATAR_DEFAULT_VALUE,
 } from 'src/constants';
+import useActiveChat from 'src/hooks/useActiveChat';
 
 interface ChatsListSectionProps {
   isMobileScreen: boolean;
@@ -41,7 +42,7 @@ const ChatsListSection: FC<ChatsListSectionProps> = ({ isMobileScreen }) => {
     activeChatname,
     activeChatMembers,
     activeChatIsGroup,
-  } = useGetActiveChat();
+  } = useActiveChat();
   console.log(
     'activeChatId',
     activeChatId,

@@ -12,7 +12,7 @@ import {
 import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
 import useAuth from 'src/hooks/useAuth';
 import { CIRCULAR_LOADING_PERCENT_VALUE } from 'src/constants';
-import { getSearchedUsersService } from 'src/services/getSearchedUsers';
+import getSearchedUsersService from 'src/services/getSearchedUsersService';
 import useNormalizedUsername from 'src/hooks/useNormalizedUsername';
 
 interface SearchChatsByNameProps {

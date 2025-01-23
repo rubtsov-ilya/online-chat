@@ -45,9 +45,10 @@ const MyPanel: FC<MyPanelProps> = ({
   };
 
   const onSignOutButtonClick = () => {
+    const userRef = ref(firebaseDatabase, `users/${uid}`);
+    update(userRef, { isOnline: false }); // установка статуса оффлайн
     signOut(auth)
       .then(() => {
-        // Sign-out successful.
         console.log('Sign-out successful.');
         dispatch(removeUser());
         localStorage.removeItem('existingDataByUser');
@@ -62,14 +63,16 @@ const MyPanel: FC<MyPanelProps> = ({
     const userRef = ref(firebaseDatabase, `users/${uid}`);
     await update(userRef, {
       username: inputValue,
-      usernameNormalized: useNormalizedUsername(inputValue)
+      usernameNormalized: useNormalizedUsername(inputValue),
     });
     setInputValue('');
   };
 
   const validateInput = (value: string): string => {
-    if (value.replace(/\s/g, '').length < 3) return 'Минимальная длина 3 символа';
-    if (value.replace(/\s/g, '').length > 32) return 'Максимальная длина 32 символа';
+    if (value.replace(/\s/g, '').length < 3)
+      return 'Минимальная длина 3 символа';
+    if (value.replace(/\s/g, '').length > 32)
+      return 'Максимальная длина 32 символа';
     const regex = /^[a-zA-Zа-яА-ЯёЁ0-9\s]+$/; // только латиница и кириллица буквы + цифры + пробелы
     if (!regex.test(value)) return 'Допускаются только буквы и цифры';
     // если нет ошибки

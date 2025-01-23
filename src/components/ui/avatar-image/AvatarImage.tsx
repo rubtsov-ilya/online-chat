@@ -1,4 +1,4 @@
-import { FC, useState } from 'react';
+import React, { FC, useState } from 'react';
 
 import styles from './AvatarImage.module.scss';
 import UserSvg from 'src/assets/images/icons/24x24-icons/User.svg?react';
@@ -11,7 +11,7 @@ interface UserAvatarProps {
   isLittle?: boolean;
 }
 
-const AvatarImage: FC<UserAvatarProps> = ({ AvatarImg, isLittle }) => {
+const AvatarImage: FC<UserAvatarProps> = React.memo(({ AvatarImg, isLittle }) => {
   const [isError, setIsError] = useState(false);
   return (
     <>
@@ -53,6 +53,6 @@ const AvatarImage: FC<UserAvatarProps> = ({ AvatarImg, isLittle }) => {
       )}
     </>
   );
-};
+});
 
 export default AvatarImage;

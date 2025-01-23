@@ -6,6 +6,7 @@ export interface IFirebaseRtDbUser {
   avatar: string;
   username: string;
   usernameNormalized: string;
+  isOnline: boolean;
   blocked?: string[];
 }
 

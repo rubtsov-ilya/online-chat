@@ -1,11 +1,11 @@
 .chat-header {
-  background: var(--base-white);
-  box-shadow: 0 1px 0 0 rgba(0, 0, 0, 0.08);
-  height: 56px;
   display: flex;
   align-items: center;
   flex-shrink: 0;
+  height: 56px;
   margin-bottom: 1px;
+  background: var(--base-white);
+  box-shadow: 0 1px 0 0 rgba(0, 0, 0, 0.08);
 
   &__content {
     display: flex;
@@ -30,14 +30,54 @@
       fill: var(--base-black);
     }
   }
+  &__middle-wrapper {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    height: 40px;
+    overflow-y: hidden;
+  }
 
-  &__chat-name {
+  &__chatname {
     font-family: var(--font-family);
     font-weight: 700;
     font-size: 16px;
     text-align: center;
     color: var(--base-black);
-    justify-self: flex-end;
+    user-select: none;
+    white-space: nowrap;
+    //justify-self: flex-end;
+  }
+  &__info {
+    font-family: var(--font-family);
+    font-weight: 400;
+    font-size: 12px;
+    line-height: 14px;
+    color: var(--base-grey);
+    user-select: none;
+    white-space: nowrap;
+    &--loading::after {
+      content: '';
+      animation: dot-animation 1s infinite;
+    }
+    &--active {
+      color: var(--base-accent-blue);
+    }
   }
 }
 
+@keyframes dot-animation {
+  0% {
+    content: '.';
+  }
+  33% {
+    content: '..';
+  }
+  66% {
+    content: '...';
+  }
+  100% {
+    content: '.';
+  }
+}

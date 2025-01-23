@@ -9,9 +9,6 @@ export interface IMemberDetails {
   blocked: string[];
 }
 
-/* export interface IMemberDetailsWithoutBlocked extends Omit<IMemberDetails, 'blocked'> {
-} */
-
 export interface IChatWithDetails extends IFirebaseRtDbChatWithCounter {
   membersDetails: IMemberDetails[]
 }

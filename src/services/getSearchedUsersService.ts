@@ -10,7 +10,7 @@ import {
 } from 'firebase/database';
 import { IFirebaseRtDbUser } from 'src/interfaces/FirebaseRealtimeDatabase.interface';
 
-export const getSearchedUsersService = async (searchInputValue: string) => {
+const getSearchedUsersService = async (searchInputValue: string) => {
   const usersRef = refFirebaseDatabase(firebaseDatabase, `users/`);
   const usersQuery = query(
     usersRef,
@@ -31,3 +31,5 @@ export const getSearchedUsersService = async (searchInputValue: string) => {
     return filteredUsers;
   }
 };
+
+export default getSearchedUsersService
