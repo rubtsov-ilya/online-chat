@@ -280,6 +280,10 @@ const AuthForm: FC<AuthFormProps> = ({
                     value: 8,
                     message: 'Минимальная длина 8 символов',
                   },
+                  maxLength: {
+                    value: 32,
+                    message: 'Максимальная длина 32 символа',
+                  },
                 })}
                 ref={(e) => {
                   ref(e);
@@ -337,6 +341,10 @@ const AuthForm: FC<AuthFormProps> = ({
                   minLength: {
                     value: 8,
                     message: 'Минимальная длина 8 символов',
+                  },
+                  maxLength: {
+                    value: 32,
+                    message: 'Максимальная длина 32 символа',
                   },
                   validate: {
                     matchesPassword: (value) => {
