@@ -1,6 +1,6 @@
 import { FC, useEffect, useLayoutEffect, useRef, useState } from 'react';
 
-import useGetMessagesFromRtk from 'src/hooks/useGetMessagesFromRtk';
+import useMessagesFromRtk from 'src/hooks/useMessagesFromRtk';
 import styles from './ChatMessagesSection.module.scss';
 import ToBottomBtn from 'src/components/ui/to-bottom-btn/ToBottomBtn';
 import { addInitialMessagesArray } from 'src/redux/slices/MessagesArraySlice';
@@ -25,7 +25,7 @@ const ChatMessagesSection: FC<ChatMessagesSectionProps> = ({
   const ComponentTag = isMobileScreen ? 'section' : 'div';
   /* const [messagesArray, setMessagesArray] = useState([]); */
   const { uid } = useAuth();
-  const { messagesArray } = useGetMessagesFromRtk();
+  const { messagesArray } = useMessagesFromRtk();
   const endRef = useRef<HTMLDivElement>(null);
   const chatMessagesRef = useRef<HTMLDivElement>(null);
   const [doScroll, setDoScroll] = useState<boolean>(false);

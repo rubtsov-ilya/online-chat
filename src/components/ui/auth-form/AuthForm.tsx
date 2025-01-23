@@ -53,7 +53,7 @@ const AuthForm: FC<AuthFormProps> = ({
   const [confirmPasswordValue, setConfirmPasswordValue] = useState<string>('');
   const [usernameValue, setUsernameValue] = useState<string>('');
   const passwordInputRef = useRef<HTMLInputElement | null>(null);
-  const { setRegisterUsername } = useAuthContext()
+  const { setRegisterUsername } = useAuthContext();
   const {
     register,
     formState: { errors },
@@ -66,9 +66,7 @@ const AuthForm: FC<AuthFormProps> = ({
 
   useEffect(() => {
     return () => {
-      if (isLoading === true) {
-        setIsLoading(false);
-      }
+      setIsLoading(false);
     };
   }, []);
 
@@ -86,7 +84,7 @@ const AuthForm: FC<AuthFormProps> = ({
    }
  */
 
-/*   const addUserDuringRegister = async (user: User, username: string) => {
+  /*   const addUserDuringRegister = async (user: User, username: string) => {
     const uid = user.uid;
 
     const updates = {
@@ -116,7 +114,7 @@ const AuthForm: FC<AuthFormProps> = ({
       createUserWithEmailAndPassword(auth, data.email, data.password)
         .then(async ({ user }) => {
           if (user) {
-            setRegisterUsername(data.username)
+            setRegisterUsername(data.username);
             // await addUserDuringRegister(user, data.username);
           }
           // Signed up
@@ -176,8 +174,8 @@ const AuthForm: FC<AuthFormProps> = ({
           setIsLoading(false);
         });
     }
-    // formReset(); 
-    // navigate('/', { state: data }); 
+    // formReset();
+    // navigate('/', { state: data });
   };
 
   return (

@@ -13,7 +13,7 @@ import {
   IUploadTasksRef,
 } from 'src/interfaces/UploadTasks.interface';
 import { deleteObject } from 'firebase/storage';
-import useGetActiveChat from 'src/hooks/useGetActiveChat';
+import useActiveChat from 'src/hooks/useActiveChat';
 import { USER_AVATAR_DEFAULT_VALUE } from 'src/constants';
 import { IFirebaseRtDbUser } from 'src/interfaces/FirebaseRealtimeDatabase.interface';
 
@@ -38,7 +38,7 @@ const Message: FC<MessageProps> = ({
     activeChatMembers,
     activeChatAvatar,
     activeChatIsGroup,
-  } = useGetActiveChat();
+  } = useActiveChat();
 
 /*   const avatar: IFirebaseRtDbUser['avatar'] = activeChatIsGroup === false ? activeChatAvatar : activeChatMembers?.find((member) => member.uid === messageData.senderUid)?.avatar || USER_AVATAR_DEFAULT_VALUE; */
   const avatar: IFirebaseRtDbUser['avatar'] = activeChatIsGroup !== null && activeChatIsGroup === false && activeChatAvatar !== null ? activeChatAvatar : activeChatMembers?.find((member) => member.uid === messageData.senderUid)?.avatar || USER_AVATAR_DEFAULT_VALUE;

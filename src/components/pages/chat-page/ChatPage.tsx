@@ -9,7 +9,7 @@ import useMobileScreen from 'src/hooks/useMobileScreen';
 import CustomToastContainer from 'src/components/ui/custom-toast-container/CustomToastContainer';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { ILocationChatPage } from 'src/interfaces/LocationChatPage.interface';
-import useGetActiveChat from 'src/hooks/useGetActiveChat';
+import useActiveChat from 'src/hooks/useActiveChat';
 
 import { ref as refFirebaseDatabase, onValue, get } from 'firebase/database';
 import { firebaseDatabase } from 'src/firebase';
@@ -47,7 +47,7 @@ const ChatPage: FC = () => {
     activeChatname,
     activeChatMembers,
     activeChatIsGroup,
-  } = useGetActiveChat();
+  } = useActiveChat();
   const locationState = location.state as ILocationChatPage | null; // null, если стейта нет
 
   useLayoutEffect(() => {

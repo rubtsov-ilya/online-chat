@@ -18,6 +18,7 @@ import useAuth from 'src/hooks/useAuth';
 import { firebaseDatabase } from 'src/firebase';
 import { ref, update } from 'firebase/database';
 import useBodyLockContext from 'src/hooks/useBodyLockContext';
+import useNormalizedUsername from 'src/hooks/useNormalizedUsername';
 
 interface MyPanelProps {
   isPanelOpen: boolean;
@@ -61,7 +62,7 @@ const MyPanel: FC<MyPanelProps> = ({
     const userRef = ref(firebaseDatabase, `users/${uid}`);
     await update(userRef, {
       username: inputValue,
-      usernameNormalized: inputValue.toLowerCase().replace(/\s+/g, '')
+      usernameNormalized: useNormalizedUsername(inputValue)
     });
     setInputValue('');
   };

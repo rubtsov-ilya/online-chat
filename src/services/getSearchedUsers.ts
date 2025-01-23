@@ -24,12 +24,10 @@ export const getSearchedUsersService = async (searchInputValue: string) => {
   if (usersSnapshot.exists()) {
     const userAvatarValue = usersSnapshot.val();
     const usersArray: IFirebaseRtDbUser[] = Object.values(userAvatarValue);
-    console.log(usersArray)
+
     const filteredUsers = usersArray.filter((user: IFirebaseRtDbUser) =>
       user.usernameNormalized.includes(searchInputValue),
     );
     return filteredUsers;
-  } else {
-    return 'error';
   }
 };

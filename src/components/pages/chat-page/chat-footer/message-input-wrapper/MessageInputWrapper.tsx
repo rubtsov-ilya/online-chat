@@ -39,17 +39,17 @@ import useAutosizeTextArea from 'src/hooks/useAutosizeTextArea';
 import { MAX_UPLOAD_FILE_SIZE } from 'src/constants';
 import { customToastError } from 'src/components/ui/custom-toast-container/CustomToastContainer';
 import { ILocationChatPage } from 'src/interfaces/LocationChatPage.interface';
-import useGetActiveChat from 'src/hooks/useGetActiveChat';
+import useActiveChat from 'src/hooks/useActiveChat';
 import { IFirebaseRtDbChat } from 'src/interfaces/FirebaseRealtimeDatabase.interface';
 import { setActiveChatId } from 'src/redux/slices/ActiveChatSlice';
 import {
+  ChatInputValue,
   clearChatInputValue,
-  setChatInputValue,
   updateChatInputValue,
 } from 'src/redux/slices/ChatInputValues';
-import useGetChatInputValues from 'src/hooks/useGetChatInputValues';
 
 interface MessageInputWrapperProps {
+  chatInputValues: { [chatId: string]: ChatInputValue };
   isSubscribeLoading: boolean;
   isMobileScreen: boolean;
   attachedItems: AttachedItemType[];
@@ -59,6 +59,7 @@ interface MessageInputWrapperProps {
 }
 
 const MessageInputWrapper: FC<MessageInputWrapperProps> = ({
+  chatInputValues,
   isSubscribeLoading,
   isMobileScreen,
   attachedItems,
@@ -67,8 +68,7 @@ const MessageInputWrapper: FC<MessageInputWrapperProps> = ({
   updateAttachedItems,
 }) => {
   const { uid } = useAuth();
-  const { activeChatId } = useGetActiveChat();
-  const { chatInputValues } = useGetChatInputValues();
+  const { activeChatId } = useActiveChat();
   const textAreaRef = useRef<HTMLTextAreaElement>(null);
   const dispatch = useDispatch();
 

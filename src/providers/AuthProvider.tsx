@@ -8,6 +8,7 @@ import { IFirebaseRtDbUser } from 'src/interfaces/FirebaseRealtimeDatabase.inter
 import { USER_AVATAR_DEFAULT_VALUE } from 'src/constants';
 import { IValueAuth } from 'src/interfaces/AuthValue.interface';
 import { FirebaseError } from 'firebase/app';
+import useNormalizedUsername from 'src/hooks/useNormalizedUsername';
 
 interface AuthProviderProps {
   children: React.ReactNode;
@@ -20,12 +21,11 @@ const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
   const dispatch = useDispatch();
 
   const checkAndCreateMissingUserData = async (user: User) => {
-    const userEmailPrefix = user
-      .email!.split('@')[0]
-      .toLowerCase()
-      .replace(/\s+/g, ''); // username без пробелов и в нижнем регистре
     const userRef = `users/${user.uid}`;
     const userChatsRef = `userChats/${user.uid}`;
+
+    const userEmailPrefix = useNormalizedUsername( user
+      .email!.split('@')[0]) // username без пробелов и в нижнем регистре
 
     const updates: Record<string, any> = {};
     const existingData: { userExist: boolean; userChatsExist: boolean } = {
@@ -83,7 +83,7 @@ const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
     // Обновляем только поля username и usernameNormalized
     const updates = {
       username: username,
-      usernameNormalized: username.toLowerCase().replace(/\s+/g, ''),
+      usernameNormalized: useNormalizedUsername(username),
     };
 
     update(userRef, updates);

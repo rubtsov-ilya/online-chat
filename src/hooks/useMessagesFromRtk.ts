@@ -1,7 +1,7 @@
 import { useSelector } from 'react-redux';
 import { selectMessagesArray } from 'src/redux/slices/MessagesArraySlice';
 
-const useGetMessagesFromRtk = () => {
+const useMessagesFromRtk = () => {
   const { messagesArray } = useSelector(selectMessagesArray);
 
   /* get in components - const { messagesArray } = useGetMessagesFromRtk(); */
@@ -11,4 +11,4 @@ const useGetMessagesFromRtk = () => {
   };
 };
 
-export default useGetMessagesFromRtk;
+export default useMessagesFromRtk;

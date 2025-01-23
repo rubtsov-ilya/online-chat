@@ -5,15 +5,19 @@ import SearchSvg from 'src/assets/images/icons/24x24-icons/Search.svg?react';
 
 import styles from './SearchChatsByName.module.scss';
 import { IFirebaseRtDbUser } from 'src/interfaces/FirebaseRealtimeDatabase.interface';
-import { IChatWithDetails } from 'src/interfaces/ChatsWithDetails.interface';
+import {
+  IChatWithDetails,
+  IMemberDetails,
+} from 'src/interfaces/ChatsWithDetails.interface';
 import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
 import useAuth from 'src/hooks/useAuth';
 import { CIRCULAR_LOADING_PERCENT_VALUE } from 'src/constants';
 import { getSearchedUsersService } from 'src/services/getSearchedUsers';
+import useNormalizedUsername from 'src/hooks/useNormalizedUsername';
 
 interface SearchChatsByNameProps {
   setSearchedGlobalChats: React.Dispatch<
-    React.SetStateAction<IFirebaseRtDbUser[] | 'error'>
+    React.SetStateAction<IFirebaseRtDbUser[]>
   >;
   setSearchedChats: React.Dispatch<React.SetStateAction<IChatWithDetails[]>>;
   setIsSearching: React.Dispatch<React.SetStateAction<boolean>>;
@@ -58,20 +62,18 @@ const SearchChatsByName: FC<SearchChatsByNameProps> = ({
           if (chat.isGroup === false) {
             const otherMember = chat.membersDetails.find(
               (member) => member.uid !== uid,
+            ) as IMemberDetails;
+            const otherMemberUsername = useNormalizedUsername(
+              otherMember.username,
             );
-            return otherMember!.username
-              ?.toLowerCase()
-              .replace(/\s+/g, '')
-              .includes(
-                deferredSearchInputValue.toLowerCase().replace(/\s+/g, ''),
-              );
+            return otherMemberUsername.includes(
+              useNormalizedUsername(deferredSearchInputValue),
+            );
           } else {
-            return chat.groupChatname
-              ?.toLowerCase()
-              .replace(/\s+/g, '')
-              .includes(
-                deferredSearchInputValue.toLowerCase().replace(/\s+/g, ''),
-              );
+            const groupChatname = useNormalizedUsername(chat.groupChatname);
+            return groupChatname.includes(
+              useNormalizedUsername(deferredSearchInputValue),
+            );
           }
         },
       );
@@ -84,7 +86,7 @@ const SearchChatsByName: FC<SearchChatsByNameProps> = ({
       if (deferredSearchInputValue.length > 0) {
         try {
           const searchedGlobalUsers = await getSearchedUsersService(
-            deferredSearchInputValue.toLowerCase().replace(/\s+/g, ''),
+            useNormalizedUsername(deferredSearchInputValue),
           );
 
           const existingChatIds = Array.from(
@@ -97,19 +99,17 @@ const SearchChatsByName: FC<SearchChatsByNameProps> = ({
             ),
           );
 
-          const filteredGlobalUsers = Array.isArray(searchedGlobalUsers)
-            ? searchedGlobalUsers.filter(
-                (user: IFirebaseRtDbUser) =>
-                  user.uid !== uid && // исключить себя
-                  !existingChatIds.includes(user.uid), // исключить уже существующие чаты
-              )
-            : 'error';
+          const filteredGlobalUsers = searchedGlobalUsers !== undefined ? searchedGlobalUsers.filter(
+            (user: IFirebaseRtDbUser) =>
+              user.uid !== uid && // исключить себя
+              !existingChatIds.includes(user.uid), // исключить уже существующие чаты
+          ) : [];
 
           setIsLoading(false);
           setSearchedGlobalChats(filteredGlobalUsers);
         } catch (error) {
           setIsLoading(false);
-          setSearchedGlobalChats('error');
+          setSearchedGlobalChats([]);
         }
       }
     }, 1000);

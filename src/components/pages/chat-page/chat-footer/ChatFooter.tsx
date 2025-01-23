@@ -7,7 +7,7 @@ import { AttachedItemType } from 'src/interfaces/AttachedItem.interface';
 import { IUploadTasksRef } from 'src/interfaces/UploadTasks.interface';
 import DragNDropZone from './drag-n-drop-zone/DragNDropZone';
 import { ILocationChatPage } from 'src/interfaces/LocationChatPage.interface';
-import useGetChatInputValues from 'src/hooks/useGetChatInputValues';
+import useChatInputValues from 'src/hooks/useChatInputValues';
 import { useDispatch } from 'react-redux';
 import {
   ChatInputValue,
@@ -36,7 +36,7 @@ const ChatFooter: FC<ChatFooterProps> = ({
 }) => {
   const ComponentTag = isMobileScreen ? 'footer' : 'div';
   const dispatch = useDispatch();
-  const { chatInputValues } = useGetChatInputValues();
+  const { chatInputValues } = useChatInputValues();
 
   const updateAttachedItems = (state: AttachedItemType[]) => {
     dispatch(
@@ -67,6 +67,7 @@ const ChatFooter: FC<ChatFooterProps> = ({
             />
           )}
           <MessageInputWrapper
+            chatInputValues={chatInputValues}
             isSubscribeLoading={isSubscribeLoading}
             locationState={locationState}
             uploadTasksRef={uploadTasksRef}

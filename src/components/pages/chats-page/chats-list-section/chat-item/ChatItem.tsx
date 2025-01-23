@@ -17,7 +17,7 @@ import {
   setActiveChatnameAndAvatar,
 } from 'src/redux/slices/ActiveChatSlice';
 import { useNavigate } from 'react-router-dom';
-import useGetActiveChat from 'src/hooks/useGetActiveChat';
+import useActiveChat from 'src/hooks/useActiveChat';
 
 interface ChatItemProps {
   isMobileScreen: boolean;
@@ -46,7 +46,7 @@ const ChatItem: FC<ChatItemProps> = ({
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const longPressDuration = 500;
-  const { activeChatAvatar, activeChatname, activeChatId } = useGetActiveChat();
+  const { activeChatAvatar, activeChatname, activeChatId } = useActiveChat();
 
   const modalActionData = {
     delete: {

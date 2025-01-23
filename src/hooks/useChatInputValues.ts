@@ -1,13 +1,13 @@
 import { useSelector } from 'react-redux';
 import { selectChatInputValues } from 'src/redux/slices/ChatInputValues';
 
-const useGetChatInputValues = () => {
+const useChatInputValues = () => {
   const { chatInputValues } = useSelector(selectChatInputValues);
-  /* get in components - const { chatInputValues } = useGetChatInputValues(); */
+  /* get in components - const { chatInputValues } = useChatInputValues(); */
 
   return {
     chatInputValues
   };
 };
 
-export default useGetChatInputValues;
+export default useChatInputValues;

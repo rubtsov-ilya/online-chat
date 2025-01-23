@@ -22,7 +22,6 @@ import {
   IChatWithDetails,
   IMemberDetails,
 } from 'src/interfaces/ChatsWithDetails.interface';
-import useGetActiveChat from 'src/hooks/useGetActiveChat';
 import {
   CIRCULAR_LOADING_PERCENT_VALUE,
   USERNAME_DEFAULT_VALUE,
@@ -62,7 +61,7 @@ const ChatsListSection: FC<ChatsListSectionProps> = ({ isMobileScreen }) => {
     [],
   );
   const [searchedGlobalChats, setSearchedGlobalChats] = useState<
-    IFirebaseRtDbUser[] | 'error'
+    IFirebaseRtDbUser[]
   >([]);
   const [searchedChats, setSearchedChats] = useState<IChatWithDetails[]>([]);
   const [isSearching, setIsSearching] = useState<boolean>(false); // состояние использования поиска
