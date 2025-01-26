@@ -1,4 +1,4 @@
-import { FC, useRef, useState } from 'react';
+import { FC, useRef } from 'react';
 import ArrowCircleSvg from 'src/assets/images/icons/24x24-icons/Left arrow circle.svg?react';
 
 import styles from './MessageInputWrapper.module.scss';
@@ -10,6 +10,7 @@ import {
   ref as refFirebaseDatabase,
   get,
   update,
+  push,
   serverTimestamp,
 } from 'firebase/database';
 import { firebaseDatabase, firebaseStorage } from 'src/firebase';
@@ -40,7 +41,10 @@ import { MAX_UPLOAD_FILE_SIZE } from 'src/constants';
 import { customToastError } from 'src/components/ui/custom-toast-container/CustomToastContainer';
 import { ILocationChatPage } from 'src/interfaces/LocationChatPage.interface';
 import useActiveChat from 'src/hooks/useActiveChat';
-import { IFirebaseRtDbChat } from 'src/interfaces/FirebaseRealtimeDatabase.interface';
+import {
+  IFirebaseRtDbChat,
+  IFirebaseRtDbChatsChat,
+} from 'src/interfaces/FirebaseRealtimeDatabase.interface';
 import { setActiveChatId } from 'src/redux/slices/ActiveChatSlice';
 import {
   ChatInputValue,
@@ -279,7 +283,8 @@ const MessageInputWrapper: FC<MessageInputWrapperProps> = ({
   const createMessageObjectWithLocaleUrl = async (
     messageTextLocale: string,
     attachedItemsLocale: AttachedItemType[],
-  ): Promise<ILoadingMessage> => {
+    chatId: string,
+  ): Promise<ILoadingMessage | undefined> => {
     /* создание полноценного массива объектов загруженных с устройства  */
     const newAttachedItems: (
       | ILoadingImgMedia
@@ -345,10 +350,18 @@ const MessageInputWrapper: FC<MessageInputWrapperProps> = ({
             }),
           )
         : [];
+    const messagesRef = refFirebaseDatabase(
+      firebaseDatabase,
+      `chats/${chatId}/messages`,
+    );
+    const messageId = push(messagesRef).key;
+    if (messageId === null) {
+      return;
+    }
     return {
       messageText: messageTextLocale,
       messageDateUTC: Date.now(),
-      messageId: uuidv4(),
+      messageId: messageId,
       isDeleted: false,
       isChecked: false,
       senderUid: uid!,
@@ -365,9 +378,10 @@ const MessageInputWrapper: FC<MessageInputWrapperProps> = ({
     };
   };
 
-  const createNewChat = async (
+  const createNewChatByUsers = async (
     sendedMessageText: string,
-  ): Promise<string | null> => {
+    newChatId: string,
+  ) => {
     // функция вызывается только если locationState !== null
     // возвращает string если пользователь найден и чат либо создан, либо уже существовал
     // возвращает null в случае ошибок, либо не найден пользователь, либо catch
@@ -393,10 +407,14 @@ const MessageInputWrapper: FC<MessageInputWrapperProps> = ({
           dispatch(
             setActiveChatId({ activeChatId: existingChatWithUser.chatId }),
           );
-          return existingChatWithUser.chatId;
+          return {
+            chatsUpdatesByUsers: undefined,
+            chatId: existingChatWithUser.chatId,
+          };
         }
+      }
+      else if (!existingChatsByUserSnapshot.exists()) {
         // если чата нет, создать новый
-        const newChatId = uuidv4();
         const newChatData: IFirebaseRtDbChat = {
           chatId: newChatId,
           membersIds: [uid!, locationState!.userUidFromGlobalSearch],
@@ -410,26 +428,57 @@ const MessageInputWrapper: FC<MessageInputWrapperProps> = ({
           isGroup: false,
         };
 
-        const updates = {
+        const chatsUpdatesByUsers = {
           [`userChats/${uid!}/chats/${newChatId}`]: newChatData,
           [`userChats/${locationState!.userUidFromGlobalSearch}/chats/${newChatId}`]:
             newChatData,
         };
 
-        await update(refFirebaseDatabase(firebaseDatabase), updates);
-
-        dispatch(setActiveChatId({ activeChatId: newChatId }));
-
-        return newChatId;
+        return { chatsUpdatesByUsers: chatsUpdatesByUsers, chatId: newChatId };
 
         // проверить есть ли чат не групповой где только ты и он. Затем создать чат и тебе и ему. Иначе ретёрн. Можно даже отправку смс прервать в случае ошибки благодаря ретёрну с 'error'
       } else {
-        return null;
+        return;
       }
     } catch (error) {
       console.error(`Ошибка при получении данных о чатах пользователя`, error);
-      return null;
+      return;
     }
+  };
+
+  const createNewChatByChats = async (
+    chatId: string,
+    messageWithFirebaseUrls: IMessage,
+    userUidFromGlobalSearch: string,
+  ) => {
+    const existingChatByChats = refFirebaseDatabase(
+      firebaseDatabase,
+      `chats/${chatId}/`,
+    );
+    const existingChatByChatsSnapshot = await get(existingChatByChats);
+
+    if (existingChatByChatsSnapshot.exists()) {
+      // если чат существует, вернуть undefined
+      return;
+    }
+
+    const newChatData: IFirebaseRtDbChatsChat = {
+      chatId: chatId,
+      unreadMessages: {
+        [userUidFromGlobalSearch]: {
+          [messageWithFirebaseUrls.messageId]: true,
+        },
+      },
+      messages: {
+        [messageWithFirebaseUrls.messageId]: messageWithFirebaseUrls,
+      },
+    };
+
+    const chatsUpdatesByChats = {
+      [`chats/${chatId}`]: newChatData,
+    };
+
+    return chatsUpdatesByChats;
   };
 
   const compressImage = async (file: File) => {
@@ -499,33 +548,110 @@ const MessageInputWrapper: FC<MessageInputWrapperProps> = ({
     ) {
       return;
     }
-    const messageWithLocaleUrls: ILoadingMessage | undefined =
-      await createMessageObjectWithLocaleUrl(
-        sendedMessageText,
-        sendedAttachedItemsLocale,
-      );
-    console.log(messageWithLocaleUrls);
-    if (messageWithLocaleUrls !== undefined) {
+
+    // создать не групповой чат. Групповой создаётся не через отправку смс пользователю
+    // если страница chat открыта переходом из глобального поиска, т.е. не созданный ранее чат
+    if (locationState !== null && activeChatId === null) {
+      const newChatId = uuidv4();
+      const messageWithLocaleUrls: ILoadingMessage | undefined =
+        await createMessageObjectWithLocaleUrl(
+          sendedMessageText,
+          sendedAttachedItemsLocale,
+          newChatId,
+        );
+
+      if (messageWithLocaleUrls === undefined) {
+        return;
+      }
+
       dispatch(addLoadingMessage(messageWithLocaleUrls));
       dispatch(
         clearChatInputValue({
           chatId: activeChatId,
         }),
       );
-      /* const messageWithFirebaseUrls = await createMessageObjectWithFirebaseUrl(
-        messageWithLocaleUrls,
-      ); */
 
-      if (messageWithFirebaseUrls !== undefined) {
-        let chatId: string | null;
-        // создать чат, если страница chat открыта переходом из глобального поиска, т.е. не созданный ранее чат
-        if (locationState !== null && activeChatId === null) {
-          chatId = await createNewChat(sendedMessageText); // вернёт либо айди имеющегося уже чата. либо созданного, либо null в случае ошибки
+      const resultByUsers = await createNewChatByUsers(
+        sendedMessageText,
+        newChatId,
+      ); // вернёт либо объект созданного чата + айди, либо пустой объект чата + айди. либо undefined в случае ошибки
+      if (resultByUsers === undefined) {
+        return;
+      }
+      const { chatsUpdatesByUsers, chatId } = resultByUsers;
+      if (chatsUpdatesByUsers !== undefined) {
+        // если chatsUpdatesByUsers !== undefined, тогда чат не существует и нужно создать чат с сообщением первым
+        const messageWithFirebaseUrls =
+          await createMessageObjectWithFirebaseUrl(messageWithLocaleUrls);
+
+        if (messageWithFirebaseUrls === undefined) {
+          return;
         }
+        const resultByChats = await createNewChatByChats(
+          chatId,
+          messageWithFirebaseUrls,
+          locationState.userUidFromGlobalSearch,
+        );
+
+        if (resultByChats === undefined) {
+          return;
+        }
+
+        const updates = { ...chatsUpdatesByUsers, ...resultByChats };
+
+        await update(refFirebaseDatabase(firebaseDatabase), updates);
+
+        dispatch(setActiveChatId({ activeChatId: newChatId }));
+      }
+      if (chatsUpdatesByUsers === undefined) {
+        // если chatsUpdatesByUsers === undefined; то чат существует и вернётся его айди и оно установится в RTK
+        const messageWithFirebaseUrls =
+          await createMessageObjectWithFirebaseUrl(messageWithLocaleUrls);
+
+        if (messageWithFirebaseUrls === undefined) {
+          return;
+        }
+        // тогда только отправить смс в чат существующий. Создавать чат не нужно
+        await update(
+          refFirebaseDatabase(firebaseDatabase, `chats/${chatId}/messages`),
+          {
+            [messageWithFirebaseUrls.messageId]: messageWithFirebaseUrls,
+          },
+        );
+      }
+    } else if (activeChatId !== null) {
+      // если activeChatId есть, тогда только отправить смс в чат существующий. Создавать чат не нужно
+      const messageWithLocaleUrls: ILoadingMessage | undefined =
+        await createMessageObjectWithLocaleUrl(
+          sendedMessageText,
+          sendedAttachedItemsLocale,
+          activeChatId,
+        );
+
+      if (messageWithLocaleUrls === undefined) {
+        return;
       }
 
-      /* добавить дату отправки повторно перед отправкой */
-      /* console.log(messageWithFirebaseUrls); */
+      dispatch(addLoadingMessage(messageWithLocaleUrls));
+      dispatch(
+        clearChatInputValue({
+          chatId: activeChatId,
+        }),
+      );
+      const messageWithFirebaseUrls = await createMessageObjectWithFirebaseUrl(
+        messageWithLocaleUrls,
+      );
+
+      if (messageWithFirebaseUrls === undefined) {
+        return;
+      }
+
+      await update(
+        refFirebaseDatabase(firebaseDatabase, `chats/${activeChatId}/messages`),
+        {
+          [messageWithFirebaseUrls.messageId]: messageWithFirebaseUrls,
+        },
+      );
     }
   };
 

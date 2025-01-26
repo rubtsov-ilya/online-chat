@@ -53,6 +53,11 @@ export interface IFirebaseRtDbUserChatsSnapshot {
 
 export interface IFirebaseRtDbChatsChat {
   chatId: string;
+  unreadMessages: {
+    [uid: string]: {
+      [messageId: string]: true | null // true - если смс непрочитано. null отправляется для удаления из базы данных через update
+    }
+  }
   messages: { [messageId: string]: IMessage }; // Сообщения в чате, где ключ - messageId, а значение - объект IMessage
 }
 
