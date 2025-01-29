@@ -31,15 +31,9 @@ export interface IFirebaseRtDbChat {
   isGroup: boolean;
 }
 
-/* unreadMessages: {
-  [uid: string] : {
-    [messageId: string]: boolean
-  }
-} */
-
-export interface IFirebaseRtDbChatWithCounter extends IFirebaseRtDbChat{
+/* export interface IFirebaseRtDbChatWithCounter extends IFirebaseRtDbChat{
   uncheckedCounter: number; 
-}
+} */
 
 export interface IFirebaseRtDbUserChat {
   uid: string;

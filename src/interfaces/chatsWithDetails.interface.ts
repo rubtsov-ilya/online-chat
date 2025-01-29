@@ -1,4 +1,4 @@
-import { IFirebaseRtDbChatWithCounter } from "./FirebaseRealtimeDatabase.interface";
+import { IFirebaseRtDbChat } from "./FirebaseRealtimeDatabase.interface";
 
 
 
@@ -9,6 +9,7 @@ export interface IMemberDetails {
   blocked: string[];
 }
 
-export interface IChatWithDetails extends IFirebaseRtDbChatWithCounter {
+export interface IChatWithDetails extends IFirebaseRtDbChat {
   membersDetails: IMemberDetails[]
 }
+

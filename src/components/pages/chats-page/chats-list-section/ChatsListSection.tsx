@@ -1,7 +1,7 @@
-import { FC, useLayoutEffect, useRef, useState } from 'react';
+import { FC, useEffect, useLayoutEffect, useRef, useState } from 'react';
 
 import styles from './ChatsListSection.module.scss';
-import { ref as refFirebaseDatabase, onValue, get } from 'firebase/database';
+import { ref as refFirebaseDatabase, onValue, get, off } from 'firebase/database';
 import { firebaseDatabase } from 'src/firebase';
 import EmptyChatsWrapper from './empty-chats-wrapper/EmptyChatsWrapper';
 import ChatItem from './chat-item/ChatItem';
@@ -27,6 +27,7 @@ import {
   USERNAME_DEFAULT_VALUE,
   USER_AVATAR_DEFAULT_VALUE,
 } from 'src/constants';
+import useActiveChat from 'src/hooks/useActiveChat';
 
 interface ChatsListSectionProps {
   isMobileScreen: boolean;
@@ -34,7 +35,7 @@ interface ChatsListSectionProps {
 
 const ChatsListSection: FC<ChatsListSectionProps> = ({ isMobileScreen }) => {
   const { uid, avatar, username, blocked } = useAuth();
-/*   const {
+  const {
     activeChatId,
     activeChatAvatar,
     activeChatBlocked,
@@ -55,11 +56,12 @@ const ChatsListSection: FC<ChatsListSectionProps> = ({ isMobileScreen }) => {
     activeChatMembers,
     'activeChatIsGroup',
     activeChatIsGroup,
-  ); */
+  );
   const [chats, setChats] = useState<IFirebaseRtDbChat[]>([]);
   const [chatsWithDetails, setChatsWithDetails] = useState<IChatWithDetails[]>(
     [],
   );
+  const [unreadCounts, setUnreadCounts] = useState<Record<string, number>>({});
   const [searchedGlobalChats, setSearchedGlobalChats] = useState<
     IFirebaseRtDbUser[]
   >([]);
@@ -214,6 +216,32 @@ const ChatsListSection: FC<ChatsListSectionProps> = ({ isMobileScreen }) => {
     getChatsWithDetails();
   }, [chats]);
 
+  useEffect(() => {
+    if (uid === null || chats.length === 0) return;
+
+    const subscriptions: (() => void)[] = [];
+
+    chats.forEach((chat) => {
+      const unreadRef = refFirebaseDatabase(firebaseDatabase, `chats/${chat.chatId}/unreadMessages/${uid}`);
+
+      const unsubscribeUnread = onValue(unreadRef, (snapshot) => {
+        const unreadMessages = snapshot.val() || {};
+        const unreadCount = Object.keys(unreadMessages).length;
+
+        setUnreadCounts((prev) => ({
+          ...prev,
+          [chat.chatId]: unreadCount,
+        }));
+      });
+
+      subscriptions.push(() => off(unreadRef, "value", unsubscribeUnread));
+    });
+
+    return () => {
+      subscriptions.forEach((unsubscribe) => unsubscribe());
+    };
+  }, [uid, chats]);
+
   return (
     <ComponentTag
       ref={chatsListRef}
@@ -275,6 +303,7 @@ const ChatsListSection: FC<ChatsListSectionProps> = ({ isMobileScreen }) => {
                       <ChatItem
                         key={index}
                         uid={uid!}
+                        uncheckedCount={unreadCounts[`${chat.chatId}`]}
                         chatItemData={chat}
                         chatsListRef={chatsListRef}
                         isMobileScreen={isMobileScreen}

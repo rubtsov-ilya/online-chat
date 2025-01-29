@@ -25,6 +25,7 @@ interface ChatItemProps {
   chatItemData: IChatWithDetails;
   chatAvatar: string;
   chatname: string;
+  uncheckedCount: number,
   uid: string;
 }
 
@@ -34,6 +35,7 @@ const ChatItem: FC<ChatItemProps> = ({
   chatItemData,
   chatAvatar,
   chatname,
+  uncheckedCount,
   uid,
 }) => {
   const [modalOpen, setModalOpen] = useState<'ban' | 'delete' | false>(false);
@@ -305,10 +307,10 @@ const ChatItem: FC<ChatItemProps> = ({
             </div>
           </div>
           <div className={styles['chat-item__right-wrapper']}>
-            {chatItemData.uncheckedCounter > 0 && (
+            {uncheckedCount > 0 && (
               <div className={styles['chat-item__counter-wrapper']}>
                 <span className={styles['chat-item__counter']}>
-                  {chatItemData.uncheckedCounter}
+                  {uncheckedCount}
                 </span>
               </div>
             )}
