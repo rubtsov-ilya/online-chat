@@ -27,7 +27,6 @@ import {
   USERNAME_DEFAULT_VALUE,
   USER_AVATAR_DEFAULT_VALUE,
 } from 'src/constants';
-import useActiveChat from 'src/hooks/useActiveChat';
 
 interface ChatsListSectionProps {
   isMobileScreen: boolean;
@@ -138,6 +137,7 @@ const ChatsListSection: FC<ChatsListSectionProps> = ({ isMobileScreen }) => {
                       };
                     } else {
                       // если чат групповой, то не делать запрос на объект. Эти данные получатся в самом чате при его открытии
+                      // blocked устанавливаются в подписку в самом чате при его открытии
                       if (chat.isGroup === true) return null;
 
                       // Для других участников
@@ -157,7 +157,7 @@ const ChatsListSection: FC<ChatsListSectionProps> = ({ isMobileScreen }) => {
                               userValue.username || USERNAME_DEFAULT_VALUE,
                             avatar:
                               userValue.avatar || USER_AVATAR_DEFAULT_VALUE,
-                            blocked: userValue.blocked || [],
+                            blocked: [],
                           };
                         } else {
                           return {
@@ -208,8 +208,6 @@ const ChatsListSection: FC<ChatsListSectionProps> = ({ isMobileScreen }) => {
           setIsChatsLoading('error');
           console.error('Error getting chats with details:', error);
         }
-      } else {
-        /* setIsChatsLoading(false); */
       }
     };
 

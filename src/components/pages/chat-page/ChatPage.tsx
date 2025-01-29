@@ -50,6 +50,16 @@ const ChatPage: FC = () => {
     activeChatIsGroup,
     } = useActiveChat();
 
+/*     console.log('activeChatId', activeChatId,
+      'activeChatAvatar',
+      activeChatAvatar,
+      'activeChatname',
+      activeChatname,
+      'activeChatMembers',
+      activeChatMembers,
+      'activeChatIsGroup',
+      activeChatIsGroup,) */
+
   useLayoutEffect(() => {
     if (activeChatId !== null) {
       setIsSubscribeLoading(true);

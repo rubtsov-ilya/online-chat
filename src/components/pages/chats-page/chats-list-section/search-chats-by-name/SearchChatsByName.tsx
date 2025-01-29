@@ -126,12 +126,12 @@ const SearchChatsByName: FC<SearchChatsByNameProps> = ({
     }
 
     return () => {
-      /* выполняется очистка таймаута на поиск при каждом вызове эффекта или размонтировании компонента*/
+      // выполняется очистка таймаута на поиск при каждом вызове эффекта или размонтировании компонента
       if (timeout) {
         clearTimeout(timeout);
       }
     };
-  }, [deferredSearchInputValue]);
+  }, [deferredSearchInputValue, chatsWithDetails.length]);
 
   return (
     <div onClick={onSearchInputClick} className={styles['search']}>
@@ -152,7 +152,6 @@ const SearchChatsByName: FC<SearchChatsByNameProps> = ({
               pathTransitionDuration: 0.5,
               // Colors
               pathColor: 'var(--base-accent-blue)',
-              // textColor: '#f88',
               trailColor: 'none',
             })}
           />

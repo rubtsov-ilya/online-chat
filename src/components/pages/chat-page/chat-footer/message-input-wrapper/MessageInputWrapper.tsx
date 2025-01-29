@@ -45,12 +45,16 @@ import {
   IFirebaseRtDbChat,
   IFirebaseRtDbChatsChat,
 } from 'src/interfaces/FirebaseRealtimeDatabase.interface';
-import { setActiveChatId } from 'src/redux/slices/ActiveChatSlice';
+import {
+  setActiveChat,
+  setActiveChatId,
+} from 'src/redux/slices/ActiveChatSlice';
 import {
   ChatInputValue,
   clearChatInputValue,
   updateChatInputValue,
 } from 'src/redux/slices/ChatInputValues';
+import { IMemberDetails } from 'src/interfaces/ChatsWithDetails.interface';
 
 interface MessageInputWrapperProps {
   chatInputValues: { [chatId: string]: ChatInputValue };
@@ -71,8 +75,8 @@ const MessageInputWrapper: FC<MessageInputWrapperProps> = ({
   locationState,
   updateAttachedItems,
 }) => {
-  const { uid } = useAuth();
-  const { activeChatId } = useActiveChat();
+  const { uid, avatar, username, blocked } = useAuth();
+  const { activeChatId, activeChatMembers } = useActiveChat();
   const textAreaRef = useRef<HTMLTextAreaElement>(null);
   const dispatch = useDispatch();
 
@@ -378,13 +382,39 @@ const MessageInputWrapper: FC<MessageInputWrapperProps> = ({
     };
   };
 
-  const createNewChatByUsers = async (
+  const createNewDataForChatsPath = (
+    chatId: string,
+    locationStateUid: string,
+    messageText: string,
+  ) => {
+    const newChatsData: IFirebaseRtDbChat = {
+      chatId: chatId,
+      membersIds: [uid!, locationStateUid],
+      lastMessageText: messageText,
+      lastMessageDateUTC: serverTimestamp(),
+      lastMessageIsChecked: false,
+      lastMessageSenderUid: uid!,
+      groupChatname: '',
+      groupAvatar: '',
+      groupAdminUid: '',
+      isGroup: false,
+    };
+
+    const updatesByUserChats = {
+      [`userChats/${uid!}/chats/${chatId}`]: newChatsData,
+      [`userChats/${locationStateUid}/chats/${chatId}`]: newChatsData,
+    };
+
+    return { updatesByUserChats: updatesByUserChats, chatId: chatId };
+  };
+
+  const createNewChatForUserChatsPath = async (
     sendedMessageText: string,
     newChatId: string,
   ) => {
     // функция вызывается только если locationState !== null
     // возвращает string если пользователь найден и чат либо создан, либо уже существовал
-    // возвращает null в случае ошибок, либо не найден пользователь, либо catch
+    // возвращает undefined в случае ошибок, либо не найден пользователь, либо catch
     try {
       const existingChatsByUser = refFirebaseDatabase(
         firebaseDatabase,
@@ -396,7 +426,6 @@ const MessageInputWrapper: FC<MessageInputWrapperProps> = ({
         const existingChatsByUserValue = Object.values(
           existingChatsByUserSnapshot.val(),
         ) as IFirebaseRtDbChat[];
-
         const existingChatWithUser = existingChatsByUserValue.find(
           (chat) =>
             chat.isGroup === false &&
@@ -408,33 +437,25 @@ const MessageInputWrapper: FC<MessageInputWrapperProps> = ({
             setActiveChatId({ activeChatId: existingChatWithUser.chatId }),
           );
           return {
-            chatsUpdatesByUsers: undefined,
+            updatesByUserChats: undefined,
             chatId: existingChatWithUser.chatId,
           };
+        } else if (existingChatWithUser === undefined) {
+          // если чата нет, создать новый
+          const createdNewDataForChatsPath = createNewDataForChatsPath(
+            newChatId,
+            locationState!.userUidFromGlobalSearch,
+            sendedMessageText,
+          );
+          return createdNewDataForChatsPath;
         }
-      }
-      else if (!existingChatsByUserSnapshot.exists()) {
-        // если чата нет, создать новый
-        const newChatData: IFirebaseRtDbChat = {
-          chatId: newChatId,
-          membersIds: [uid!, locationState!.userUidFromGlobalSearch],
-          lastMessageText: sendedMessageText,
-          lastMessageDateUTC: serverTimestamp(),
-          lastMessageIsChecked: false,
-          lastMessageSenderUid: uid!,
-          groupChatname: '',
-          groupAvatar: '',
-          groupAdminUid: '',
-          isGroup: false,
-        };
-
-        const chatsUpdatesByUsers = {
-          [`userChats/${uid!}/chats/${newChatId}`]: newChatData,
-          [`userChats/${locationState!.userUidFromGlobalSearch}/chats/${newChatId}`]:
-            newChatData,
-        };
-
-        return { chatsUpdatesByUsers: chatsUpdatesByUsers, chatId: newChatId };
+      } else if (!existingChatsByUserSnapshot.exists()) {
+        const createdNewDataForChatsPath = createNewDataForChatsPath(
+          newChatId,
+          locationState!.userUidFromGlobalSearch,
+          sendedMessageText,
+        );
+        return createdNewDataForChatsPath;
 
         // проверить есть ли чат не групповой где только ты и он. Затем создать чат и тебе и ему. Иначе ретёрн. Можно даже отправку смс прервать в случае ошибки благодаря ретёрну с 'error'
       } else {
@@ -446,7 +467,7 @@ const MessageInputWrapper: FC<MessageInputWrapperProps> = ({
     }
   };
 
-  const createNewChatByChats = async (
+  const createNewChatForChatsPath = async (
     chatId: string,
     messageWithFirebaseUrls: IMessage,
     userUidFromGlobalSearch: string,
@@ -474,11 +495,53 @@ const MessageInputWrapper: FC<MessageInputWrapperProps> = ({
       },
     };
 
-    const chatsUpdatesByChats = {
+    const chatUpdatesByChats = {
       [`chats/${chatId}`]: newChatData,
     };
 
-    return chatsUpdatesByChats;
+    return chatUpdatesByChats;
+  };
+
+  const createUpdatesChatForUserChatsPath = (
+    chatId: string,
+    sendedMessageText: string,
+    membersIds: string[],
+  ) => {
+    const newChatsData = {
+      lastMessageText: sendedMessageText,
+      lastMessageDateUTC: serverTimestamp(),
+      lastMessageIsChecked: false,
+      lastMessageSenderUid: uid!,
+    };
+
+    const updatesByUserChats = membersIds.reduce((acc, memberId) => {
+      acc[`userChats/${memberId}/chats/${chatId}/lastMessageText`] = newChatsData.lastMessageText;
+      acc[`userChats/${memberId}/chats/${chatId}/lastMessageDateUTC`] = newChatsData.lastMessageDateUTC;
+      acc[`userChats/${memberId}/chats/${chatId}/lastMessageIsChecked`] = newChatsData.lastMessageIsChecked;
+      acc[`userChats/${memberId}/chats/${chatId}/lastMessageSenderUid`] = newChatsData.lastMessageSenderUid;
+      return acc;
+    }, {} as Record<string, any>);
+
+    return updatesByUserChats;
+  };
+
+  const createUpdatesChatForChatsPath = (
+    chatId: string,
+    messageWithFirebaseUrls: IMessage,
+    membersIds: string[],
+  ) => {
+    const filteredMembersIds = membersIds.filter(memberId => memberId !== uid);
+    const unreadMessages = filteredMembersIds.reduce((acc, memberId) => {
+      acc[`chats/${chatId}/unreadMessages/${memberId}/${messageWithFirebaseUrls.messageId}`] = true;
+      return acc;
+    }, {} as Record<string, any>);
+
+    const updatesByChats = {
+      [`chats/${chatId}/messages/${messageWithFirebaseUrls.messageId}`]: messageWithFirebaseUrls,
+      ...unreadMessages,
+    };
+
+    return updatesByChats;
   };
 
   const compressImage = async (file: File) => {
@@ -534,24 +597,24 @@ const MessageInputWrapper: FC<MessageInputWrapperProps> = ({
     }
   };
 
-  const sendMessage = async (
+  const sendMessageOrCreateNewChat = async (
     sendedMessageText: string,
     sendedAttachedItemsLocale: AttachedItemType[],
+    sendedlocationState: ILocationChatPage | null,
   ) => {
     if (!uid) {
       return;
     }
     if (
+      isSubscribeLoading === true ||
       (sendedMessageText.trim().length === 0 &&
-        sendedAttachedItemsLocale.length === 0) ||
-      isSubscribeLoading === true
+        sendedAttachedItemsLocale.length === 0)
     ) {
       return;
     }
-
-    // создать не групповой чат. Групповой создаётся не через отправку смс пользователю
+    // СОЗДАТЬ НЕ ГРУППОВОЙ ЧАТ. Групповой создаётся не через отправку смс пользователю
     // если страница chat открыта переходом из глобального поиска, т.е. не созданный ранее чат
-    if (locationState !== null && activeChatId === null) {
+    if (sendedlocationState !== null && activeChatId === null) {
       const newChatId = uuidv4();
       const messageWithLocaleUrls: ILoadingMessage | undefined =
         await createMessageObjectWithLocaleUrl(
@@ -571,56 +634,67 @@ const MessageInputWrapper: FC<MessageInputWrapperProps> = ({
         }),
       );
 
-      const resultByUsers = await createNewChatByUsers(
+      const updatesByUsers = await createNewChatForUserChatsPath(
         sendedMessageText,
         newChatId,
       ); // вернёт либо объект созданного чата + айди, либо пустой объект чата + айди. либо undefined в случае ошибки
-      if (resultByUsers === undefined) {
+      if (updatesByUsers === undefined) {
         return;
       }
-      const { chatsUpdatesByUsers, chatId } = resultByUsers;
-      if (chatsUpdatesByUsers !== undefined) {
-        // если chatsUpdatesByUsers !== undefined, тогда чат не существует и нужно создать чат с сообщением первым
+
+      const { updatesByUserChats, chatId } = updatesByUsers;
+      if (updatesByUserChats !== undefined) {
+        // если updatesByUserChats !== undefined, тогда чат не существует и нужно создать чат с сообщением первым
         const messageWithFirebaseUrls =
           await createMessageObjectWithFirebaseUrl(messageWithLocaleUrls);
 
         if (messageWithFirebaseUrls === undefined) {
           return;
         }
-        const resultByChats = await createNewChatByChats(
+        const updatesByChats = await createNewChatForChatsPath(
           chatId,
           messageWithFirebaseUrls,
-          locationState.userUidFromGlobalSearch,
+          sendedlocationState.userUidFromGlobalSearch,
         );
 
-        if (resultByChats === undefined) {
+        if (updatesByChats === undefined) {
           return;
         }
 
-        const updates = { ...chatsUpdatesByUsers, ...resultByChats };
+        const updates = { ...updatesByUserChats, ...updatesByChats };
 
         await update(refFirebaseDatabase(firebaseDatabase), updates);
-
-        dispatch(setActiveChatId({ activeChatId: newChatId }));
-      }
-      if (chatsUpdatesByUsers === undefined) {
-        // если chatsUpdatesByUsers === undefined; то чат существует и вернётся его айди и оно установится в RTK
-        const messageWithFirebaseUrls =
-          await createMessageObjectWithFirebaseUrl(messageWithLocaleUrls);
-
-        if (messageWithFirebaseUrls === undefined) {
-          return;
-        }
-        // тогда только отправить смс в чат существующий. Создавать чат не нужно
-        await update(
-          refFirebaseDatabase(firebaseDatabase, `chats/${chatId}/messages`),
+        const membersDetails: IMemberDetails[] = [
+          { uid: uid, username: username!, avatar: avatar!, blocked: blocked! },
           {
-            [messageWithFirebaseUrls.messageId]: messageWithFirebaseUrls,
+            uid: sendedlocationState.userUidFromGlobalSearch,
+            username: sendedlocationState.chatnameFromGlobalSearch,
+            avatar: sendedlocationState.chatAvatarFromGlobalSearch,
+            blocked: [],
           },
+        ]; // blocked у второго пользователя будет установлен подпиской в chatpage
+        dispatch(
+          setActiveChat({
+            activeChatId: newChatId,
+            activeChatAvatar: sendedlocationState.chatAvatarFromGlobalSearch,
+            activeChatname: sendedlocationState.chatnameFromGlobalSearch,
+            activeChatIsGroup: false,
+            activeChatMembers: membersDetails,
+            activeChatBlocked: [],
+          }),
         );
       }
-    } else if (activeChatId !== null) {
-      // если activeChatId есть, тогда только отправить смс в чат существующий. Создавать чат не нужно
+      // ОТПРАВИТЬ СООБЩЕНИЕ, если при создании чата уже был создан чат ранее вторым пользователем
+      if (updatesByUserChats === undefined) {
+        // если updatesByUserChats === undefined; то чат существует и вернётся его айди и оно установится в RTK
+
+        /* ПРОВЕРИТЬ БУДЕТ ЛИ ОТПРАВКА СМС ОТСЮДА ИЛИ СНИЗУ СРАЗУ ИЗ РТК ПОДХВАТИТ ИЗМЕНЕНИЕ */
+
+      }
+    } // ОТПРАВИТЬ СООБЩЕНИЕ
+    else if (activeChatId !== null && activeChatMembers !== null) {
+      // если activeChatId и activeChatMembers есть, тогда отправить смс в чат существующий
+      activeChatMembers
       const messageWithLocaleUrls: ILoadingMessage | undefined =
         await createMessageObjectWithLocaleUrl(
           sendedMessageText,
@@ -645,13 +719,11 @@ const MessageInputWrapper: FC<MessageInputWrapperProps> = ({
       if (messageWithFirebaseUrls === undefined) {
         return;
       }
-
-      await update(
-        refFirebaseDatabase(firebaseDatabase, `chats/${activeChatId}/messages`),
-        {
-          [messageWithFirebaseUrls.messageId]: messageWithFirebaseUrls,
-        },
-      );
+      const activeMemberIds = activeChatMembers.map(member => member.uid);
+      const updatesByUserChats = createUpdatesChatForUserChatsPath(activeChatId, sendedMessageText, activeMemberIds);
+      const updatesByChats = createUpdatesChatForChatsPath(activeChatId, messageWithFirebaseUrls, activeMemberIds)
+      const updates = { ...updatesByUserChats, ...updatesByChats };
+      await update(refFirebaseDatabase(firebaseDatabase), updates);
     }
   };
 
@@ -677,7 +749,11 @@ const MessageInputWrapper: FC<MessageInputWrapperProps> = ({
         onKeyDown={(e: React.KeyboardEvent<HTMLTextAreaElement>) => {
           if (e.key === 'Enter' && !isMobileScreen && !e.shiftKey) {
             e.preventDefault();
-            sendMessage(messageText, attachedItems);
+            sendMessageOrCreateNewChat(
+              messageText,
+              attachedItems,
+              locationState,
+            );
           }
         }}
         value={messageText}
@@ -691,7 +767,7 @@ const MessageInputWrapper: FC<MessageInputWrapperProps> = ({
         }
         className={styles['message-input-wrapper__btn']}
         onClick={() => {
-          sendMessage(messageText, attachedItems);
+          sendMessageOrCreateNewChat(messageText, attachedItems, locationState);
         }}
       >
         <ArrowCircleSvg
