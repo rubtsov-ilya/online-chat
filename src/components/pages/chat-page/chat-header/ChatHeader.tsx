@@ -12,12 +12,14 @@ import {
   CHAT_INFO_STATUS_OFFLINE,
   CHAT_INFO_STATUS_ONLINE,
 } from 'src/constants';
+import { ILocationChatPage } from 'src/interfaces/LocationChatPage.interface';
 
 interface ChatHeaderProps {
   isMobileScreen?: boolean;
   avatar: string;
   chatname: string;
   isSubscribeLoading: boolean;
+  locationUid: ILocationChatPage['userUidFromGlobalSearch'] | null;
 }
 
 const ChatHeader: FC<ChatHeaderProps> = ({
@@ -25,6 +27,7 @@ const ChatHeader: FC<ChatHeaderProps> = ({
   avatar,
   chatname,
   isSubscribeLoading,
+  locationUid,
 }) => {
   const ComponentTag = isMobileScreen ? 'header' : 'div';
   const { uid } = useAuth();
@@ -37,19 +40,17 @@ const ChatHeader: FC<ChatHeaderProps> = ({
     /* dispatch(removeActiveChat()); */
   };
 
-  console.log(activeChatMembers)
-
   useEffect(() => {
     let unsubscribeUserIsOnline: (() => void) | undefined;
 
-    if (activeChatMembers !== null && activeChatIsGroup !== null) {
+    if ((activeChatMembers !== null && activeChatIsGroup !== null) || locationUid !== null) {
       if (isSubscribeLoading === true) {
         setChatInfo('');
-      } else if (isSubscribeLoading === false && activeChatIsGroup === false) {
+      } else if ((isSubscribeLoading === false && activeChatIsGroup === false) || locationUid !== null) {
         // если чат не групповой
-        const otherMemberUid = activeChatMembers.find(
+        const otherMemberUid = activeChatMembers?.find(
           (member) => member.uid !== uid,
-        )?.uid;
+        )?.uid || locationUid;
 
         if (otherMemberUid) {
           const userIsOnlineRef = ref(
@@ -71,13 +72,13 @@ const ChatHeader: FC<ChatHeaderProps> = ({
             },
             (error) => {
               console.error(
-                'Ошибка при получении статус online:',
+                'Ошибка при получении статуса online:',
                 error,
               );
             },
           );
         }
-      } else if (isSubscribeLoading === false && activeChatIsGroup === true) {
+      } else if (isSubscribeLoading === false && activeChatIsGroup === true && activeChatMembers !== null) {
               // если чат групповой
         const membersCount = activeChatMembers.length;
         const membersText = 
@@ -95,7 +96,7 @@ const ChatHeader: FC<ChatHeaderProps> = ({
         unsubscribeUserIsOnline();
       }
     };
-  }, [activeChatMembers, isSubscribeLoading]);
+  }, [activeChatMembers, isSubscribeLoading, locationUid]);
 
   return (
     <ComponentTag className={styles['chat-header']}>

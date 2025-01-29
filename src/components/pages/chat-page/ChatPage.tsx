@@ -50,10 +50,8 @@ const ChatPage: FC = () => {
     activeChatIsGroup,
     } = useActiveChat();
 
-    console.log(isSubscribeLoading)
-
   useLayoutEffect(() => {
-    if (activeChatId != null) {
+    if (activeChatId !== null) {
       setIsSubscribeLoading(true);
     } else {
       setIsSubscribeLoading(false);
@@ -238,6 +236,7 @@ const ChatPage: FC = () => {
       <ChatHeader
         isMobileScreen={isMobileScreen}
         isSubscribeLoading={isSubscribeLoading}
+        locationUid={locationState? locationState.userUidFromGlobalSearch : null}
         avatar={
           activeChatAvatar !== null
             ? activeChatAvatar
