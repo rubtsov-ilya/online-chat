@@ -11,8 +11,10 @@ import { onValue, ref } from 'firebase/database';
 import {
   CHAT_INFO_STATUS_OFFLINE,
   CHAT_INFO_STATUS_ONLINE,
+  CHAT_INFO_STATUS_WRITING,
 } from 'src/constants';
 import { ILocationChatPage } from 'src/interfaces/LocationChatPage.interface';
+import DotsBounceLoader from 'src/components/ui/dots-bounce-loader/DotsBounceLoader';
 
 interface ChatHeaderProps {
   isMobileScreen?: boolean;
@@ -31,8 +33,10 @@ const ChatHeader: FC<ChatHeaderProps> = ({
 }) => {
   const ComponentTag = isMobileScreen ? 'header' : 'div';
   const { uid } = useAuth();
-  const { activeChatMembers, activeChatIsGroup } = useActiveChat();
-  const [chatInfo, setChatInfo] = useState('');
+  const { activeChatMembers, activeChatIsGroup, activeChatId } =
+    useActiveChat();
+  const [chatStatus, setChatStatus] = useState<string>('');
+  const [writingUsers, setWritingUsers] = useState<string[]>([]);
   const navigate = useNavigate();
 
   const onBackBtnClick = () => {
@@ -42,15 +46,22 @@ const ChatHeader: FC<ChatHeaderProps> = ({
 
   useEffect(() => {
     let unsubscribeUserIsOnline: (() => void) | undefined;
+    let unsubscribeWritingUsers: (() => void) | undefined;
 
-    if ((activeChatMembers !== null && activeChatIsGroup !== null) || locationUid !== null) {
+    if (
+      (activeChatMembers !== null && activeChatIsGroup !== null) ||
+      locationUid !== null
+    ) {
       if (isSubscribeLoading === true) {
-        setChatInfo('');
-      } else if ((isSubscribeLoading === false && activeChatIsGroup === false) || locationUid !== null) {
+        setChatStatus('');
+      } else if (
+        (isSubscribeLoading === false && activeChatIsGroup === false) ||
+        locationUid !== null
+      ) {
         // если чат не групповой
-        const otherMemberUid = activeChatMembers?.find(
-          (member) => member.uid !== uid,
-        )?.uid || locationUid;
+        const otherMemberUid =
+          activeChatMembers?.find((member) => member.uid !== uid)?.uid ||
+          locationUid;
 
         if (otherMemberUid) {
           const userIsOnlineRef = ref(
@@ -65,38 +76,76 @@ const ChatHeader: FC<ChatHeaderProps> = ({
             (snapshot) => {
               const isUserOnline: boolean = snapshot.val() || false;
               if (isUserOnline === false) {
-                setChatInfo(CHAT_INFO_STATUS_OFFLINE);
+                setChatStatus(CHAT_INFO_STATUS_OFFLINE);
               } else if (isUserOnline === true) {
-                setChatInfo(CHAT_INFO_STATUS_ONLINE);
+                setChatStatus(CHAT_INFO_STATUS_ONLINE);
               }
             },
             (error) => {
-              console.error(
-                'Ошибка при получении статуса online:',
-                error,
-              );
+              console.error('Ошибка при получении статуса online:', error);
             },
           );
         }
-      } else if (isSubscribeLoading === false && activeChatIsGroup === true && activeChatMembers !== null) {
-              // если чат групповой
+      } else if (
+        isSubscribeLoading === false &&
+        activeChatIsGroup === true &&
+        activeChatMembers !== null
+      ) {
+        // если чат групповой
         const membersCount = activeChatMembers.length;
-        const membersText = 
+        const membersText =
           membersCount === 1
             ? 'участник'
             : membersCount >= 2 && membersCount <= 4
-            ? 'участника'
-            : 'участников';
-        setChatInfo(`${membersCount} ${membersText}`);
+              ? 'участника'
+              : 'участников';
+        setChatStatus(`${membersCount} ${membersText}`);
       }
+    }
+
+    // подписка на writingUsers
+    if (isSubscribeLoading === true) {
+      setWritingUsers([]);
+    } else if (isSubscribeLoading === false && activeChatId) {
+      const writingUsersRef = ref(
+        firebaseDatabase,
+        `chats/${activeChatId}/writingUsers`,
+      );
+
+      unsubscribeWritingUsers = onValue(
+        writingUsersRef,
+        (snapshot) => {
+          const writingUsersData = snapshot.val(); // объект вида { uid1: true, uid2: true, ... }
+
+          if (writingUsersData) {
+            // извлекаем ключи (UID`s) из объекта и фильтруем текущего пользователя
+            const writingUsersArray = Object.keys(writingUsersData).filter(
+              (userUid) => userUid !== uid,
+            );
+
+            setWritingUsers(writingUsersArray);
+          } else {
+            setWritingUsers([]);
+          }
+        },
+        (error) => {
+          console.error('Ошибка при подписке на writingUsers:', error);
+        },
+      );
     }
 
     return () => {
       if (unsubscribeUserIsOnline) {
         unsubscribeUserIsOnline();
       }
+      if (unsubscribeWritingUsers) {
+        unsubscribeWritingUsers();
+      }
     };
-  }, [activeChatMembers, isSubscribeLoading, locationUid]);
+  }, [activeChatMembers, isSubscribeLoading, locationUid, activeChatId]);
+
+  // получаем имя печатющего пользователя для группового чата
+  const username = activeChatIsGroup === true && activeChatMembers !== null && writingUsers.length > 0 ? activeChatMembers.find((member) => member.uid === writingUsers[0])?.username.slice(0,20) || '' : '';
 
   return (
     <ComponentTag className={styles['chat-header']}>
@@ -116,7 +165,49 @@ const ChatHeader: FC<ChatHeaderProps> = ({
           </button>
           <div className={styles['chat-header__middle-wrapper']}>
             <span className={styles['chat-header__chatname']}>{chatname}</span>
-            <span className={`${styles['chat-header__info']} ${chatInfo === CHAT_INFO_STATUS_ONLINE ? styles['chat-header__info--active'] : ''} ${chatInfo.length === 0 ? styles['chat-header__info--loading'] : ''}`}>{chatInfo}</span>
+            {/* если не получен статус, отображать анимированные ... */}
+            {chatStatus.length === 0 && (
+              <span className={`${styles['chat-header__info']}`}>
+                <DotsBounceLoader />
+              </span>
+            )}
+            {/* если получен статус, и нет печатающих пользователей, отображать статус */}
+            {chatStatus.length > 0 && writingUsers.length === 0 && (
+              <span
+                className={`${styles['chat-header__info']} ${chatStatus === CHAT_INFO_STATUS_ONLINE ? styles['chat-header__info--active'] : ''}`}
+              >
+                {chatStatus}
+              </span>
+            )}
+            {/* если получен статус, и есть печатающие пользователи и чат негрупповой, отображать статус "печатает" без имени пользователя*/}
+            {chatStatus.length > 0 &&
+              writingUsers.length > 0 &&
+              activeChatIsGroup === false && (
+                <span
+                  className={`${styles['chat-header__info']} ${styles['chat-header__info--active']} ${styles['chat-header__info--loading']}`}
+                >
+                  {CHAT_INFO_STATUS_WRITING}
+                  <DotsBounceLoader />
+                </span>
+              )}
+            {/* если получен статус, и есть печатающие пользователи и чат групповой, отображать статус "печатает" с именем первого в массиве пользователя*/}
+            {chatStatus.length > 0 &&
+              writingUsers.length > 0 &&
+              activeChatIsGroup === true &&
+              activeChatMembers && (
+                <span
+                  className={`${styles['chat-header__info']} ${styles['chat-header__info--active']}`}
+                >
+                  {username.length > 0 ? (
+                    <>
+                      {username}
+                      {' '}
+                      {CHAT_INFO_STATUS_WRITING}
+                      <DotsBounceLoader />
+                    </>
+                  ) : chatStatus}
+                </span>
+              )}
           </div>
           <AvatarImage AvatarImg={avatar} />
         </div>
