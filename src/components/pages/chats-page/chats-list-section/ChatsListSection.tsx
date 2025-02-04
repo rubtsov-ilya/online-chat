@@ -322,6 +322,7 @@ const ChatsListSection: FC<ChatsListSectionProps> = ({ isMobileScreen }) => {
                   })}
                 {isSearching === true && searchedChats.length > 0 && (
                   <SearchedChatsWrapper
+                    unreadCounts={unreadCounts}
                     uid={uid}
                     isMobileScreen={isMobileScreen}
                     chatsListRef={chatsListRef}

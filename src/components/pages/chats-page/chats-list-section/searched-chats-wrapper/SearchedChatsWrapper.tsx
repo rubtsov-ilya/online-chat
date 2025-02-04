@@ -6,12 +6,14 @@ import { IChatWithDetails } from 'src/interfaces/ChatsWithDetails.interface';
 import ChatItem from '../chat-item/ChatItem';
 
 interface SearchedChatsWrapperProps {
+  unreadCounts: Record<string, number>;
   searchedChats: IChatWithDetails[];
   chatsListRef: React.RefObject<HTMLDivElement | null>;
   isMobileScreen: boolean;
   uid: string | null;
 }
 const SearchedChatsWrapper: FC<SearchedChatsWrapperProps> = ({
+  unreadCounts,
   searchedChats,
   chatsListRef,
   isMobileScreen,
@@ -27,6 +29,7 @@ const SearchedChatsWrapper: FC<SearchedChatsWrapperProps> = ({
 
         return (
           <ChatItem
+            uncheckedCount={unreadCounts[`${chat.chatId}`]}
             key={index}
             uid={uid!}
             chatItemData={chat}
