@@ -1,4 +1,4 @@
-import { FC, useRef } from 'react';
+import { FC, useEffect, useRef, useState } from 'react';
 import ArrowCircleSvg from 'src/assets/images/icons/24x24-icons/Left arrow circle.svg?react';
 
 import styles from './MessageInputWrapper.module.scss';
@@ -10,6 +10,7 @@ import {
   ref as refFirebaseDatabase,
   get,
   update,
+  onDisconnect,
   push,
   serverTimestamp,
 } from 'firebase/database';
@@ -75,6 +76,7 @@ const MessageInputWrapper: FC<MessageInputWrapperProps> = ({
   locationState,
   updateAttachedItems,
 }) => {
+  const isWritingByChatsUpdatedRef = useRef<{ [chatId: string]: boolean }>({});
   const { uid, avatar, username, blocked } = useAuth();
   const { activeChatId, activeChatMembers } = useActiveChat();
   const textAreaRef = useRef<HTMLTextAreaElement>(null);
@@ -84,6 +86,97 @@ const MessageInputWrapper: FC<MessageInputWrapperProps> = ({
     activeChatId !== null && chatInputValues[activeChatId] != null
       ? chatInputValues[activeChatId].messageText
       : chatInputValues['localeState'].messageText; // localeState - initialState if (chatId === null)
+
+  useEffect(() => {
+    // обновление статуса writingUsers
+    const updateIsWriting = async () => {
+      if (activeChatId === null) return;
+      const wasWriting =
+        isWritingByChatsUpdatedRef.current[activeChatId] ?? false;
+      if (messageText.length > 0 && !wasWriting) {
+        // если статус не печатает и длинна текста больше 0 - поставить true = печатает
+        await update(refFirebaseDatabase(firebaseDatabase), {
+          [`chats/${activeChatId}/writingUsers/${uid}`]: true,
+        });
+        isWritingByChatsUpdatedRef.current[activeChatId] = true;
+      }
+
+      if (messageText.length === 0 && wasWriting) {
+        // если статус печатает и длинна текста 0 - поставить null = не печатает
+        await update(refFirebaseDatabase(firebaseDatabase), {
+          [`chats/${activeChatId}/writingUsers/${uid}`]: null,
+        });
+        isWritingByChatsUpdatedRef.current[activeChatId] = false;
+      }
+    };
+
+    updateIsWriting();
+  }, [messageText, activeChatId]);
+
+  useEffect(() => {
+    if (activeChatId === null) return;
+    const wasWriting =
+      isWritingByChatsUpdatedRef.current[activeChatId] ?? false;
+    if (wasWriting) {
+    }
+    // Устанавливаем onDisconnect для автоматического обновления, если соединение разорвется
+    const writingStatusRef = refFirebaseDatabase(
+      firebaseDatabase,
+      `chats/${activeChatId}/writingUsers/${uid}`,
+    );
+    onDisconnect(writingStatusRef).set(null); // Это сработает при потере соединения или выходе со страницы
+
+    return () => {
+      // срабатывает при смене айди чата или выходе со страницы chats/chat
+      const updateWritingStatusOnChatChange = async () => {
+        if (activeChatId === null) return;
+        const wasWriting =
+          isWritingByChatsUpdatedRef.current[activeChatId] ?? false;
+        if (wasWriting) {
+          // если статус печатает, поставить null = не печатает
+          await update(refFirebaseDatabase(firebaseDatabase), {
+            [`chats/${activeChatId}/writingUsers/${uid}`]: null,
+          });
+          console.log('useEffect return');
+          isWritingByChatsUpdatedRef.current[activeChatId] = false;
+        }
+      };
+      updateWritingStatusOnChatChange();
+    };
+  }, [activeChatId]);
+
+  useEffect(() => {
+    if (activeChatId === null) return;
+    // Устанавливаем onDisconnect для автоматического обновления при потере соединения
+    const writingStatusRef = refFirebaseDatabase(
+      firebaseDatabase,
+      `chats/${activeChatId}/writingUsers/${uid}`,
+    );
+    onDisconnect(writingStatusRef).set(null);
+
+    return () => {
+      // обновления статуса при смене чата
+
+      // Отменяем onDisconnect для текущего чата
+      onDisconnect(writingStatusRef).cancel();
+
+      const updateWritingStatusOnChatChange = async () => {
+        if (activeChatId === null) return;
+        // проверяем, был ли пользователь в статусе "печатает"
+        const wasWriting =
+          isWritingByChatsUpdatedRef.current[activeChatId] ?? false;
+        if (wasWriting) {
+          // если статус печатает, поставить null = не печатает
+          await update(refFirebaseDatabase(firebaseDatabase), {
+            [`chats/${activeChatId}/writingUsers/${uid}`]: null,
+          });
+          isWritingByChatsUpdatedRef.current[activeChatId] = false;
+        }
+      };
+
+      updateWritingStatusOnChatChange();
+    };
+  }, [activeChatId]);
 
   useAutosizeTextArea(textAreaRef.current, messageText, 130);
 
@@ -514,13 +607,20 @@ const MessageInputWrapper: FC<MessageInputWrapperProps> = ({
       lastMessageSenderUid: uid!,
     };
 
-    const updatesByUserChats = membersIds.reduce((acc, memberId) => {
-      acc[`userChats/${memberId}/chats/${chatId}/lastMessageText`] = newChatsData.lastMessageText;
-      acc[`userChats/${memberId}/chats/${chatId}/lastMessageDateUTC`] = newChatsData.lastMessageDateUTC;
-      acc[`userChats/${memberId}/chats/${chatId}/lastMessageIsChecked`] = newChatsData.lastMessageIsChecked;
-      acc[`userChats/${memberId}/chats/${chatId}/lastMessageSenderUid`] = newChatsData.lastMessageSenderUid;
-      return acc;
-    }, {} as Record<string, any>);
+    const updatesByUserChats = membersIds.reduce(
+      (acc, memberId) => {
+        acc[`userChats/${memberId}/chats/${chatId}/lastMessageText`] =
+          newChatsData.lastMessageText;
+        acc[`userChats/${memberId}/chats/${chatId}/lastMessageDateUTC`] =
+          newChatsData.lastMessageDateUTC;
+        acc[`userChats/${memberId}/chats/${chatId}/lastMessageIsChecked`] =
+          newChatsData.lastMessageIsChecked;
+        acc[`userChats/${memberId}/chats/${chatId}/lastMessageSenderUid`] =
+          newChatsData.lastMessageSenderUid;
+        return acc;
+      },
+      {} as Record<string, any>,
+    );
 
     return updatesByUserChats;
   };
@@ -530,14 +630,22 @@ const MessageInputWrapper: FC<MessageInputWrapperProps> = ({
     messageWithFirebaseUrls: IMessage,
     membersIds: string[],
   ) => {
-    const filteredMembersIds = membersIds.filter(memberId => memberId !== uid);
-    const unreadMessages = filteredMembersIds.reduce((acc, memberId) => {
-      acc[`chats/${chatId}/unreadMessages/${memberId}/${messageWithFirebaseUrls.messageId}`] = true;
-      return acc;
-    }, {} as Record<string, any>);
+    const filteredMembersIds = membersIds.filter(
+      (memberId) => memberId !== uid,
+    );
+    const unreadMessages = filteredMembersIds.reduce(
+      (acc, memberId) => {
+        acc[
+          `chats/${chatId}/unreadMessages/${memberId}/${messageWithFirebaseUrls.messageId}`
+        ] = true;
+        return acc;
+      },
+      {} as Record<string, any>,
+    );
 
     const updatesByChats = {
-      [`chats/${chatId}/messages/${messageWithFirebaseUrls.messageId}`]: messageWithFirebaseUrls,
+      [`chats/${chatId}/messages/${messageWithFirebaseUrls.messageId}`]:
+        messageWithFirebaseUrls,
       ...unreadMessages,
     };
 
@@ -687,14 +795,12 @@ const MessageInputWrapper: FC<MessageInputWrapperProps> = ({
       // ОТПРАВИТЬ СООБЩЕНИЕ, если при создании чата уже был создан чат ранее вторым пользователем
       if (updatesByUserChats === undefined) {
         // если updatesByUserChats === undefined; то чат существует и вернётся его айди и оно установится в RTK
-
         /* ПРОВЕРИТЬ БУДЕТ ЛИ ОТПРАВКА СМС ОТСЮДА ИЛИ СНИЗУ СРАЗУ ИЗ РТК ПОДХВАТИТ ИЗМЕНЕНИЕ */
-
       }
     } // ОТПРАВИТЬ СООБЩЕНИЕ
     else if (activeChatId !== null && activeChatMembers !== null) {
       // если activeChatId и activeChatMembers есть, тогда отправить смс в чат существующий
-      activeChatMembers
+      activeChatMembers;
       const messageWithLocaleUrls: ILoadingMessage | undefined =
         await createMessageObjectWithLocaleUrl(
           sendedMessageText,
@@ -719,9 +825,17 @@ const MessageInputWrapper: FC<MessageInputWrapperProps> = ({
       if (messageWithFirebaseUrls === undefined) {
         return;
       }
-      const activeMemberIds = activeChatMembers.map(member => member.uid);
-      const updatesByUserChats = createUpdatesChatForUserChatsPath(activeChatId, sendedMessageText, activeMemberIds);
-      const updatesByChats = createUpdatesChatForChatsPath(activeChatId, messageWithFirebaseUrls, activeMemberIds)
+      const activeMemberIds = activeChatMembers.map((member) => member.uid);
+      const updatesByUserChats = createUpdatesChatForUserChatsPath(
+        activeChatId,
+        sendedMessageText,
+        activeMemberIds,
+      );
+      const updatesByChats = createUpdatesChatForChatsPath(
+        activeChatId,
+        messageWithFirebaseUrls,
+        activeMemberIds,
+      );
       const updates = { ...updatesByUserChats, ...updatesByChats };
       await update(refFirebaseDatabase(firebaseDatabase), updates);
     }
