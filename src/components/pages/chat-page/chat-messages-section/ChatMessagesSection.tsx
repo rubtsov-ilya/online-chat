@@ -14,7 +14,7 @@ import { ILoadingMessage } from 'src/interfaces/LoadingMessage.interface';
 interface ChatMessagesSectionProps {
   isMobileScreen?: boolean;
   uploadTasksRef: React.MutableRefObject<IUploadTasksRef>;
-  activeChatId: string | null
+  activeChatId: string | null;
 }
 
 const ChatMessagesSection: FC<ChatMessagesSectionProps> = ({
@@ -431,7 +431,7 @@ const ChatMessagesSection: FC<ChatMessagesSectionProps> = ({
   ];
   const [initialMessagesArray, setInitialMessagesArray] =
     useState(devMessagesArrayInit);
-  
+
   /* console.log(messagesArray); */
 
   useLayoutEffect(() => {
@@ -457,19 +457,29 @@ const ChatMessagesSection: FC<ChatMessagesSectionProps> = ({
     return () => {};
   }, [doScroll]);
 
-  const scrollToBottom = () => {
+  const scrollToBottom = (isOwnMessage: boolean) => {
     if (chatMessagesRef.current) {
       const chatMessagesCurrent = chatMessagesRef.current;
       const animationLength = 80;
       const scrollCoefficient = 2.8;
       const { scrollTop, clientHeight, scrollHeight } = chatMessagesCurrent;
-      //if логика = высота всего div минус прокрученное расстояние от верха > высота viewport умноженная на коэффициент (колво экранов заданное вручную)
-      if (scrollHeight - scrollTop > clientHeight * scrollCoefficient) {
-        const scrollPosition = scrollHeight - clientHeight - animationLength;
-        chatMessagesCurrent.scrollTo({ top: scrollPosition, behavior: 'auto' });
-        endRef.current?.scrollIntoView({ behavior: 'smooth' });
-      } else {
-        endRef.current?.scrollIntoView({ behavior: 'smooth' });
+      if (isOwnMessage) {
+        //if логика = высота всего div минус прокрученное расстояние от верха > высота viewport умноженная на коэффициент (колво экранов заданное вручную)
+        if (scrollHeight - scrollTop > clientHeight * scrollCoefficient) {
+          const scrollPosition = scrollHeight - clientHeight - animationLength;
+          chatMessagesCurrent.scrollTo({
+            top: scrollPosition,
+            behavior: 'auto',
+          });
+          endRef.current?.scrollIntoView({ behavior: 'smooth' });
+        } else {
+          endRef.current?.scrollIntoView({ behavior: 'smooth' });
+        }
+      } else if (!isOwnMessage) {
+        const scrollPosition = scrollHeight - scrollTop - clientHeight;
+        if (scrollPosition < animationLength) {
+          endRef.current?.scrollIntoView({ behavior: 'smooth' });
+        }
       }
     }
   };
@@ -477,9 +487,7 @@ const ChatMessagesSection: FC<ChatMessagesSectionProps> = ({
   useEffect(() => {
     // прокрутка секции вниз при отправке смс со стороны пользователя
     if (messagesArray.length > 0) {
-      if (messagesArray[messagesArray.length - 1].senderUid === uid) {
-        scrollToBottom();
-      }
+      scrollToBottom(messagesArray[messagesArray.length - 1].senderUid === uid);
     }
     return () => {};
   }, [messagesArray.length]);
