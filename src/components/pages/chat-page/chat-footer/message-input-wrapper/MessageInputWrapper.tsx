@@ -367,6 +367,7 @@ const MessageInputWrapper: FC<MessageInputWrapperProps> = ({
       senderUid: messageWithLocaleUrl.senderUid,
       isEdited: false,
       isLoading: false,
+      answerToMessage: messageWithLocaleUrl.answerToMessage,
       media: newFilesAndMediaArray.filter((item) => !('fileUrl' in item)) as (
         | IImgMedia
         | IVideoMedia
@@ -465,6 +466,7 @@ const MessageInputWrapper: FC<MessageInputWrapperProps> = ({
       isLoading: true,
       isCanceled: false,
       isEdited: false,
+      answerToMessage: '',
       media: newAttachedItems.filter((item) => !('fileUrl' in item)) as (
         | ILoadingImgMedia
         | ILoadingVideoMedia

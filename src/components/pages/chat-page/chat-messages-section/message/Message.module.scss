@@ -48,6 +48,23 @@
     width: 100%;
   }
 
+  &__username-wrapper {
+    padding: 8px 16px 0px 16px;
+    &--befor-media {
+      padding-bottom: 8px;
+    }
+    &--before-files {
+      padding-bottom: 4px;
+    }
+  }
+
+  &__username {
+    font-family: var(--font-family);
+    font-weight: 500;
+    font-size: 14px;
+    color: var(--base-accent-blue);
+  }
+
   &__text-wrapper {
     padding: 8px 16px;
   }

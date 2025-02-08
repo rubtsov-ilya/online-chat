@@ -26,6 +26,7 @@ export interface IMessage {
   isChecked: boolean;
   isLoading: boolean;
   isEdited: boolean;
+  answerToMessage: string;
   media: (IImgMedia | IVideoMedia)[];
   files: IFile[];
 }

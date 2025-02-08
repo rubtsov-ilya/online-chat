@@ -14,7 +14,10 @@ import {
 } from 'src/interfaces/UploadTasks.interface';
 import { deleteObject } from 'firebase/storage';
 import useActiveChat from 'src/hooks/useActiveChat';
-import { USER_AVATAR_DEFAULT_VALUE } from 'src/constants';
+import {
+  USERNAME_LEAVED_VALUE,
+  USER_AVATAR_DEFAULT_VALUE,
+} from 'src/constants';
 import { IFirebaseRtDbUser } from 'src/interfaces/FirebaseRealtimeDatabase.interface';
 
 interface MessageProps {
@@ -34,15 +37,22 @@ const Message: FC<MessageProps> = ({
   uploadTasksRef,
   messageIndex,
 }) => {
-  const {
-    activeChatMembers,
-    activeChatAvatar,
-    activeChatIsGroup,
-  } = useActiveChat();
-
-/*   const avatar: IFirebaseRtDbUser['avatar'] = activeChatIsGroup === false ? activeChatAvatar : activeChatMembers?.find((member) => member.uid === messageData.senderUid)?.avatar || USER_AVATAR_DEFAULT_VALUE; */
-  const avatar: IFirebaseRtDbUser['avatar'] = activeChatIsGroup !== null && activeChatIsGroup === false && activeChatAvatar !== null ? activeChatAvatar : activeChatMembers?.find((member) => member.uid === messageData.senderUid)?.avatar || USER_AVATAR_DEFAULT_VALUE;
-
+  const { activeChatMembers, activeChatAvatar, activeChatIsGroup } =
+    useActiveChat();
+  /*   const avatar: IFirebaseRtDbUser['avatar'] = activeChatIsGroup === false ? activeChatAvatar : activeChatMembers?.find((member) => member.uid === messageData.senderUid)?.avatar || USER_AVATAR_DEFAULT_VALUE; */
+  const avatar: IFirebaseRtDbUser['avatar'] =
+    activeChatIsGroup !== null &&
+    activeChatIsGroup === false &&
+    activeChatAvatar !== null
+      ? activeChatAvatar
+      : activeChatMembers?.find(
+          (member) => member.uid === messageData.senderUid,
+        )?.avatar || USER_AVATAR_DEFAULT_VALUE;
+  const username =
+    activeChatMembers != null
+      ? activeChatMembers.find((member) => member.uid === messageData.senderUid)
+          ?.username || USERNAME_LEAVED_VALUE
+      : undefined;
   const cancelUploadsForMessage = (messageId: string) => {
     if (uploadTasksRef.current[messageId]) {
       /* Отмена загрузки каждого файла */
@@ -71,6 +81,16 @@ const Message: FC<MessageProps> = ({
       <div
         className={`${styles['message__wrapper']} ${messageData.senderUid === uid ? styles['own'] : ''} ${isLastOfGroup ? `${styles['border']} ${styles['margin-left']}` : ''} ${isFirstOfGroup && messageIndex !== 0 ? styles['margin-top'] : ''}`}
       >
+        {/* отображение username в групповом чате */}
+        {isFirstOfGroup === true &&
+          activeChatIsGroup === true &&
+          username !== undefined &&
+          messageData.senderUid !== uid && (
+            <div className={`${styles['message__username-wrapper']} ${messageData.media.length > 0 ? styles['message__username-wrapper--befor-media'] : ''}  ${messageData.media.length === 0 && messageData.files.length > 0 ? styles['message__username-wrapper--before-files'] : ''}`}>
+              <span className={styles['message__username']}>{username}</span>
+            </div>
+          )}
+
         {/* отображение медиа файлов */}
         {messageData.media.length > 0 && (
           <div className={styles['message__album']}>
@@ -281,7 +301,7 @@ const Message: FC<MessageProps> = ({
         {messageData.messageText.length > 0 && (
           <div className={styles['message__text-wrapper']}>
             {messageData.messageText.length > 0 && (
-              <div className={styles['message__text']}>
+              <span className={styles['message__text']}>
                 <Linkify options={{ target: '_blank' }}>
                   {messageData.messageText}
                 </Linkify>
@@ -298,7 +318,7 @@ const Message: FC<MessageProps> = ({
                     isOwn={messageData.senderUid === uid}
                   />
                 </div>
-              </div>
+              </span>
             )}
           </div>
         )}

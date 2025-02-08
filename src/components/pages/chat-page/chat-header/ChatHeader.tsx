@@ -204,7 +204,7 @@ const ChatHeader: FC<ChatHeaderProps> = ({
                       {' '}
                       {CHAT_INFO_STATUS_WRITING}
                       <DotsBounceLoader />
-                    </>
+                    </> 
                   ) : chatStatus}
                 </span>
               )}
