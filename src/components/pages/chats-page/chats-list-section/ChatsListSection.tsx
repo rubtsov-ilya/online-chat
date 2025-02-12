@@ -128,7 +128,7 @@ const ChatsListSection: FC<ChatsListSectionProps> = ({ isMobileScreen }) => {
 
               const membersDetails: (IMemberDetails | null)[] =
                 await Promise.all(
-                  chat.membersIds.map(async (memberId) => {
+                  Object.keys(chat.membersIds).map(async (memberId) => {
                     if (memberId === uid) {
                       // Для текущего пользователя
                       return {

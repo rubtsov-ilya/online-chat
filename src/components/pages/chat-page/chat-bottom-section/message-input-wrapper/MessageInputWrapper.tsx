@@ -137,7 +137,6 @@ const MessageInputWrapper: FC<MessageInputWrapperProps> = ({
           await update(refFirebaseDatabase(firebaseDatabase), {
             [`chats/${activeChatId}/writingUsers/${uid}`]: null,
           });
-          console.log('useEffect return');
           isWritingByChatsUpdatedRef.current[activeChatId] = false;
         }
       };
@@ -484,7 +483,7 @@ const MessageInputWrapper: FC<MessageInputWrapperProps> = ({
   ) => {
     const newChatsData: IFirebaseRtDbChat = {
       chatId: chatId,
-      membersIds: [uid!, locationStateUid],
+      membersIds: {[uid!]: true, [locationStateUid]: true},
       lastMessageText: messageText,
       lastMessageDateUTC: serverTimestamp(),
       lastMessageIsChecked: false,
@@ -524,7 +523,7 @@ const MessageInputWrapper: FC<MessageInputWrapperProps> = ({
         const existingChatWithUser = existingChatsByUserValue.find(
           (chat) =>
             chat.isGroup === false &&
-            chat.membersIds.includes(locationState!.userUidFromGlobalSearch),
+            Object.keys(chat.membersIds).includes(locationState!.userUidFromGlobalSearch),
         );
         // если чат существует, установить его айди в активный чат rtk и вернуть айди
         if (existingChatWithUser !== undefined) {
@@ -802,7 +801,6 @@ const MessageInputWrapper: FC<MessageInputWrapperProps> = ({
     } // ОТПРАВИТЬ СООБЩЕНИЕ
     else if (activeChatId !== null && activeChatMembers !== null) {
       // если activeChatId и activeChatMembers есть, тогда отправить смс в чат существующий
-      activeChatMembers;
       const messageWithLocaleUrls: ILoadingMessage | undefined =
         await createMessageObjectWithLocaleUrl(
           sendedMessageText,

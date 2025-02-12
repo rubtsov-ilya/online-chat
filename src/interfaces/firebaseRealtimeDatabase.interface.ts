@@ -20,7 +20,7 @@ export interface IFirebaseRtDbUserAvatarSnapshot {
 
 export interface IFirebaseRtDbChat {
   chatId: string;
-  membersIds: string[]; 
+  membersIds: {[uid: string]: true}; 
   lastMessageText: string; 
   lastMessageDateUTC: number | object; 
   lastMessageIsChecked: boolean;

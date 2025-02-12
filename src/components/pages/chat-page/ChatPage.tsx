@@ -209,7 +209,7 @@ const ChatPage: FC = () => {
             membersRef,
             async (snapshot) => {
               if (!snapshot.exists()) return;
-              const membersIds = snapshot.val() as string[];
+              const membersIds = Object.keys(snapshot.val() as IFirebaseRtDbChat['membersIds']);
               await updateMembersDetails(membersIds, activeChatMembers || []);
             },
             (error) => {
