@@ -1,5 +1,5 @@
 import { FC, useEffect } from 'react';
-import ChatsHeader from 'src/components/pages/chats-page/chats-header/ChatsHeader';
+import ChatsTopSection from 'src/components/pages/chats-page/chats-top-section/ChatsTopSection';
 import ChatsListSection from 'src/components/pages/chats-page/chats-list-section/ChatsListSection';
 import { Outlet, useLocation } from 'react-router-dom';
 
@@ -28,7 +28,7 @@ const ChatsPage: FC<ChatsPageProps> = ({ isMobileScreen }) => {
       {!isMobileScreen && (
         <>
           <section className={styles['chats-section']}>
-            <ChatsHeader isMobileScreen={isMobileScreen} />
+            <ChatsTopSection isMobileScreen={isMobileScreen} />
             <ChatsListSection isMobileScreen={isMobileScreen} />
           </section>
           {isChatPathName && <Outlet />}
@@ -38,7 +38,7 @@ const ChatsPage: FC<ChatsPageProps> = ({ isMobileScreen }) => {
 
       {isMobileScreen && (
         <>
-          <ChatsHeader isMobileScreen={isMobileScreen} />
+          <ChatsTopSection isMobileScreen={isMobileScreen} />
           <ChatsListSection isMobileScreen={isMobileScreen} />
         </>
       )}

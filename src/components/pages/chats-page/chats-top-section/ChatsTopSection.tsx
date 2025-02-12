@@ -2,23 +2,23 @@ import { FC } from 'react';
 import PencilBtn from 'src/components/ui/pencil-btn/PencilBtn';
 import AvatarImage from 'src/components/ui/avatar-image/AvatarImage';
 
-import styles from './ChatsHeader.module.scss';
+import styles from './ChatsTopSection.module.scss';
 import useAuth from 'src/hooks/useAuth';
 
-interface HeaderProps {
+interface ChatsTopSectionProps {
   isMobileScreen: boolean;
 }
 
-const Header: FC<HeaderProps> = ({ isMobileScreen }) => {
+const ChatsTopSection: FC<ChatsTopSectionProps> = ({ isMobileScreen }) => {
   const { avatar } = useAuth();
-  const ComponentTag = isMobileScreen ? 'header' : 'div';
+  const ComponentTag = isMobileScreen ? 'section' : 'div';
 
   return (
-    <ComponentTag className={styles['top-bar']}>
+    <ComponentTag className={styles['chats-top-section']}>
       <div className="container">
-        <div className={styles['top-bar__content']}>
+        <div className={styles['chats-top-section__content']}>
           <AvatarImage AvatarImg={avatar!} />
-          <h1 className={styles['top-bar__title']}>Online Chat</h1>
+          <h1 className={styles['chats-top-section__title']}>Online Chat</h1>
           <PencilBtn isMobileScreen={isMobileScreen} />
         </div>
       </div>
@@ -26,4 +26,4 @@ const Header: FC<HeaderProps> = ({ isMobileScreen }) => {
   );
 };
 
-export default Header;
+export default ChatsTopSection;

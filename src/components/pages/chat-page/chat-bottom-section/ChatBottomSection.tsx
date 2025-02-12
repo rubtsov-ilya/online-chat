@@ -1,6 +1,6 @@
 import { FC, useEffect, useState } from 'react';
 
-import styles from './ChatFooter.module.scss';
+import styles from './ChatBottomSection.module.scss';
 import MessageInputWrapper from './message-input-wrapper/MessageInputWrapper';
 import AttachedContentWrapper from './attached-content-wrapper/AttachedContentWrapper';
 import { AttachedItemType } from 'src/interfaces/AttachedItem.interface';
@@ -15,7 +15,7 @@ import {
   updateChatInputValue,
 } from 'src/redux/slices/ChatInputValues';
 
-interface ChatFooterProps {
+interface ChatBottomSectionProps {
   activeChatId: string | null;
   isSubscribeLoading: boolean;
   isMobileScreen: boolean;
@@ -25,7 +25,7 @@ interface ChatFooterProps {
   setIsDrag: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-const ChatFooter: FC<ChatFooterProps> = ({
+const ChatBottomSection: FC<ChatBottomSectionProps> = ({
   activeChatId,
   isSubscribeLoading,
   isMobileScreen,
@@ -34,7 +34,7 @@ const ChatFooter: FC<ChatFooterProps> = ({
   locationState,
   setIsDrag,
 }) => {
-  const ComponentTag = isMobileScreen ? 'footer' : 'div';
+  const ComponentTag = isMobileScreen ? 'section' : 'div';
   const dispatch = useDispatch();
   const { chatInputValues } = useChatInputValues();
 
@@ -53,13 +53,13 @@ const ChatFooter: FC<ChatFooterProps> = ({
       : chatInputValues['localeState'].attachedItems; // localeState - initialState if (chatId === null)
 
   return (
-    <ComponentTag className={styles['chat-footer']}>
+    <ComponentTag className={styles['chat-bottom-section']}>
       <div
         className={
           isMobileScreen ? 'container' : 'container container--max-width-unset'
         }
       >
-        <div className={styles['chat-footer__content']}>
+        <div className={styles['chat-bottom-section__content']}>
           {attachedItems.length > 0 && (
             <AttachedContentWrapper
               activeChatId={activeChatId}
@@ -88,4 +88,4 @@ const ChatFooter: FC<ChatFooterProps> = ({
   );
 };
 
-export default ChatFooter;
+export default ChatBottomSection;

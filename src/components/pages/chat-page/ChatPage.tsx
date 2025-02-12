@@ -1,8 +1,8 @@
 import { FC, useLayoutEffect, useRef, useState } from 'react';
 
 import styles from './ChatPage.module.scss';
-import ChatFooter from './chat-footer/ChatFooter';
-import ChatHeader from './chat-header/ChatHeader';
+import ChatBottomSection from './chat-bottom-section/ChatBottomSection';
+import ChatTopSection from './chat-top-section/ChatTopSection';
 import ChatMessagesSection from './chat-messages-section/ChatMessagesSection';
 import { IUploadTasksRef } from 'src/interfaces/UploadTasks.interface';
 import useMobileScreen from 'src/hooks/useMobileScreen';
@@ -243,7 +243,7 @@ const ChatPage: FC = () => {
 
   return (
     <ComponentTag onDragEnter={onDragEnter} className={styles['main']}>
-      <ChatHeader
+      <ChatTopSection
         isMobileScreen={isMobileScreen}
         isSubscribeLoading={isSubscribeLoading}
         locationUid={locationState? locationState.userUidFromGlobalSearch : null}
@@ -270,7 +270,7 @@ const ChatPage: FC = () => {
         //УДАЛИТЬ, ОНО БУДЕТ В САМОЙ СЕКЦИИ
         <ChatMessagesSectionLoader />
       )}
-      <ChatFooter
+      <ChatBottomSection
         activeChatId={activeChatId}
         isSubscribeLoading={isSubscribeLoading}
         isDrag={isDrag}

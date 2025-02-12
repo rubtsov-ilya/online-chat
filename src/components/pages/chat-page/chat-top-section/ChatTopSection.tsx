@@ -2,7 +2,7 @@ import { FC, useEffect, useState } from 'react';
 import LeftChevronSvg from 'src/assets/images/icons/24x24-icons/Left Chevron.svg?react';
 import AvatarImage from 'src/components/ui/avatar-image/AvatarImage';
 
-import styles from './ChatHeader.module.scss';
+import styles from './ChatTopSection.module.scss';
 import { useNavigate } from 'react-router-dom';
 import useActiveChat from 'src/hooks/useActiveChat';
 import useAuth from 'src/hooks/useAuth';
@@ -16,7 +16,7 @@ import {
 import { ILocationChatPage } from 'src/interfaces/LocationChatPage.interface';
 import DotsBounceLoader from 'src/components/ui/dots-bounce-loader/DotsBounceLoader';
 
-interface ChatHeaderProps {
+interface ChatTopSectionProps {
   isMobileScreen?: boolean;
   avatar: string;
   chatname: string;
@@ -24,14 +24,14 @@ interface ChatHeaderProps {
   locationUid: ILocationChatPage['userUidFromGlobalSearch'] | null;
 }
 
-const ChatHeader: FC<ChatHeaderProps> = ({
+const ChatTopSection: FC<ChatTopSectionProps> = ({
   isMobileScreen,
   avatar,
   chatname,
   isSubscribeLoading,
   locationUid,
 }) => {
-  const ComponentTag = isMobileScreen ? 'header' : 'div';
+  const ComponentTag = isMobileScreen ? 'section' : 'div';
   const { uid } = useAuth();
   const { activeChatMembers, activeChatIsGroup, activeChatId } =
     useActiveChat();
@@ -148,33 +148,33 @@ const ChatHeader: FC<ChatHeaderProps> = ({
   const username = activeChatIsGroup === true && activeChatMembers !== null && writingUsers.length > 0 ? activeChatMembers.find((member) => member.uid === writingUsers[0])?.username.slice(0,20) || '' : '';
 
   return (
-    <ComponentTag className={styles['chat-header']}>
+    <ComponentTag className={styles['chat-top-section']}>
       <div
         className={
           isMobileScreen ? 'container' : 'container container--max-width-unset'
         }
       >
-        <div className={styles['chat-header__content']}>
+        <div className={styles['chat-top-section__content']}>
           <button
             onClick={onBackBtnClick}
-            className={styles['chat-header__back-btn']}
+            className={styles['chat-top-section__back-btn']}
           >
             <LeftChevronSvg
-              className={styles['chat-header__left-chevron-svg']}
+              className={styles['chat-top-section__left-chevron-svg']}
             />
           </button>
-          <div className={styles['chat-header__middle-wrapper']}>
-            <span className={styles['chat-header__chatname']}>{chatname}</span>
+          <div className={styles['chat-top-section__middle-wrapper']}>
+            <span className={styles['chat-top-section__chatname']}>{chatname}</span>
             {/* если не получен статус, отображать анимированные ... */}
             {chatStatus.length === 0 && (
-              <span className={`${styles['chat-header__info']}`}>
+              <span className={`${styles['chat-top-section__info']}`}>
                 <DotsBounceLoader />
               </span>
             )}
             {/* если получен статус, и нет печатающих пользователей, отображать статус */}
             {chatStatus.length > 0 && writingUsers.length === 0 && (
               <span
-                className={`${styles['chat-header__info']} ${chatStatus === CHAT_INFO_STATUS_ONLINE ? styles['chat-header__info--active'] : ''}`}
+                className={`${styles['chat-top-section__info']} ${chatStatus === CHAT_INFO_STATUS_ONLINE ? styles['chat-top-section__info--active'] : ''}`}
               >
                 {chatStatus}
               </span>
@@ -184,7 +184,7 @@ const ChatHeader: FC<ChatHeaderProps> = ({
               writingUsers.length > 0 &&
               activeChatIsGroup === false && (
                 <span
-                  className={`${styles['chat-header__info']} ${styles['chat-header__info--active']} ${styles['chat-header__info--loading']}`}
+                  className={`${styles['chat-top-section__info']} ${styles['chat-top-section__info--active']} ${styles['chat-top-section__info--loading']}`}
                 >
                   {CHAT_INFO_STATUS_WRITING}
                   <DotsBounceLoader />
@@ -196,7 +196,7 @@ const ChatHeader: FC<ChatHeaderProps> = ({
               activeChatIsGroup === true &&
               activeChatMembers && (
                 <span
-                  className={`${styles['chat-header__info']} ${styles['chat-header__info--active']}`}
+                  className={`${styles['chat-top-section__info']} ${styles['chat-top-section__info--active']}`}
                 >
                   {username.length > 0 ? (
                     <>
@@ -216,4 +216,4 @@ const ChatHeader: FC<ChatHeaderProps> = ({
   );
 };
 
-export default ChatHeader;
+export default ChatTopSection;

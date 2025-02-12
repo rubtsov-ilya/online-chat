@@ -539,7 +539,7 @@ const ChatMessagesSection: FC<ChatMessagesSectionProps> = ({
           )}
           <div className={styles['chat-messages__overlay-to-bottom-btn']}>
             <ToBottomBtn
-              scrollToBottom={scrollToBottom}
+              scrollToBottom={() => scrollToBottom(true)}
               chatMessagesRef={chatMessagesRef}
             />
           </div>
