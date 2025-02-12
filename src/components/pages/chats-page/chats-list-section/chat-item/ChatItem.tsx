@@ -70,8 +70,21 @@ const ChatItem: FC<ChatItemProps> = ({
       title: 'Удалить чат',
       subtitle: 'Вы точно хотите удалить чат без возможности восстановления?',
       actionBtnText: 'Удалить',
-      action: () => {
-        console.log('delete');
+      action: async () => {
+        if (otherMember === null || blocked === null) {
+          console.error(`Ошибка удаления чата`);
+          return;
+        }
+        try {
+          const updatesByDeleting = {
+            [`userChats/${uid!}/chats/${chatItemData.chatId}`]: null,
+            [`userChats/${otherMember}/chats/${chatItemData.chatId}`]: null,
+            [`chats/${chatItemData.chatId}`]: null,
+          };
+          await update(refFirebaseDatabase(firebaseDatabase), updatesByDeleting);
+        } catch (error) {
+          console.error(`Ошибка удаления чата`, error);
+        }
       },
     },
     ban: {
@@ -80,6 +93,7 @@ const ChatItem: FC<ChatItemProps> = ({
       actionBtnText: otherMember !== null && blocked !== null ? blocked.includes(otherMember) ? 'Разблокировать' : 'Заблокировать' : 'Заблокировать',
       action: async () => {
         if (otherMember === null || blocked === null) {
+          console.error(`Ошибка блокировки пользователя`);
           return;
         }
         const blockedRef = refFirebaseDatabase(
