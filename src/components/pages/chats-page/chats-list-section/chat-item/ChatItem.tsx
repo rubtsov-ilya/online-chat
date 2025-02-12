@@ -2,6 +2,7 @@ import { FC, useEffect, useRef, useState } from 'react';
 import AvatarImage from 'src/components/ui/avatar-image/AvatarImage';
 import UserBanSvg from 'src/assets/images/icons/24x24-icons/User Ban.svg?react';
 import DeleteSvg from 'src/assets/images/icons/24x24-icons/Delete.svg?react';
+import UserRemoveSvg from 'src/assets/images/icons/24x24-icons/User Remove.svg?react';
 
 import styles from './ChatItem.module.scss';
 import CheckedAndTimeStatuses from 'src/components/ui/checked-and-time-statuses/CheckedAndTimeStatuses';
@@ -10,7 +11,10 @@ import ModalBackdrop from 'src/components/ui/modal-backdrop/ModalBackdrop';
 import ModalActionConfirm from 'src/components/ui/modal-action-confirm/modalActionConfirm';
 import Skeleton, { SkeletonTheme } from 'react-loading-skeleton';
 import 'react-loading-skeleton/dist/skeleton.css';
-import { IChatWithDetails } from 'src/interfaces/ChatsWithDetails.interface';
+import {
+  IChatWithDetails,
+  IMemberDetails,
+} from 'src/interfaces/ChatsWithDetails.interface';
 import { useDispatch } from 'react-redux';
 import {
   setActiveChat,
@@ -18,6 +22,9 @@ import {
 } from 'src/redux/slices/ActiveChatSlice';
 import { useNavigate } from 'react-router-dom';
 import useActiveChat from 'src/hooks/useActiveChat';
+import { ref as refFirebaseDatabase, set, update } from 'firebase/database';
+import { firebaseDatabase } from 'src/firebase';
+import useAuth from 'src/hooks/useAuth';
 
 interface ChatItemProps {
   isMobileScreen: boolean;
@@ -25,7 +32,7 @@ interface ChatItemProps {
   chatItemData: IChatWithDetails;
   chatAvatar: string;
   chatname: string;
-  uncheckedCount: number,
+  uncheckedCount: number;
   uid: string;
 }
 
@@ -38,7 +45,9 @@ const ChatItem: FC<ChatItemProps> = ({
   uncheckedCount,
   uid,
 }) => {
-  const [modalOpen, setModalOpen] = useState<'ban' | 'delete' | false>(false);
+  const [modalOpen, setModalOpen] = useState<
+    'ban' | 'delete' | 'leave' | false
+  >(false);
   const { toggleModal } = useToggleModal({ setCbState: setModalOpen });
   const [isActive, setIsActive] = useState<boolean>(false);
   const [isHover, setIsHover] = useState<boolean>(false);
@@ -47,24 +56,55 @@ const ChatItem: FC<ChatItemProps> = ({
   const initialTouchYRef = useRef<number | null>(null);
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const longPressDuration = 500;
+  const { blocked } = useAuth();
   const { activeChatAvatar, activeChatname, activeChatId } = useActiveChat();
+  const longPressDuration = 500;
+
+  const otherMember =
+    chatItemData.membersDetails.find((member) => {
+      return member.uid !== uid;
+    })?.uid || null;
 
   const modalActionData = {
     delete: {
       title: 'Удалить чат',
       subtitle: 'Вы точно хотите удалить чат без возможности восстановления?',
       actionBtnText: 'Удалить',
-      action() {
+      action: () => {
         console.log('delete');
       },
     },
     ban: {
       title: 'Подтверждение',
-      subtitle: 'Запретить пользователю писать Вам сообщения?',
-      actionBtnText: 'Заблокировать',
-      action() {
-        console.log('ban');
+      subtitle: otherMember !== null && blocked !== null ? blocked.includes(otherMember) ? 'Разрешить пользователю писать Вам сообщения?' : 'Запретить пользователю писать Вам сообщения' : 'Запретить пользователю писать Вам сообщения',
+      actionBtnText: otherMember !== null && blocked !== null ? blocked.includes(otherMember) ? 'Разблокировать' : 'Заблокировать' : 'Заблокировать',
+      action: async () => {
+        if (otherMember === null || blocked === null) {
+          return;
+        }
+        const blockedRef = refFirebaseDatabase(
+          firebaseDatabase,
+          `users/${uid}/blocked`,
+        );
+        try {
+          if (blocked.includes(otherMember)) {
+            // если пользователь уже заблокирован, тогда разблокировать
+            await set(blockedRef, blocked.filter((blockedUid) => blockedUid !== otherMember));
+            // если пользователь не заблокирован, тогда заблокировать
+          } else {
+            await set(blockedRef, [...blocked, otherMember]);
+          }
+        } catch (error) {
+          console.error(`Ошибка блокировки пользователя`, error);
+        }
+      },
+    },
+    leave: {
+      title: 'Покинуть чат',
+      subtitle: 'Вы точно хотите покинуть чат?',
+      actionBtnText: 'Покинуть',
+      action: () => {
+        console.log('leave');
       },
     },
   };
@@ -175,19 +215,13 @@ const ChatItem: FC<ChatItemProps> = ({
 
   const onChatItemForegroundClick = () => {
     setIsActive(false);
-    const chatBlocked =
-      chatItemData.isGroup === false
-        ? chatItemData.membersDetails.find((member) => {
-            return member.uid !== uid;
-          })?.blocked || []
-        : [];
     if (activeChatId !== chatItemData.chatId) {
       dispatch(
         setActiveChat({
           activeChatId: chatItemData.chatId,
           activeChatname: chatname,
           activeChatAvatar: chatAvatar,
-          activeChatBlocked: chatBlocked,
+          activeChatBlocked: [], // не требуется передача get данных, стейт будет получен подпиской в ChatPage
           activeChatIsGroup: chatItemData.isGroup,
           activeChatMembers: chatItemData.membersDetails,
         }),
@@ -216,28 +250,45 @@ const ChatItem: FC<ChatItemProps> = ({
             }
           }}
         >
-          <button
-            onClick={() => toggleModal('ban')}
-            onContextMenu={(e) => {
-              if (isMobileScreen) {
-                e.preventDefault();
-              }
-            }}
-            className={styles['chat-item__background-btn']}
-          >
-            <UserBanSvg className={styles['chat-item__user-ban-icon']} />
-          </button>
-          <button
-            onClick={() => toggleModal('delete')}
-            onContextMenu={(e) => {
-              if (isMobileScreen) {
-                e.preventDefault();
-              }
-            }}
-            className={styles['chat-item__background-btn']}
-          >
-            <DeleteSvg className={styles['chat-item__delete-icon']} />
-          </button>
+          {chatItemData.isGroup === false && (
+            <>
+              <button
+                onClick={() => toggleModal('ban')}
+                onContextMenu={(e) => {
+                  if (isMobileScreen) {
+                    e.preventDefault();
+                  }
+                }}
+                className={styles['chat-item__background-btn']}
+              >
+                <UserBanSvg className={styles['chat-item__black-icon']} />
+              </button>
+              <button
+                onClick={() => toggleModal('delete')}
+                onContextMenu={(e) => {
+                  if (isMobileScreen) {
+                    e.preventDefault();
+                  }
+                }}
+                className={styles['chat-item__background-btn']}
+              >
+                <DeleteSvg className={styles['chat-item__red-icon']} />
+              </button>
+            </>
+          )}
+          {chatItemData.isGroup === true && (
+            <button
+              onClick={() => toggleModal('leave')}
+              onContextMenu={(e) => {
+                if (isMobileScreen) {
+                  e.preventDefault();
+                }
+              }}
+              className={styles['chat-item__background-btn']}
+            >
+              <UserRemoveSvg className={styles['chat-item__black-icon']} />
+            </button>
+          )}
         </div>
         <div
           onContextMenu={(e) => {
@@ -267,7 +318,7 @@ const ChatItem: FC<ChatItemProps> = ({
           }}
           onClick={onChatItemForegroundClick}
           onTouchMove={onTouchMove}
-          className={`${styles['chat-item__foreground']} ${isActive ? styles['chat-item__foreground--active'] : ''} ${isHover && isMobileScreen ? styles['chat-item__foreground--hover'] : ''}`}
+          className={`${styles['chat-item__foreground']} ${isActive ? (chatItemData.isGroup === false ? styles['chat-item__foreground--active'] : styles['chat-item__foreground--active-group']) : ''}  ${isHover && isMobileScreen ? styles['chat-item__foreground--hover'] : ''}`}
         >
           <div className={styles['chat-item__left-wrapper']}>
             <AvatarImage AvatarImg={chatAvatar} />

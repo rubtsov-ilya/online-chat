@@ -20,7 +20,7 @@ interface ChatBottomSectionProps {
   isSubscribeLoading: boolean;
   isMobileScreen: boolean;
   uploadTasksRef: React.MutableRefObject<IUploadTasksRef>;
-  isDrag: boolean;
+  isDrag: boolean; 
   locationState: ILocationChatPage | null;
   setIsDrag: React.Dispatch<React.SetStateAction<boolean>>;
 }

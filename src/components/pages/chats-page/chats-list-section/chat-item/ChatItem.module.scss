@@ -42,7 +42,7 @@
     height: 24px;
   }
 
-  &__user-ban-icon {
+  &__black-icon {
     min-width: 24px;
     min-height: 24px;
     pointer-events: none;
@@ -51,7 +51,7 @@
     }
   }
 
-  &__delete-icon {
+  &__red-icon {
     min-width: 24px;
     min-height: 24px;
     pointer-events: none;
@@ -83,6 +83,12 @@
     }
     &--active {
       left: -96px;
+      &:hover {
+        background-color: var(--base-white-snow);
+      }
+    }
+    &--active-group {
+      left: -56px;
       &:hover {
         background-color: var(--base-white-snow);
       }
