@@ -1,5 +1,6 @@
-import { FC, useEffect, useRef, useState } from 'react';
+import { FC, useEffect, useRef } from 'react';
 import ArrowCircleSvg from 'src/assets/images/icons/24x24-icons/Left arrow circle.svg?react';
+import ErrorSvg from 'src/assets/images/icons/24x24-icons/Error.svg?react';
 
 import styles from './MessageInputWrapper.module.scss';
 import AttachMenu from '../attach-menu/AttachMenu';
@@ -78,7 +79,12 @@ const MessageInputWrapper: FC<MessageInputWrapperProps> = ({
 }) => {
   const isWritingByChatsUpdatedRef = useRef<{ [chatId: string]: boolean }>({});
   const { uid, avatar, username, blocked } = useAuth();
-  const { activeChatId, activeChatMembers } = useActiveChat();
+  const {
+    activeChatId,
+    activeChatMembers,
+    activeChatBlocked,
+    activeChatIsGroup,
+  } = useActiveChat();
   const textAreaRef = useRef<HTMLTextAreaElement>(null);
   const dispatch = useDispatch();
 
@@ -86,6 +92,18 @@ const MessageInputWrapper: FC<MessageInputWrapperProps> = ({
     activeChatId !== null && chatInputValues[activeChatId] != null
       ? chatInputValues[activeChatId].messageText
       : chatInputValues['localeState'].messageText; // localeState - initialState if (chatId === null)
+
+  // статус заблокирован ли чат. только для негрупповых чатов, в групповом присваивается false
+  const otherMemberUid = activeChatMembers?.find(
+    (member) => member.uid !== uid,
+  )?.uid;
+  const isBlocked =
+    activeChatIsGroup === false
+      ? otherMemberUid !== undefined &&
+        activeChatBlocked !== null &&
+        blocked !== null &&
+        (blocked.includes(otherMemberUid) || activeChatBlocked.includes(uid!))
+      : false;
 
   useEffect(() => {
     // обновление статуса writingUsers
@@ -483,7 +501,7 @@ const MessageInputWrapper: FC<MessageInputWrapperProps> = ({
   ) => {
     const newChatsData: IFirebaseRtDbChat = {
       chatId: chatId,
-      membersIds: {[uid!]: true, [locationStateUid]: true},
+      membersIds: { [uid!]: true, [locationStateUid]: true },
       lastMessageText: messageText,
       lastMessageDateUTC: serverTimestamp(),
       lastMessageIsChecked: false,
@@ -523,7 +541,9 @@ const MessageInputWrapper: FC<MessageInputWrapperProps> = ({
         const existingChatWithUser = existingChatsByUserValue.find(
           (chat) =>
             chat.isGroup === false &&
-            Object.keys(chat.membersIds).includes(locationState!.userUidFromGlobalSearch),
+            Object.keys(chat.membersIds).includes(
+              locationState!.userUidFromGlobalSearch,
+            ),
         );
         // если чат существует, установить его айди в активный чат rtk и вернуть айди
         if (existingChatWithUser !== undefined) {
@@ -843,55 +863,73 @@ const MessageInputWrapper: FC<MessageInputWrapperProps> = ({
 
   return (
     <div className={styles['message-input-wrapper']}>
-      <AttachMenu
-        updateAttachedItems={updateAttachedItems}
-        isAttachedItems={attachedItems.length > 0}
-        isMobileScreen={isMobileScreen}
-      />
-      <textarea
-        rows={1}
-        ref={textAreaRef}
-        onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
-          dispatch(
-            updateChatInputValue({
-              chatId: activeChatId,
-              messageText: e.target.value,
-            }),
-          )
-        }
-        onPasteCapture={onTextAreaPasteCapture}
-        onKeyDown={(e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-          if (e.key === 'Enter' && !isMobileScreen && !e.shiftKey) {
-            e.preventDefault();
-            sendMessageOrCreateNewChat(
-              messageText,
-              attachedItems,
-              locationState,
-            );
-          }
-        }}
-        value={messageText}
-        placeholder="Сообщение"
-        className={styles['message-input-wrapper__textarea']}
-      />
-      <button
-        disabled={
-          (messageText.trim().length === 0 && attachedItems.length === 0) ||
-          isSubscribeLoading === true
-        }
-        className={styles['message-input-wrapper__btn']}
-        onClick={() => {
-          sendMessageOrCreateNewChat(messageText, attachedItems, locationState);
-        }}
-      >
-        <ArrowCircleSvg
-          className={
-            messageText.trim().length === 0 && attachedItems.length === 0
-              ? styles['message-input-wrapper__arrow-icon']
-              : `${styles['message-input-wrapper__arrow-icon']} ${styles['active']}`
-          }
-        />
-      </button>
+      {!isBlocked && !isSubscribeLoading && (
+        <>
+          <AttachMenu
+            updateAttachedItems={updateAttachedItems}
+            isAttachedItems={attachedItems.length > 0}
+            isMobileScreen={isMobileScreen}
+          />
+          <textarea
+            rows={1}
+            ref={textAreaRef}
+            onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
+              dispatch(
+                updateChatInputValue({
+                  chatId: activeChatId,
+                  messageText: e.target.value,
+                }),
+              )
+            }
+            onPasteCapture={onTextAreaPasteCapture}
+            onKeyDown={(e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+              if (e.key === 'Enter' && !isMobileScreen && !e.shiftKey) {
+                e.preventDefault();
+                sendMessageOrCreateNewChat(
+                  messageText,
+                  attachedItems,
+                  locationState,
+                );
+              }
+            }}
+            value={messageText}
+            placeholder="Сообщение"
+            className={styles['message-input-wrapper__textarea']}
+          />
+          <button
+            disabled={
+              messageText.trim().length === 0 && attachedItems.length === 0
+            }
+            className={styles['message-input-wrapper__btn']}
+            onClick={() => {
+              sendMessageOrCreateNewChat(
+                messageText,
+                attachedItems,
+                locationState,
+              );
+            }}
+          >
+            <ArrowCircleSvg
+              className={
+                messageText.trim().length === 0 && attachedItems.length === 0
+                  ? styles['message-input-wrapper__arrow-icon']
+                  : `${styles['message-input-wrapper__arrow-icon']} ${styles['active']}`
+              }
+            />
+          </button>
+        </>
+      )}
+      {isBlocked && !isSubscribeLoading && (
+        <div className={styles['message-input-wrapper__sub-wrapper']}>
+          <ErrorSvg className={styles['message-input-wrapper__error-icon']} />
+          <span className={styles['message-input-wrapper__blocked-text']}>
+            Отправка сообщений ограничена
+          </span>
+        </div>
+      )}
+      {isSubscribeLoading && (
+        <div className={styles['message-input-wrapper__sub-wrapper']}></div>
+      )}
     </div>
   );
 };

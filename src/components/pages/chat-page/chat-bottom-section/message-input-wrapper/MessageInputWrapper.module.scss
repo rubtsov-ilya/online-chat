@@ -54,4 +54,30 @@
       }
     }
   }
+
+  &__sub-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 57px;
+    gap: 8px;
+  }
+
+  &__blocked-text {
+    font-family: var(--font-family);
+    font-weight: 500;
+    font-size: 16px;
+    color: var(--base-black);
+  }
+
+  &__error-icon {
+    width: 24px;
+    height: 24px;
+    min-width: 24px;
+    min-height: 24px;
+    path {
+      fill: var(--base-accent-red);
+    }
+  }
 }
