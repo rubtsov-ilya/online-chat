@@ -4,8 +4,10 @@
   display: flex;
   align-items: flex-end;
   gap: 8px;
+  position: relative;
   @include fade-in-animation;
   &__wrapper {
+    position: relative;
     display: flex;
     flex-direction: column;
     max-width: 480px;
@@ -63,6 +65,7 @@
     font-weight: 500;
     font-size: 14px;
     color: var(--base-accent-blue);
+    user-select: none;
   }
 
   &__text-wrapper {

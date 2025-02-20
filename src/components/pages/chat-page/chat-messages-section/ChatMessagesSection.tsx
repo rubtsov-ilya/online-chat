@@ -12,7 +12,7 @@ import MessageDateGroup from './message-date-group/MessageDateGroup';
 import { ILoadingMessage } from 'src/interfaces/LoadingMessage.interface';
 
 interface ChatMessagesSectionProps {
-  isMobileScreen?: boolean;
+  isMobileScreen: boolean;
   uploadTasksRef: React.MutableRefObject<IUploadTasksRef>;
   activeChatId: string | null;
 }
@@ -497,6 +497,9 @@ const ChatMessagesSection: FC<ChatMessagesSectionProps> = ({
       className={styles['chat-messages']}
       ref={chatMessagesRef}
       id="chat-messages"
+      onContextMenu={(e: React.MouseEvent<HTMLElement, MouseEvent>) => {
+        e.preventDefault();
+      }}
     >
       <div
         className={

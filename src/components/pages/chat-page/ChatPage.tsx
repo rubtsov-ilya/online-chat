@@ -280,6 +280,7 @@ const ChatPage: FC = () => {
         locationState={locationState}
       />
       <CustomToastContainer />
+      <div id='message-context-overlay'></div>
     </ComponentTag>
   );
 };

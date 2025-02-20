@@ -1,0 +1,12 @@
+.message-context-overlay {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  /* background-color: #ff000015; */
+  z-index: 3;
+  &__text {
+    position: absolute;
+  }
+}

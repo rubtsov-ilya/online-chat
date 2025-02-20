@@ -53,7 +53,7 @@ const ChatBottomSection: FC<ChatBottomSectionProps> = ({
       : chatInputValues['localeState'].attachedItems; // localeState - initialState if (chatId === null)
 
   return (
-    <ComponentTag className={styles['chat-bottom-section']}>
+    <ComponentTag className={styles['chat-bottom-section']} id='chat-bottom-section'>
       <div
         className={
           isMobileScreen ? 'container' : 'container container--max-width-unset'

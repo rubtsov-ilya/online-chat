@@ -2,7 +2,11 @@ import { FC, useState } from 'react';
 import styles from './MessageMediaItem.module.scss';
 import ModalGallery from 'src/components/ui/modal-gallery/ModalGallery';
 import PlaySvg from 'src/assets/images/icons/misc/Play.svg?react';
-import { IImgMedia, IMessage, IVideoMedia } from 'src/interfaces/Message.interface';
+import {
+  IImgMedia,
+  IMessage,
+  IVideoMedia,
+} from 'src/interfaces/Message.interface';
 import CircularLoadingProgressbar from 'src/components/ui/circular-loading-progressbar/CircularLoadingProgressbar';
 import { ILoadingVideoMedia } from 'src/interfaces/LoadingMessage.interface';
 import useBodyLockContext from 'src/hooks/useBodyLockContext';
@@ -50,7 +54,14 @@ const MessageMediaItem: FC<MessageMediaItemProps> = ({
   };
 
   return (
-    <div style={{ width }} className={styles['media-item-wrapper']}>
+    <div
+      style={{ width }}
+      className={styles['media-item-wrapper']}
+      onContextMenu={(e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+        e.stopPropagation();
+        e.preventDefault();
+      }}
+    >
       {(imgUrl || (videoPreview && videoPreview.length > 0)) && (
         <>
           <img

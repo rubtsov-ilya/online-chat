@@ -27,7 +27,9 @@ const CheckedAndTimeStatuses: FC<CheckedAndTimeStatusesProps> = ({
   const timeDate = new Date(time as number);
   const formattedTime = `${timeDate.getHours().toString().padStart(2, '0')}:${timeDate.getMinutes().toString().padStart(2, '0')}`;
   return (
-    <div className={styles['checked-and-time-statuses']}>
+    <div className={styles['checked-and-time-statuses']} onContextMenu={(e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+      e.preventDefault();
+    }}>
       {!isCanceled && isLoading !== true && isChecked && isOwn && (
         <CheckedStatusSvg
           className={`${styles['checked-and-time-statuses__checked-icon']} ${isForImage ? styles['checked-and-time-statuses__checked-mark--image'] : ''}`}
