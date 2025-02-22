@@ -19,9 +19,7 @@ import {
   USER_AVATAR_DEFAULT_VALUE,
 } from 'src/constants';
 import { IFirebaseRtDbUser } from 'src/interfaces/FirebaseRealtimeDatabase.interface';
-import MessageContextOverlay from '../message-context-overlay/MessageContextOverlay';
-import useMobileScreen from 'src/hooks/useMobileScreen';
-import MessageContextMenu from '../message-context-menu/MessageContextMenu';
+import MessageContextBackdrop from '../message-context-backdrop/MessageContextBackdrop';
 
 interface MessageProps {
   messageData: IMessage | ILoadingMessage;
@@ -43,14 +41,14 @@ const Message: FC<MessageProps> = ({
   const [сontextMenuActive, setContextMenuActive] = useState<{
     positionY: number;
     positionX: number;
-    overlayHeight: number;
-    overlayWidth: number;
+    backdropHeight: number;
+    backdropWidth: number;
     isActive: boolean;
   }>({
     positionY: 0,
     positionX: 0,
-    overlayHeight: 0,
-    overlayWidth: 0,
+    backdropHeight: 0,
+    backdropWidth: 0,
     isActive: false,
   });
   const { activeChatMembers, activeChatAvatar, activeChatIsGroup } =
@@ -99,15 +97,15 @@ const Message: FC<MessageProps> = ({
           e.stopPropagation();
 
           // координаты на странице относительно оверлея
-          const overlayElement = document.getElementById(
-            'message-context-overlay',
+          const backdropElement = document.getElementById(
+            'message-context-backdrop',
           ) as HTMLDivElement; // находится в ChatPage
-          const { width, left } = overlayElement.getBoundingClientRect();
+          const { width, left } = backdropElement.getBoundingClientRect();
           setContextMenuActive({
             positionY: e.clientY,
-            positionX: e.clientX - left, // координата X относительно overlayElement
-            overlayHeight: document.documentElement.scrollHeight, // высота всей страницы
-            overlayWidth: width,
+            positionX: e.clientX - left, // координата X относительно backdropElement
+            backdropHeight: document.documentElement.scrollHeight, // высота всей страницы
+            backdropWidth: width,
             isActive: true,
           });
         }}
@@ -372,7 +370,7 @@ const Message: FC<MessageProps> = ({
         </div>
       </div>
       {сontextMenuActive.isActive && (
-        <MessageContextOverlay
+        <MessageContextBackdrop
           setContextMenuActive={setContextMenuActive}
           сontextMenuActive={сontextMenuActive}
         />

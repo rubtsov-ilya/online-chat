@@ -1,28 +1,28 @@
-import { FC, useEffect, useLayoutEffect, useState } from 'react';
-import styles from './MessageContextOverlay.module.scss';
+import { FC, useEffect, useState } from 'react';
+import styles from './MessageContextBackdrop.module.scss';
 import { createPortal } from 'react-dom';
 import MessageContextMenu from '../message-context-menu/MessageContextMenu';
 
-interface MessageContextOverlayProps {
+interface MessageContextBackdropProps {
   setContextMenuActive: React.Dispatch<
     React.SetStateAction<{
       positionY: number;
       positionX: number;
-      overlayHeight: number;
-      overlayWidth: number;
+      backdropHeight: number;
+      backdropWidth: number;
       isActive: boolean;
     }>
   >;
   сontextMenuActive: {
     positionY: number;
     positionX: number;
-    overlayHeight: number;
-    overlayWidth: number;
+    backdropHeight: number;
+    backdropWidth: number;
     isActive: boolean;
   };
 }
 
-const MessageContextOverlay: FC<MessageContextOverlayProps> = ({
+const MessageContextBackdrop: FC<MessageContextBackdropProps> = ({
   setContextMenuActive,
   сontextMenuActive,
 }) => {
@@ -40,8 +40,8 @@ const MessageContextOverlay: FC<MessageContextOverlayProps> = ({
       setContextMenuActive({
         positionY: 0,
         positionX: 0,
-        overlayHeight: 0,
-        overlayWidth: 0,
+        backdropHeight: 0,
+        backdropWidth: 0,
         isActive: false,
       });
     }, 150); // 150ms длительность анимации в .message-context-menu transition
@@ -53,7 +53,7 @@ const MessageContextOverlay: FC<MessageContextOverlayProps> = ({
       onContextMenu={(e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
         e.preventDefault();
       }}
-      className={styles['message-context-overlay']}
+      className={styles['message-context-backdrop']}
     >
       <MessageContextMenu
         closeContextMenu={closeContextMenu}
@@ -61,8 +61,8 @@ const MessageContextOverlay: FC<MessageContextOverlayProps> = ({
         сontextMenuActive={сontextMenuActive}
       />
     </div>,
-    document.getElementById('message-context-overlay') as HTMLDivElement, // находится в ChatPage
+    document.getElementById('message-context-backdrop') as HTMLDivElement, // находится в ChatPage
   );
 };
 
-export default MessageContextOverlay;
+export default MessageContextBackdrop;

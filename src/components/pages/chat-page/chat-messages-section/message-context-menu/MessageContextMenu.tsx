@@ -1,4 +1,4 @@
-import { FC, useEffect, useRef, useState } from 'react';
+import { FC, useRef } from 'react';
 import styles from './MessageContextMenu.module.scss';
 import CopySvg from 'src/assets/images/icons/24x24-icons/Copy.svg?react';
 import ThreadSvg from 'src/assets/images/icons/24x24-icons/Thread Reply.svg?react';
@@ -8,8 +8,8 @@ interface MessageContextMenuProps {
   сontextMenuActive: {
     positionY: number;
     positionX: number;
-    overlayHeight: number;
-    overlayWidth: number;
+    backdropHeight: number;
+    backdropWidth: number;
     isActive: boolean;
   };
   isMenuVisible: boolean;
@@ -29,10 +29,10 @@ const MessageContextMenu: FC<MessageContextMenuProps> = ({
   };
 
   const isWidthEnough =
-    сontextMenuActive.overlayWidth - сontextMenuActive.positionX >
+    сontextMenuActive.backdropWidth - сontextMenuActive.positionX >
     menuSize.width;
   const isHeightEnough =
-    сontextMenuActive.overlayHeight - сontextMenuActive.positionY > menuSize.height;
+    сontextMenuActive.backdropHeight - сontextMenuActive.positionY > menuSize.height;
 
   return (
     <div

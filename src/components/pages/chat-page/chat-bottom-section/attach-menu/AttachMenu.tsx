@@ -9,7 +9,7 @@ import { AttachedItemType } from 'src/interfaces/AttachedItem.interface';
 
 import imageCompression from 'browser-image-compression';
 import { MAX_UPLOAD_FILE_SIZE } from 'src/constants';
-import CustomToastContainer, {
+import {
   customToastError,
 } from 'src/components/ui/custom-toast-container/CustomToastContainer';
 
@@ -28,14 +28,16 @@ const AttachMenu: FC<AttachBtnProps> = ({
   const mediaInputRef = useRef<HTMLInputElement>(null);
   const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false);
   const [isOverlayHovered, setIsOverlayHovered] = useState(false);
-  const [hoverTimeout, setHoverTimeout] = useState<null | NodeJS.Timeout>(null);
+  const hoverTimeoutRef = useRef<NodeJS.Timeout>(null)
 
   const acceptFormats =
     'image/jpeg, image/png, image/bmp, image/webp, image/avif, image/gif, video/mp4, video/webm';
 
   useEffect(() => {
     return () => {
-      clearTimeout(hoverTimeout!);
+      if (hoverTimeoutRef.current) {
+        clearTimeout(hoverTimeoutRef.current);
+      }
     };
   }, []);
 
@@ -131,7 +133,9 @@ const AttachMenu: FC<AttachBtnProps> = ({
           onMouseEnter={() => {
             if (!isMobileScreen) {
               setIsMenuOpen(true);
-              clearTimeout(hoverTimeout!);
+              if (hoverTimeoutRef.current) {
+                clearTimeout(hoverTimeoutRef.current);
+              }
               setIsOverlayHovered(false);
             }
           }}
@@ -190,19 +194,21 @@ const AttachMenu: FC<AttachBtnProps> = ({
       </div>
       {isMenuOpen && (
         <div
-          className={styles['attach-overlay']}
+          className={styles['attach-backdrop']}
           onClick={() => setIsMenuOpen(false)}
           onMouseEnter={() => {
             if (!isMobileScreen) {
               const timeout = setTimeout(() => {
                 setIsOverlayHovered(true);
               }, 800);
-              setHoverTimeout(timeout);
+              hoverTimeoutRef.current = timeout
             }
           }}
           onMouseLeave={() => {
             if (!isMobileScreen) {
-              clearTimeout(hoverTimeout!);
+              if (hoverTimeoutRef.current) {
+                clearTimeout(hoverTimeoutRef.current);
+              }
               if (isOverlayHovered === true) {
                 setIsOverlayHovered(false);
               }
