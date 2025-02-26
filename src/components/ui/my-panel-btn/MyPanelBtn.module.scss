@@ -12,6 +12,10 @@
   &:hover &__text{
     color: var(--base-accent-blue);
   }
+  &:focus {
+    box-shadow: 0 0 0 1px var(--base-accent-blue);
+    border-radius: 8px;
+  }
 
   &__svg {
     min-height: 24px;

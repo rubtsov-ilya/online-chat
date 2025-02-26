@@ -10,7 +10,7 @@ interface MyPanelBtnProps {
 
 const MyPanelBtn: FC<MyPanelBtnProps> = ({ Svg, onBtnClick, text }) => {
   return (
-    <button onClick={onBtnClick} className={styles['btn']}>
+    <button tabIndex={1} onClick={onBtnClick} className={styles['btn']}>
       <Svg className={styles['btn__svg']} />
       <span className={styles['btn__text']}>{text}</span>
     </button>
