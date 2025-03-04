@@ -24,8 +24,12 @@ const SearchedChatsWrapper: FC<SearchedChatsWrapperProps> = ({
       <span className={styles['searched-chats-wrapper__text']}>Чаты</span>
       {searchedChats.map((chat, index) => {
         const otherMember =
-        chat.isGroup === false &&
+          chat.isGroup === false &&
           chat.membersDetails.find((member) => member.uid !== uid)!;
+
+        if (!('chatId' in chat)) {
+          return null; // защита от крашнутых чатов
+        }
 
         return (
           <ChatItem
@@ -36,14 +40,10 @@ const SearchedChatsWrapper: FC<SearchedChatsWrapperProps> = ({
             chatsListRef={chatsListRef}
             isMobileScreen={isMobileScreen}
             chatname={
-              otherMember === false
-                ? chat.groupChatname
-                : otherMember.username
+              otherMember === false ? chat.groupChatname : otherMember.username
             }
             chatAvatar={
-              otherMember === false
-                ? chat.groupAvatar
-                : otherMember?.avatar
+              otherMember === false ? chat.groupAvatar : otherMember?.avatar
             }
           />
         );

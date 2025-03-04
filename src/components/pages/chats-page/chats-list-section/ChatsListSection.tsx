@@ -299,6 +299,10 @@ const ChatsListSection: FC<ChatsListSectionProps> = ({ isMobileScreen }) => {
                           )!
                         : null;
 
+                    if (!('chatId' in chat)) {
+                      return null // защита от крашнутых чатов
+                    }
+
                     return (
                       <ChatItem
                         key={index}

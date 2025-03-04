@@ -371,6 +371,7 @@ const Message: FC<MessageProps> = ({
       </div>
       {сontextMenuActive.isActive && (
         <MessageContextBackdrop
+          messageText={messageData.messageText}
           setContextMenuActive={setContextMenuActive}
           сontextMenuActive={сontextMenuActive}
         />
