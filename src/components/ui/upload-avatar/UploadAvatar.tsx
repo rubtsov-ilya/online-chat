@@ -33,6 +33,7 @@ const UploadAvatar: FC<UploadAvatarProps> = ({ userAvatar, uid }) => {
   >(false);
   const mediaInputRef = useRef<HTMLInputElement>(null);
   const { toggleModal } = useToggleModal({ setCbState: setModalOpen });
+  const modalDuration = 100;
   const openModal = () => toggleModal(true);
 
   const acceptFormats =
@@ -162,9 +163,9 @@ const UploadAvatar: FC<UploadAvatarProps> = ({ userAvatar, uid }) => {
         }}
       />
       {modalOpen && avatar && (
-        //аргумент number в toggleModal - длительность transition opacity в modal-backdrop
         <ModalBackdrop
-          toggleModal={() => toggleModal(false, 100)}
+          transitionDuration={modalDuration}
+          toggleModal={() => toggleModal(false, modalDuration)}
           divIdFromIndexHtml={'modal-backdrop'}
         >
           <ModalCropper

@@ -11,7 +11,6 @@
   background-color: #00000099;
   backdrop-filter: blur(2px);
   opacity: 0;
-  transition: opacity 0.1s ease;
   pointer-events: none;
   overflow: hidden;
   &--visible {

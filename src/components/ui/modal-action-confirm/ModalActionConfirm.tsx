@@ -50,7 +50,7 @@ const ModalActionConfirm: FC<ModalActionConfirmProps> = ({
         </div>
       )}
 
-      <p className={styles['modal-action-confirm__subtitle']}>{subtitle}</p>
+      <span className={styles['modal-action-confirm__subtitle']}>{subtitle}</span>
       <div className={styles['modal-action-confirm__buttons-wrapper']}>
         <button
           className={styles['modal-action-confirm__action-btn']}

@@ -5,6 +5,7 @@ import React, { FC, useEffect, useState } from 'react';
 
 interface ModalBackdropProps {
   children: React.ReactNode;
+  transitionDuration: number;
   toggleModal: () => void;
   divIdFromIndexHtml: string;
 }
@@ -15,6 +16,7 @@ interface ModalChildProps {
 
 const ModalBackdrop: FC<ModalBackdropProps> = ({
   children,
+  transitionDuration,
   toggleModal,
   divIdFromIndexHtml,
 }) => {
@@ -32,6 +34,9 @@ const ModalBackdrop: FC<ModalBackdropProps> = ({
 
   return createPortal(
     <div
+      style={{
+        transition: `opacity ${transitionDuration}ms ease`,
+      }}
       className={`${styles['modal-backdrop']} ${isVisible ? styles['modal-backdrop--visible'] : ''}`}
       onClick={closeModal}
     >

@@ -4,7 +4,9 @@ import CopySvg from 'src/assets/images/icons/24x24-icons/Copy.svg?react';
 import ThreadSvg from 'src/assets/images/icons/24x24-icons/Thread Reply.svg?react';
 import DeleteSvg from 'src/assets/images/icons/24x24-icons/Delete.svg?react';
 
+
 interface MessageContextMenuProps {
+  setModalOpen: (value: React.SetStateAction<false | "delete">) => void
   messageText: string;
   сontextMenuActive: {
     positionY: number;
@@ -22,6 +24,7 @@ const MessageContextMenu: FC<MessageContextMenuProps> = ({
   сontextMenuActive,
   isMenuVisible,
   closeContextMenu,
+  setModalOpen,
 }) => {
   const menuRef = useRef<HTMLDivElement | null>(null);
   const buttonCount = messageText ? 3 : 2; // число кнопок в меню. Если текста нет, то на одну кнопку меньше
@@ -45,6 +48,11 @@ const MessageContextMenu: FC<MessageContextMenuProps> = ({
       console.error('Не удалось скопировать текст: ', error);
       closeContextMenu();
     }
+  };
+
+  const onDeleteButtonClick = () => {
+    closeContextMenu();
+    setModalOpen('delete');
   };
 
   return (
@@ -85,6 +93,7 @@ const MessageContextMenu: FC<MessageContextMenuProps> = ({
 
       {/* кнопка удалить */}
       <button
+        onClick={onDeleteButtonClick}
         className={`${styles['message-context-menu__button']} ${styles['red']}`}
       >
         <DeleteSvg

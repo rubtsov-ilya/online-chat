@@ -60,6 +60,7 @@ const ChatItem: FC<ChatItemProps> = ({
   const { blocked } = useAuth();
   const { activeChatAvatar, activeChatname, activeChatId } = useActiveChat();
   const longPressDuration = 500;
+  const modalDuration = 100;
 
   const otherMember =
     chatItemData.membersDetails.find((member) => {
@@ -453,9 +454,10 @@ const ChatItem: FC<ChatItemProps> = ({
         />
       )}
       {modalOpen && (
-        /* аргумент number в toggleModal - длительность transition opacity в modal-backdrop */
+        /* аргумент number в toggleModal - длительность transitionDuration */
         <ModalBackdrop
-          toggleModal={() => toggleModal(false, 100)}
+          transitionDuration={modalDuration}
+          toggleModal={() => toggleModal(false, modalDuration)}
           divIdFromIndexHtml={'modal-backdrop'}
         >
           <ModalActionConfirm

@@ -20,6 +20,10 @@ import {
 } from 'src/constants';
 import { IFirebaseRtDbUser } from 'src/interfaces/FirebaseRealtimeDatabase.interface';
 import MessageContextBackdrop from '../message-context-backdrop/MessageContextBackdrop';
+import useMobileScreen from 'src/hooks/useMobileScreen';
+import useToggleModal from 'src/hooks/useToggleModal';
+import ModalBackdrop from 'src/components/ui/modal-backdrop/ModalBackdrop';
+import ModalActionConfirm from 'src/components/ui/modal-action-confirm/modalActionConfirm';
 
 interface MessageProps {
   messageData: IMessage | ILoadingMessage;
@@ -53,7 +57,13 @@ const Message: FC<MessageProps> = ({
   });
   const { activeChatMembers, activeChatAvatar, activeChatIsGroup } =
     useActiveChat();
-  /*   const avatar: IFirebaseRtDbUser['avatar'] = activeChatIsGroup === false ? activeChatAvatar : activeChatMembers?.find((member) => member.uid === messageData.senderUid)?.avatar || USER_AVATAR_DEFAULT_VALUE; */
+
+    const [modalOpen, setModalOpen] = useState<'delete' | false>(false);
+    const { isMobileScreen } = useMobileScreen();
+    const { toggleModal } = useToggleModal({ setCbState: setModalOpen });
+
+    const modalDuration = 100;
+
   const avatar: IFirebaseRtDbUser['avatar'] =
     activeChatIsGroup !== null &&
     activeChatIsGroup === false &&
@@ -62,11 +72,41 @@ const Message: FC<MessageProps> = ({
       : activeChatMembers?.find(
           (member) => member.uid === messageData.senderUid,
         )?.avatar || USER_AVATAR_DEFAULT_VALUE;
+
   const username =
     activeChatMembers != null
       ? activeChatMembers.find((member) => member.uid === messageData.senderUid)
           ?.username || USERNAME_LEAVED_VALUE
       : undefined;
+
+  const modalActionData = {
+    delete: {
+      title: 'Удалить сообщение',
+      subtitle: 'Вы хотите удалить сообщение безвозвратно?',
+      actionBtnText: 'Удалить',
+      action: async () => {
+        //  if (otherMember === null || blocked === null) {
+        //    console.error(`Ошибка удаления чата`);
+        //    return;
+        //  }
+        //  setIsActive(false)
+        //  try {
+        //    const updatesByDeleting = {
+        //      [`userChats/${uid!}/chats/${chatItemData.chatId}`]: null,
+        //      [`userChats/${otherMember}/chats/${chatItemData.chatId}`]: null,
+        //      [`chats/${chatItemData.chatId}`]: null,
+        //    };
+        //    await update(
+        //      refFirebaseDatabase(firebaseDatabase),
+        //      updatesByDeleting,
+        //    );
+        //  } catch (error) {
+        //    console.error(`Ошибка удаления чата`, error);
+        //  }
+      },
+    },
+  };
+
   const cancelUploadsForMessage = (messageId: string) => {
     if (uploadTasksRef.current[messageId]) {
       /* Отмена загрузки каждого файла */
@@ -371,10 +411,26 @@ const Message: FC<MessageProps> = ({
       </div>
       {сontextMenuActive.isActive && (
         <MessageContextBackdrop
+          setModalOpen={(c) => setModalOpen(c)}
           messageText={messageData.messageText}
           setContextMenuActive={setContextMenuActive}
           сontextMenuActive={сontextMenuActive}
         />
+      )}
+      {modalOpen && (
+        <ModalBackdrop
+          transitionDuration={modalDuration}
+          toggleModal={() => toggleModal(false, modalDuration)}
+          divIdFromIndexHtml={'modal-backdrop'}
+        >
+          <ModalActionConfirm
+            isMobileScreen={isMobileScreen}
+            title={modalActionData[modalOpen].title}
+            subtitle={modalActionData[modalOpen].subtitle}
+            actionBtnText={modalActionData[modalOpen].actionBtnText}
+            action={modalActionData[modalOpen].action}
+          />
+        </ModalBackdrop>
       )}
     </>
   );

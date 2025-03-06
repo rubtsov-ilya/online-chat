@@ -4,6 +4,7 @@ import { createPortal } from 'react-dom';
 import MessageContextMenu from '../message-context-menu/MessageContextMenu';
 
 interface MessageContextBackdropProps {
+  setModalOpen: (value: React.SetStateAction<false | "delete">) => void
   messageText: string;
   setContextMenuActive: React.Dispatch<
     React.SetStateAction<{
@@ -24,6 +25,7 @@ interface MessageContextBackdropProps {
 }
 
 const MessageContextBackdrop: FC<MessageContextBackdropProps> = ({
+  setModalOpen,
   messageText,
   setContextMenuActive,
   сontextMenuActive,
@@ -58,6 +60,7 @@ const MessageContextBackdrop: FC<MessageContextBackdropProps> = ({
       className={styles['message-context-backdrop']}
     >
       <MessageContextMenu
+        setModalOpen={(c) => setModalOpen(c)}
         messageText={messageText}
         closeContextMenu={closeContextMenu}
         isMenuVisible={isMenuVisible}

@@ -38,6 +38,7 @@ const MyPanel: FC<MyPanelProps> = ({
   const auth = getAuth();
   const { toggleBodyLock } = useBodyLockContext();
   const { toggleModal } = useToggleModal({ setCbState: setModalOpen });
+  const modalDuration = 100;
 
   const onBackdropClick = (): void => {
     setIsPanelOpen((prev) => !prev);
@@ -112,9 +113,9 @@ const MyPanel: FC<MyPanelProps> = ({
             text={'Выйти'}
           />
           {modalOpen && (
-            /* аргумент number в toggleModal - длительность transition opacity в modal-backdrop */
             <ModalBackdrop
-              toggleModal={() => toggleModal(false, 100)}
+              transitionDuration={modalDuration}
+              toggleModal={() => toggleModal(false, modalDuration)}
               divIdFromIndexHtml={'modal-backdrop'}
             >
               <ModalInputConfirm
