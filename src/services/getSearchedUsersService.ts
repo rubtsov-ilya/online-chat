@@ -33,3 +33,20 @@ const getSearchedUsersService = async (searchInputValue: string) => {
 };
 
 export default getSearchedUsersService
+/* 
+const updatesByUserChats = membersIds.reduce(
+  (acc, memberId) => {
+    acc[`userChats/${memberId}/chats/${chatId}/lastMessageText`] =
+      newChatsData.lastMessageText;
+    acc[`userChats/${memberId}/chats/${chatId}/lastMessageDateUTC`] =
+      newChatsData.lastMessageDateUTC;
+    acc[`userChats/${memberId}/chats/${chatId}/lastMessageIsChecked`] =
+      newChatsData.lastMessageIsChecked;
+    acc[`userChats/${memberId}/chats/${chatId}/lastMessageSenderUid`] =
+      newChatsData.lastMessageSenderUid;
+    return acc;
+  },
+  {} as Record<string, any>,
+);
+
+return updatesByUserChats; */

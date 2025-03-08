@@ -22,7 +22,12 @@ import {
 } from 'src/redux/slices/ActiveChatSlice';
 import { useNavigate } from 'react-router-dom';
 import useActiveChat from 'src/hooks/useActiveChat';
-import { get, ref as refFirebaseDatabase, set, update } from 'firebase/database';
+import {
+  get,
+  ref as refFirebaseDatabase,
+  set,
+  update,
+} from 'firebase/database';
 import { firebaseDatabase } from 'src/firebase';
 import useAuth from 'src/hooks/useAuth';
 import { IFirebaseRtDbChat } from 'src/interfaces/FirebaseRealtimeDatabase.interface';
@@ -62,7 +67,7 @@ const ChatItem: FC<ChatItemProps> = ({
   const longPressDuration = 500;
   const modalDuration = 100;
 
-  const otherMember =
+  const otherMemberUid =
     chatItemData.membersDetails.find((member) => {
       return member.uid !== uid;
     })?.uid || null;
@@ -73,15 +78,15 @@ const ChatItem: FC<ChatItemProps> = ({
       subtitle: 'Вы точно хотите удалить чат без возможности восстановления?',
       actionBtnText: 'Удалить',
       action: async () => {
-        if (otherMember === null || blocked === null) {
-          console.error(`Ошибка удаления чата`);
-          return;
+        // TODO от сюда взять функцию
+        if (otherMemberUid === null || blocked === null) {
+          throw new Error('Ошибка удаления чата');
         }
-        setIsActive(false)
+        setIsActive(false);
         try {
           const updatesByDeleting = {
             [`userChats/${uid!}/chats/${chatItemData.chatId}`]: null,
-            [`userChats/${otherMember}/chats/${chatItemData.chatId}`]: null,
+            [`userChats/${otherMemberUid}/chats/${chatItemData.chatId}`]: null,
             [`chats/${chatItemData.chatId}`]: null,
           };
           await update(
@@ -96,37 +101,37 @@ const ChatItem: FC<ChatItemProps> = ({
     ban: {
       title: 'Подтверждение',
       subtitle:
-        otherMember !== null && blocked !== null
-          ? blocked.includes(otherMember)
+        otherMemberUid !== null && blocked !== null
+          ? blocked.includes(otherMemberUid)
             ? 'Разрешить пользователю писать Вам сообщения?'
             : 'Запретить пользователю писать Вам сообщения'
           : 'Запретить пользователю писать Вам сообщения',
       actionBtnText:
-        otherMember !== null && blocked !== null
-          ? blocked.includes(otherMember)
+        otherMemberUid !== null && blocked !== null
+          ? blocked.includes(otherMemberUid)
             ? 'Разблокировать'
             : 'Заблокировать'
           : 'Заблокировать',
       action: async () => {
-        if (otherMember === null || blocked === null) {
+        if (otherMemberUid === null || blocked === null) {
           console.error(`Ошибка блокировки пользователя`);
           return;
         }
-        setIsActive(false)
+        setIsActive(false);
         const blockedRef = refFirebaseDatabase(
           firebaseDatabase,
           `users/${uid}/blocked`,
         );
         try {
-          if (blocked.includes(otherMember)) {
+          if (blocked.includes(otherMemberUid)) {
             // если пользователь уже заблокирован, тогда разблокировать
             await set(
               blockedRef,
-              blocked.filter((blockedUid) => blockedUid !== otherMember),
+              blocked.filter((blockedUid) => blockedUid !== otherMemberUid),
             );
           } else {
             // если пользователь не заблокирован, тогда заблокировать
-            await set(blockedRef, [...blocked, otherMember]);
+            await set(blockedRef, [...blocked, otherMemberUid]);
           }
         } catch (error) {
           console.error(`Ошибка блокировки пользователя`, error);
@@ -138,14 +143,18 @@ const ChatItem: FC<ChatItemProps> = ({
       subtitle: 'Вы точно хотите покинуть чат?',
       actionBtnText: 'Покинуть',
       action: async () => {
-        setIsActive(false)
+        setIsActive(false);
         try {
           //у себя чат будет удалён, у иных пользователей будет удалён из membersIds
           // из-за структуры бэкенда есть предположение, что возможна ситуация: один пользователь отправит сообщение и второй пользователь удалит чат, и если пакет дойдёт после удаления чата, то у второго пользователя будет сломанный чат отображаться без необходим для полноценной отрисовки ключей
-          const updatesMembersIdsByUserChats = Object.keys(chatItemData.membersIds ).reduce(
+          const updatesMembersIdsByUserChats = Object.keys(
+            chatItemData.membersIds,
+          ).reduce(
             (acc, memberId) => {
               if (memberId !== uid) {
-                acc[`userChats/${memberId}/chats/${chatItemData.chatId}/membersIds/${uid!}`] = null;
+                acc[
+                  `userChats/${memberId}/chats/${chatItemData.chatId}/membersIds/${uid!}`
+                ] = null;
               }
               return acc;
             },
@@ -153,9 +162,9 @@ const ChatItem: FC<ChatItemProps> = ({
           );
           const updatesByLeaving = {
             [`userChats/${uid!}/chats/${chatItemData.chatId}`]: null,
-            ...updatesMembersIdsByUserChats
+            ...updatesMembersIdsByUserChats,
           };
-          console.log(updatesByLeaving)
+          console.log(updatesByLeaving);
           /* await update(refFirebaseDatabase(firebaseDatabase), updatesByDeleting); */
         } catch (error) {
           console.error(`Ошибка покидания чата`, error);

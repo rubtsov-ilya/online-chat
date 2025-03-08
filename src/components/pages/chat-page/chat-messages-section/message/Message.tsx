@@ -1,6 +1,15 @@
 import { FC, useState } from 'react';
 
 import styles from './Message.module.scss';
+import { firebaseDatabase } from 'src/firebase';
+import {
+  equalTo,
+  get,
+  orderByChild,
+  query,
+  ref as refFirebaseDatabase,
+  update,
+} from 'firebase/database';
 import AvatarImage from 'src/components/ui/avatar-image/AvatarImage';
 import Linkify from 'linkify-react';
 import MessageMediaItem from '../message-media-item/MessageMediaItem';
@@ -18,12 +27,19 @@ import {
   USERNAME_LEAVED_VALUE,
   USER_AVATAR_DEFAULT_VALUE,
 } from 'src/constants';
-import { IFirebaseRtDbUser } from 'src/interfaces/FirebaseRealtimeDatabase.interface';
+import {
+  IFirebaseRtDbChat,
+  IFirebaseRtDbUser,
+} from 'src/interfaces/FirebaseRealtimeDatabase.interface';
 import MessageContextBackdrop from '../message-context-backdrop/MessageContextBackdrop';
 import useMobileScreen from 'src/hooks/useMobileScreen';
 import useToggleModal from 'src/hooks/useToggleModal';
 import ModalBackdrop from 'src/components/ui/modal-backdrop/ModalBackdrop';
 import ModalActionConfirm from 'src/components/ui/modal-action-confirm/modalActionConfirm';
+import getLastUndeletedMessage from 'src/services/getLastUndeletedMessage';
+import { useNavigate } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
+import { removeActiveChat } from 'src/redux/slices/ActiveChatSlice';
 
 interface MessageProps {
   messageData: IMessage | ILoadingMessage;
@@ -55,14 +71,21 @@ const Message: FC<MessageProps> = ({
     backdropWidth: 0,
     isActive: false,
   });
-  const { activeChatMembers, activeChatAvatar, activeChatIsGroup } =
-    useActiveChat();
+  const {
+    activeChatMembers,
+    activeChatAvatar,
+    activeChatname,
+    activeChatIsGroup,
+    activeChatId,
+  } = useActiveChat();
 
-    const [modalOpen, setModalOpen] = useState<'delete' | false>(false);
-    const { isMobileScreen } = useMobileScreen();
-    const { toggleModal } = useToggleModal({ setCbState: setModalOpen });
+  const [modalOpen, setModalOpen] = useState<'delete' | false>(false);
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const { isMobileScreen } = useMobileScreen();
+  const { toggleModal } = useToggleModal({ setCbState: setModalOpen });
 
-    const modalDuration = 100;
+  const modalDuration = 100;
 
   const avatar: IFirebaseRtDbUser['avatar'] =
     activeChatIsGroup !== null &&
@@ -85,24 +108,149 @@ const Message: FC<MessageProps> = ({
       subtitle: 'Вы хотите удалить сообщение безвозвратно?',
       actionBtnText: 'Удалить',
       action: async () => {
-        //  if (otherMember === null || blocked === null) {
-        //    console.error(`Ошибка удаления чата`);
-        //    return;
-        //  }
-        //  setIsActive(false)
-        //  try {
-        //    const updatesByDeleting = {
-        //      [`userChats/${uid!}/chats/${chatItemData.chatId}`]: null,
-        //      [`userChats/${otherMember}/chats/${chatItemData.chatId}`]: null,
-        //      [`chats/${chatItemData.chatId}`]: null,
-        //    };
-        //    await update(
-        //      refFirebaseDatabase(firebaseDatabase),
-        //      updatesByDeleting,
-        //    );
-        //  } catch (error) {
-        //    console.error(`Ошибка удаления чата`, error);
-        //  }
+        try {
+          if (activeChatMembers === null || activeChatId === null) {
+            return;
+          }
+
+          /* const chatRef = refFirebaseDatabase(
+            firebaseDatabase,
+            `chats/${activeChatId}`,
+          ); */
+
+          const lastMessageDateUTCRef = refFirebaseDatabase(
+            firebaseDatabase,
+            `userChats/${uid}/chats/${activeChatId}/lastMessageDateUTC`,
+          );
+
+          /* const chatSnapshot = await get(chatRef); */
+          const lastMessageDateUTCSnapshot = await get(lastMessageDateUTCRef);
+
+          if (!lastMessageDateUTCSnapshot.exists()) {
+            throw new Error('Чат не найден');
+          }
+
+          /* const chatValue = chatSnapshot.val() as IFirebaseRtDbChatsChat; */
+          const lastMessageDateUTCValue =
+            lastMessageDateUTCSnapshot.val() as IFirebaseRtDbChat['lastMessageDateUTC'];
+
+          // обновляем сообщение как удаленное
+          await update(refFirebaseDatabase(firebaseDatabase), {
+            [`chats/${activeChatId}/messages/${messageData.messageId}/isDeleted`]:
+              true,
+          });
+
+          // получаем последнее неудаленное сообщение в чате, значение в удалемом уже будет обновлено
+          const lastUndeletedMessage =
+            await getLastUndeletedMessage(activeChatId);
+
+          // lastUndeletedMessage === null в случае, если нет неудаленных сообщений
+          // тогда если чат негрупповой, нужно его удалить
+          if (lastUndeletedMessage === null && activeChatIsGroup === false) {
+            // дополнительная проверка перед удалением чата на то, что нет неудаленных сообщений и это не ошибка в getLastUndeletedMessage()
+            const messagesRef = refFirebaseDatabase(
+              firebaseDatabase,
+              `chats/${activeChatId}/messages`,
+            );
+            const messagesQuery = query(
+              messagesRef,
+              orderByChild('isDeleted'),
+              equalTo(false), // Фильтруем неудаленные сообщения
+            );
+
+            const messagesSnapshot = await get(messagesQuery);
+            if (messagesSnapshot.exists()) {
+              const undeletedMessages: IMessage[] = Object.values(
+                messagesSnapshot.val(),
+              );
+              if (undeletedMessages.length > 0) {
+                // если есть неудалённые сообщения в чате, то это ошибка в функции getLastUndeletedMessage()
+                throw new Error('Error in function getLastUndeletedMessage');
+              }
+            }
+
+            if (!messagesSnapshot.exists()) {
+
+              // если неудаленных сообщений нет, то удалить чат
+              if (activeChatIsGroup === false) {
+                // TODO здесь прописать удаление всего чата. УДАЛЯТЬ ТОЛЬКО ДЛЯ НЕГРУППОВОГО, групповой чат нельзя удалить так
+
+                const otherMemberUid =
+                  activeChatMembers.find((member) => {
+                    return member.uid !== uid;
+                  })?.uid || null;
+
+                if (otherMemberUid === null) {
+                  throw new Error('Ошибка удаления чата');
+                }
+
+                dispatch(removeActiveChat());
+
+                navigate('.', {
+                  state: {
+                    userUidFromGlobalSearch: otherMemberUid,
+                    chatAvatarFromGlobalSearch: activeChatAvatar,
+                    chatnameFromGlobalSearch: activeChatname,
+                  },
+                });
+
+                try {
+                  const updatesByDeleting = {
+                    [`userChats/${uid!}/chats/${activeChatId}`]: null,
+                    [`userChats/${otherMemberUid}/chats/${activeChatId}`]: null,
+                    [`chats/${activeChatId}`]: null,
+                  };
+                  await update(
+                    refFirebaseDatabase(firebaseDatabase),
+                    updatesByDeleting,
+                  );
+                } catch (error) {
+                  console.error(`Ошибка удаления чата`, error);
+                  return
+                }
+              }
+            }
+            return;
+          }
+
+
+          // проверяем, является ли последнее неудаленное сообщение тем, что на данный момент установлено в usersChats/uid/chats/chatId
+          const isLastUndeletedMessageDifferent =
+            lastUndeletedMessage?.messageDateUTC !== lastMessageDateUTCValue; // выдаст true если сообщения отличаются, тогда нужно обновлять значения в usersChats/uid/chats/chatId всем участникам
+
+          const membersIds = activeChatMembers.map((member) => member.uid);
+
+          if (isLastUndeletedMessageDifferent) {
+            // если последнее сообщение не то, что сейчас установлено, обновляем userChats для всех участников
+
+            const updatesByUserChats = membersIds.reduce(
+              (acc, memberUid) => {
+                acc[
+                  `userChats/${memberUid}/chats/${activeChatId}/lastMessageDateUTC`
+                ] = lastUndeletedMessage.messageDateUTC;
+                acc[
+                  `userChats/${memberUid}/chats/${activeChatId}/lastMessageIsChecked`
+                ] = lastUndeletedMessage.isChecked;
+                acc[
+                  `userChats/${memberUid}/chats/${activeChatId}/lastMessageSenderUid`
+                ] = lastUndeletedMessage.senderUid;
+                acc[
+                  `userChats/${memberUid}/chats/${activeChatId}/lastMessageText`
+                ] = lastUndeletedMessage.messageText;
+                return acc;
+              },
+              {} as Record<string, any>,
+            );
+
+            await update(
+              refFirebaseDatabase(firebaseDatabase),
+              updatesByUserChats,
+            );
+          }
+        } catch (error) {
+          console.error('Ошибка удаления сообщения:', error);
+          throw error;
+        }
       },
     },
   };

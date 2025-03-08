@@ -27,6 +27,9 @@ const MessageDateGroup: FC<MessageDateGroupProps> = ({
       />
       {messagesArray.length > 0 &&
         messagesArray.map((messageData, index) => {
+          if (messageData.isDeleted === true) {
+            return null
+          }
           return (
             <Message
               key={index}

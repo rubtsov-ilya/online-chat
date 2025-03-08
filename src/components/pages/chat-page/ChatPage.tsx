@@ -50,6 +50,8 @@ const ChatPage: FC = () => {
     activeChatIsGroup,
     } = useActiveChat();
 
+    console.log(locationState)
+
 /*     console.log('activeChatId', activeChatId,
       'activeChatAvatar',
       activeChatAvatar,
