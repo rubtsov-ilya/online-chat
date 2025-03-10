@@ -1,4 +1,4 @@
-import { FC, useRef } from 'react';
+import { FC, useEffect, useRef, useState } from 'react';
 import styles from './MessageContextMenu.module.scss';
 import CopySvg from 'src/assets/images/icons/24x24-icons/Copy.svg?react';
 import ThreadSvg from 'src/assets/images/icons/24x24-icons/Thread Reply.svg?react';
@@ -27,11 +27,14 @@ const MessageContextMenu: FC<MessageContextMenuProps> = ({
   setModalOpen,
 }) => {
   const menuRef = useRef<HTMLDivElement | null>(null);
-  const buttonCount = messageText ? 3 : 2; // число кнопок в меню. Если текста нет, то на одну кнопку меньше
-  const menuSize = {
-    width: 264, // ширина в css у .message-context-menu
-    height: 40 * buttonCount + 2, // первое число - высота в css у .message-context-menu__button, второе - кол-во кнопок, третье высота border с двух сторон
-  };
+  const [menuSize, setMenuSize] = useState({ width: 0, height: 0 });
+
+  useEffect(() => {
+    if (menuRef.current) {
+      const { clientWidth, clientHeight } = menuRef.current;
+      setMenuSize({ width: clientWidth + 2, height: clientHeight + 2}); // 2px чтобы избежать бага появления скроллбара на всей страницы в редких случаях
+    }
+  }, [isMenuVisible]);
 
   const isWidthEnough =
     сontextMenuActive.backdropWidth - сontextMenuActive.positionX >
