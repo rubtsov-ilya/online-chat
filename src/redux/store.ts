@@ -15,7 +15,8 @@ import { shopApi } from './shopApi';
 import userReducer from './slices/UserSlice';
 import messagesArrayReducer from './slices/MessagesArraySlice';
 import activeChatReducer from './slices/ActiveChatSlice';
-import chatInputValuesReducer from './slices/ChatInputValues';
+import chatInputValuesReducer from './slices/ChatInputValuesSlice';
+import selectedMessagesReducer from './slices/SelectedMessagesSlice';
 
 
 const persistConfig = {
@@ -30,6 +31,7 @@ const rootReduser = combineReducers({
   messagesArray: messagesArrayReducer,
   activeChat: activeChatReducer,
   chatInputValues: chatInputValuesReducer,
+  selectedMessages: selectedMessagesReducer,
 });
 
 const persistedReducer = persistReducer(persistConfig, rootReduser);

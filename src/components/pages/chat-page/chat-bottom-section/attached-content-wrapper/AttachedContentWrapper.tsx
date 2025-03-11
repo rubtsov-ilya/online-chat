@@ -4,7 +4,7 @@ import CrossSvg from 'src/assets/images/icons/24x24-icons/Close.svg?react';
 import FileSvg from 'src/assets/images/icons/24x24-icons/File.svg?react';
 import { AttachedItemType } from 'src/interfaces/AttachedItem.interface';
 import { useDispatch } from 'react-redux';
-import { filterAttachedItemsChatInputValue } from 'src/redux/slices/ChatInputValues';
+import { filterAttachedItemsChatInputValue } from 'src/redux/slices/ChatInputValuesSlice';
 
 interface AttachedContentWrapperProps {
   activeChatId: string | null;

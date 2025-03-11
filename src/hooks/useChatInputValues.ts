@@ -1,5 +1,5 @@
 import { useSelector } from 'react-redux';
-import { selectChatInputValues } from 'src/redux/slices/ChatInputValues';
+import { selectChatInputValues } from 'src/redux/slices/ChatInputValuesSlice';
 
 const useChatInputValues = () => {
   const { chatInputValues } = useSelector(selectChatInputValues);

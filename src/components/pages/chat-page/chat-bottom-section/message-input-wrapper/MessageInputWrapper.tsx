@@ -55,7 +55,7 @@ import {
   ChatInputValue,
   clearChatInputValue,
   updateChatInputValue,
-} from 'src/redux/slices/ChatInputValues';
+} from 'src/redux/slices/ChatInputValuesSlice';
 import { IMemberDetails } from 'src/interfaces/ChatsWithDetails.interface';
 
 interface MessageInputWrapperProps {

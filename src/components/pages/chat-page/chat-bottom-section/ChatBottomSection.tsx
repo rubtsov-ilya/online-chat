@@ -1,4 +1,4 @@
-import { FC, useEffect, useState } from 'react';
+import { FC } from 'react';
 
 import styles from './ChatBottomSection.module.scss';
 import MessageInputWrapper from './message-input-wrapper/MessageInputWrapper';
@@ -10,10 +10,8 @@ import { ILocationChatPage } from 'src/interfaces/LocationChatPage.interface';
 import useChatInputValues from 'src/hooks/useChatInputValues';
 import { useDispatch } from 'react-redux';
 import {
-  ChatInputValue,
-  addChatInputValue,
   updateChatInputValue,
-} from 'src/redux/slices/ChatInputValues';
+} from 'src/redux/slices/ChatInputValuesSlice';
 
 interface ChatBottomSectionProps {
   activeChatId: string | null;

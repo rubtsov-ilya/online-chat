@@ -29,7 +29,7 @@ import {
   USER_AVATAR_DEFAULT_VALUE,
 } from 'src/constants';
 import ChatMessagesSectionLoader from './chat-messages-section-loader/ChatMessagesSectionLoader';
-import { addChatInputValue } from 'src/redux/slices/ChatInputValues';
+import { addChatInputValue } from 'src/redux/slices/ChatInputValuesSlice';
 
 const ChatPage: FC = () => {
   const { isMobileScreen } = useMobileScreen();

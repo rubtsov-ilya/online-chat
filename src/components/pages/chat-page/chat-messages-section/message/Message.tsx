@@ -218,10 +218,9 @@ const Message: FC<MessageProps> = ({
           const isLastUndeletedMessageDifferent =
             lastUndeletedMessage?.messageDateUTC !== lastMessageDateUTCValue; // выдаст true если сообщения отличаются, тогда нужно обновлять значения в usersChats/uid/chats/chatId всем участникам
 
-          const membersIds = activeChatMembers.map((member) => member.uid);
-
-          if (isLastUndeletedMessageDifferent) {
+          if (isLastUndeletedMessageDifferent && lastUndeletedMessage !== null) {
             // если последнее сообщение не то, что сейчас установлено, обновляем userChats для всех участников
+            const membersIds = activeChatMembers.map((member) => member.uid);
 
             const updatesByUserChats = membersIds.reduce(
               (acc, memberUid) => {
