@@ -11,25 +11,27 @@ const SearchedGlobalChatsWrapper: FC<SearchedGlobalChatsWrapperProps> = ({
   searchedGlobalChats,
   isMobileScreen,
 }) => {
-  // TODO отработку 'error сделать'
+
+  if (searchedGlobalChats === 'error') {
+    return null
+  }
 
   return (
     <div className={styles['searched-global-chats-wrapper']}>
       <span className={styles['searched-global-chats-wrapper__text']}>
         Глобальный поиск
       </span>
-      {searchedGlobalChats !== 'error' &&
-        searchedGlobalChats.map((globalChat, index) => {
-          return (
-            <ChatGlobalItem
-              key={index}
-              userUid={globalChat.uid}
-              isMobileScreen={isMobileScreen}
-              chatname={globalChat.username}
-              chatAvatar={globalChat.avatar}
-            />
-          );
-        })}
+      {searchedGlobalChats.map((globalChat, index) => {
+        return (
+          <ChatGlobalItem
+            key={index}
+            userUid={globalChat.uid}
+            isMobileScreen={isMobileScreen}
+            chatname={globalChat.username}
+            chatAvatar={globalChat.avatar}
+          />
+        );
+      })}
     </div>
   );
 };

@@ -6,6 +6,9 @@
   gap: 8px;
   position: relative;
   @include fade-in-animation;
+  &.selecting * {
+    pointer-events: none;
+  }
   &__wrapper {
     position: relative;
     display: flex;
@@ -16,6 +19,10 @@
     border-radius: 16px 16px 16px 16px;
     background: var(--base-white);
     border: 1px solid var(--base-grey-whisper);
+    transition: all 0.2s ease;
+    &.selected {
+      border: 1px solid var(--light-blue-alice);
+    }
     &.margin-left {
       margin-left: 0px;
     }
@@ -35,6 +42,9 @@
     }
     &.border {
       border-radius: 16px 16px 16px 0;
+    }
+    &.selected {
+      background: var(--light-blue-alice);
     }
     @include tablet-small {
       max-width: 380px;
@@ -130,4 +140,48 @@
     bottom: 4px;
     right: 7px;
   }
+
+  &__selecting-icon-wrapper {
+    position: relative;
+    will-change: width, opacity;
+    width: 0px;
+    height: 24px; // высота иконки
+    opacity: 0;
+    transition: all 0.2s ease;
+    pointer-events: none;
+    &.selecting {
+      width: 24px; // ширина иконки
+      opacity: 1;
+    }
+  }
+
+  &__selecting-icon {
+    min-width: 24px;
+    min-height: 24px;
+    path {
+      fill: var(--light-grey-gainsboro);
+    }
+
+  }
+  &__selected-icon {
+    position: absolute;
+    top: 1px;
+    left: 1px;
+    min-width: 22px; 
+    min-height: 22px; 
+    max-width: 22px; 
+    max-height: 22px; // багнутое сжатие иногда у svg через импорт компонентом, из-за чего такие свойства
+    z-index: -1;
+    opacity: 0;
+    transition: all 0.2s ease;
+    &.selected {
+      opacity: 1;
+    }
+    
+    path {
+      fill: var(--base-accent-blue);
+    }
+
+  }
+
 }

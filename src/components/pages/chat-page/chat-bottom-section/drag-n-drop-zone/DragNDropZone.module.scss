@@ -17,7 +17,7 @@
   transition: opacity 0.1s ease;
   /* background-color: #00000099;
   backdrop-filter: blur(2px); */
-  &--active {
+  &.active {
     pointer-events: auto;
     opacity: 1;
   }
@@ -35,7 +35,7 @@
     border-radius: 8px;
     color: var(--base-grey);
     transition: color 0.15s ease;
-    &--active {
+    &.active {
       color: var(--base-accent-blue);
     }
   }

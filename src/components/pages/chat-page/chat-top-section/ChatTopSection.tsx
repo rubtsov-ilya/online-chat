@@ -1,5 +1,8 @@
 import { FC, useEffect, useState } from 'react';
 import LeftChevronSvg from 'src/assets/images/icons/24x24-icons/Left Chevron.svg?react';
+import CloseSvg from 'src/assets/images/icons/24x24-icons/Close.svg?react';
+import CopySvg from 'src/assets/images/icons/24x24-icons/Copy.svg?react';
+import DeleteSvg from 'src/assets/images/icons/24x24-icons/Delete.svg?react';
 import AvatarImage from 'src/components/ui/avatar-image/AvatarImage';
 
 import styles from './ChatTopSection.module.scss';
@@ -15,6 +18,10 @@ import {
 } from 'src/constants';
 import { ILocationChatPage } from 'src/interfaces/LocationChatPage.interface';
 import DotsBounceLoader from 'src/components/ui/dots-bounce-loader/DotsBounceLoader';
+import useSelectedMessages from 'src/hooks/useSelectedMessages';
+import { clearSelectedMessagesState } from 'src/redux/slices/SelectedMessagesSlice';
+import { useDispatch } from 'react-redux';
+import FlipNumbers from 'react-flip-numbers';
 
 interface ChatTopSectionProps {
   isMobileScreen?: boolean;
@@ -38,10 +45,15 @@ const ChatTopSection: FC<ChatTopSectionProps> = ({
   const [chatStatus, setChatStatus] = useState<string>('');
   const [writingUsers, setWritingUsers] = useState<string[]>([]);
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const { isMessagesSelecting, selectedMessages } = useSelectedMessages();
 
   const onBackBtnClick = () => {
-    navigate('/chats');
-    /* dispatch(removeActiveChat()); */
+    if (isMessagesSelecting) {
+      dispatch(clearSelectedMessagesState());
+    } else {
+      navigate('/chats');
+    }
   };
 
   useEffect(() => {
@@ -145,7 +157,14 @@ const ChatTopSection: FC<ChatTopSectionProps> = ({
   }, [activeChatMembers, isSubscribeLoading, locationUid, activeChatId]);
 
   // получаем имя печатющего пользователя для группового чата
-  const username = activeChatIsGroup === true && activeChatMembers !== null && writingUsers.length > 0 ? activeChatMembers.find((member) => member.uid === writingUsers[0])?.username.slice(0,20) || '' : '';
+  const username =
+    activeChatIsGroup === true &&
+    activeChatMembers !== null &&
+    writingUsers.length > 0
+      ? activeChatMembers
+          .find((member) => member.uid === writingUsers[0])
+          ?.username.slice(0, 20) || ''
+      : '';
 
   return (
     <ComponentTag className={styles['chat-top-section']}>
@@ -155,61 +174,105 @@ const ChatTopSection: FC<ChatTopSectionProps> = ({
         }
       >
         <div className={styles['chat-top-section__content']}>
-          <button
-            onClick={onBackBtnClick}
-            className={styles['chat-top-section__back-btn']}
-          >
-            <LeftChevronSvg
-              className={styles['chat-top-section__left-chevron-svg']}
-            />
-          </button>
-          <div className={styles['chat-top-section__middle-wrapper']}>
-            <span className={styles['chat-top-section__chatname']}>{chatname}</span>
-            {/* если не получен статус, отображать анимированные ... */}
-            {chatStatus.length === 0 && (
-              <span className={`${styles['chat-top-section__info']}`}>
-                <DotsBounceLoader />
-              </span>
+          <div className={styles['chat-top-section__back-wrapper']}>
+            <button
+              onClick={onBackBtnClick}
+              className={styles['chat-top-section__back-btn']}
+            >
+              <LeftChevronSvg
+                className={`${styles['chat-top-section__back-icon']} ${!isMessagesSelecting ? styles['active'] : ''}`}
+              />
+              <CloseSvg
+                className={`${styles['chat-top-section__back-icon']} ${isMessagesSelecting ? styles['active'] : ''}`}
+              />
+            </button>
+            {isMessagesSelecting && (
+              <FlipNumbers
+                numberStyle={{
+                  fontFamily: 'var(--font-family)',
+                  fontWeight: 500,
+                  whiteSpace: 'nowrap',
+                  fontVariantNumeric: 'tabular-nums',
+                }}
+                height={13}
+                width={9}
+                color={`var(--base-black)`}
+                play
+                perspective={100}
+                numbers={`${selectedMessages.length}`}
+              />
             )}
-            {/* если получен статус, и нет печатающих пользователей, отображать статус */}
-            {chatStatus.length > 0 && writingUsers.length === 0 && (
-              <span
-                className={`${styles['chat-top-section__info']} ${chatStatus === CHAT_INFO_STATUS_ONLINE ? styles['chat-top-section__info--active'] : ''}`}
-              >
-                {chatStatus}
-              </span>
-            )}
-            {/* если получен статус, и есть печатающие пользователи и чат негрупповой, отображать статус "печатает" без имени пользователя*/}
-            {chatStatus.length > 0 &&
-              writingUsers.length > 0 &&
-              activeChatIsGroup === false && (
-                <span
-                  className={`${styles['chat-top-section__info']} ${styles['chat-top-section__info--active']} ${styles['chat-top-section__info--loading']}`}
-                >
-                  {CHAT_INFO_STATUS_WRITING}
-                  <DotsBounceLoader />
+          </div>
+
+          {!isMessagesSelecting && (
+            <>
+              <div className={styles['chat-top-section__middle-wrapper']}>
+                <span className={styles['chat-top-section__chatname']}>
+                  {chatname}
                 </span>
-              )}
-            {/* если получен статус, и есть печатающие пользователи и чат групповой, отображать статус "печатает" с именем первого в массиве пользователя*/}
-            {chatStatus.length > 0 &&
-              writingUsers.length > 0 &&
-              activeChatIsGroup === true &&
-              activeChatMembers && (
-                <span
-                  className={`${styles['chat-top-section__info']} ${styles['chat-top-section__info--active']}`}
-                >
-                  {username.length > 0 ? (
-                    <>
-                      {username}
-                      {' '}
+                {/* если не получен статус, отображать анимированные ... */}
+                {chatStatus.length === 0 && (
+                  <span className={styles['chat-top-section__info']}>
+                    <DotsBounceLoader />
+                  </span>
+                )}
+                {/* если получен статус, и нет печатающих пользователей, отображать статус */}
+                {chatStatus.length > 0 && writingUsers.length === 0 && (
+                  <span
+                    className={`${styles['chat-top-section__info']} ${chatStatus === CHAT_INFO_STATUS_ONLINE ? styles['chat-top-section__info--active'] : ''}`}
+                  >
+                    {chatStatus}
+                  </span>
+                )}
+                {/* если получен статус, и есть печатающие пользователи и чат негрупповой, отображать статус "печатает" без имени пользователя*/}
+                {chatStatus.length > 0 &&
+                  writingUsers.length > 0 &&
+                  activeChatIsGroup === false && (
+                    <span
+                      className={`${styles['chat-top-section__info']} ${styles['chat-top-section__info--active']} ${styles['chat-top-section__info--loading']}`}
+                    >
                       {CHAT_INFO_STATUS_WRITING}
                       <DotsBounceLoader />
-                    </> 
-                  ) : chatStatus}
-                </span>
-              )}
-          </div>
-          <AvatarImage AvatarImg={avatar} />
+                    </span>
+                  )}
+                {/* если получен статус, и есть печатающие пользователи и чат групповой, отображать статус "печатает" с именем первого в массиве пользователя*/}
+                {chatStatus.length > 0 &&
+                  writingUsers.length > 0 &&
+                  activeChatIsGroup === true &&
+                  activeChatMembers && (
+                    <span
+                      className={`${styles['chat-top-section__info']} ${styles['chat-top-section__info--active']}`}
+                    >
+                      {username.length > 0 ? (
+                        <>
+                          {username} {CHAT_INFO_STATUS_WRITING}
+                          <DotsBounceLoader />
+                        </>
+                      ) : (
+                        chatStatus
+                      )}
+                    </span>
+                  )}
+              </div>
+              <AvatarImage animated={true} AvatarImg={avatar} />
+            </>
+          )}
+          {isMessagesSelecting && (
+            <div
+              className={styles['chat-top-section__selecting-buttons-wrapper']}
+            >
+              <button className={styles['chat-top-section__selecting-button']}>
+                <CopySvg
+                  className={styles['chat-top-section__selecting-icon']}
+                />
+              </button>
+              <button className={styles['chat-top-section__selecting-button']}>
+                <DeleteSvg
+                  className={styles['chat-top-section__selecting-icon']}
+                />
+              </button>
+            </div>
+          )}
         </div>
       </div>
     </ComponentTag>

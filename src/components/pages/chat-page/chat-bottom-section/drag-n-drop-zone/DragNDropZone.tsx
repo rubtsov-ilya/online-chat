@@ -121,7 +121,7 @@ const DragNDropZone: FC<DragNDropZoneProps> = ({
 
   return (
     <div
-      className={`${styles['drag-n-drop-zone']} ${isDrag ? styles['drag-n-drop-zone--active'] : ''}`}
+      className={`${styles['drag-n-drop-zone']} ${isDrag ? styles['active'] : ''}`}
       onDragEnter={onDragEnter}
       onDragLeave={onDragLeave}
       onDrop={(e: React.DragEvent) => {
@@ -144,7 +144,7 @@ const DragNDropZone: FC<DragNDropZoneProps> = ({
             }
           }}
           style={{ height: fileType === 'file' ? 'calc(70% + 8px)' : '35%' }}
-          className={`${styles['drag-n-drop-zone__drop-wrapper']} ${isDragOnDropWrapper === 'file' ? styles['drag-n-drop-zone__drop-wrapper--active'] : ''}`}
+          className={`${styles['drag-n-drop-zone__drop-wrapper']} ${isDragOnDropWrapper === 'file' ? styles['active'] : ''}`}
         >
           <span className={styles['drag-n-drop-zone__top-span']}>
             Перетащите сюда файлы
@@ -168,7 +168,7 @@ const DragNDropZone: FC<DragNDropZoneProps> = ({
             }
           }}
           style={{ height: '35%' }}
-          className={`${styles['drag-n-drop-zone__drop-wrapper']} ${isDragOnDropWrapper === 'media' ? styles['drag-n-drop-zone__drop-wrapper--active'] : ''}`}
+          className={`${styles['drag-n-drop-zone__drop-wrapper']} ${isDragOnDropWrapper === 'media' ? styles['active'] : ''}`}
         >
           <span className={styles['drag-n-drop-zone__top-span']}>
             Перетащите сюда файлы

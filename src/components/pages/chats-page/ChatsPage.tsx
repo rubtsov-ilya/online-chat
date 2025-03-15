@@ -7,6 +7,8 @@ import styles from './ChatsPage.module.scss';
 import ChatsDefaultSection from './chats-default-section/ChatsDefaultSection';
 import { useDispatch } from 'react-redux';
 import { removeActiveChat } from 'src/redux/slices/ActiveChatSlice';
+import useSelectedMessages from 'src/hooks/useSelectedMessages';
+import { clearSelectedMessagesState } from 'src/redux/slices/SelectedMessagesSlice';
 
 interface ChatsPageProps {
   isMobileScreen: boolean;
@@ -15,14 +17,19 @@ interface ChatsPageProps {
 const ChatsPage: FC<ChatsPageProps> = ({ isMobileScreen }) => {
   const location = useLocation();
   const dispatch = useDispatch();
+  const { isForwarding } = useSelectedMessages();
+
   const isChatPathName = location.pathname === '/chats/chat';
 
   useEffect(() => {
     if (location.pathname === '/chats') {
       dispatch(removeActiveChat());
+      if (!isForwarding) {
+        dispatch(clearSelectedMessagesState());
+      }
     }
   }, [location]);
-  
+
   return (
     <main className={styles['main']}>
       {!isMobileScreen && (

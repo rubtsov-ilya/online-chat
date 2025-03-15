@@ -3,10 +3,12 @@ import styles from './MessageContextMenu.module.scss';
 import CopySvg from 'src/assets/images/icons/24x24-icons/Copy.svg?react';
 import ThreadSvg from 'src/assets/images/icons/24x24-icons/Thread Reply.svg?react';
 import DeleteSvg from 'src/assets/images/icons/24x24-icons/Delete.svg?react';
-
+import MessageContextMenuButton from '../message-context-menu-button/MessageContextMenuButton';
+import { useDispatch } from 'react-redux';
+import { addSelectedMessage } from 'src/redux/slices/SelectedMessagesSlice';
+import useActiveChat from 'src/hooks/useActiveChat';
 
 interface MessageContextMenuProps {
-  setModalOpen: (value: React.SetStateAction<false | "delete">) => void
   messageText: string;
   сontextMenuActive: {
     positionY: number;
@@ -16,6 +18,8 @@ interface MessageContextMenuProps {
     isActive: boolean;
   };
   isMenuVisible: boolean;
+  selectingMessageData: { messageId: string; messageDateUTC: number };
+  setModalOpen: (value: React.SetStateAction<false | 'delete'>) => void;
   closeContextMenu: () => void;
 }
 
@@ -23,16 +27,19 @@ const MessageContextMenu: FC<MessageContextMenuProps> = ({
   messageText,
   сontextMenuActive,
   isMenuVisible,
+  selectingMessageData,
   closeContextMenu,
   setModalOpen,
 }) => {
   const menuRef = useRef<HTMLDivElement | null>(null);
   const [menuSize, setMenuSize] = useState({ width: 0, height: 0 });
+  const dispatch = useDispatch();
+  const { activeChatId } = useActiveChat();
 
   useEffect(() => {
     if (menuRef.current) {
       const { clientWidth, clientHeight } = menuRef.current;
-      setMenuSize({ width: clientWidth + 2, height: clientHeight + 2}); // 2px чтобы избежать бага появления скроллбара на всей страницы в редких случаях
+      setMenuSize({ width: clientWidth + 2, height: clientHeight + 2 }); // 2px чтобы избежать бага появления скроллбара на всей страницы в редких случаях
     }
   }, [isMenuVisible]);
 
@@ -43,7 +50,7 @@ const MessageContextMenu: FC<MessageContextMenuProps> = ({
     сontextMenuActive.backdropHeight - сontextMenuActive.positionY >
     menuSize.height;
 
-  const copyText = async (text: string) => {
+  const onCopyButtonClick = async (text: string) => {
     try {
       await navigator.clipboard.writeText(text); // копируется текст в буфер обмена
       closeContextMenu();
@@ -56,6 +63,25 @@ const MessageContextMenu: FC<MessageContextMenuProps> = ({
   const onDeleteButtonClick = () => {
     closeContextMenu();
     setModalOpen('delete');
+  };
+
+  const onSelectMessageClick = () => {
+    if (activeChatId === null) {
+      return;
+    }
+    const messageDateTimestamp = new Date(
+      selectingMessageData.messageDateUTC,
+    ).getTime(); // selectingMessageData.messageDateUTC в виде строки
+    dispatch(
+      addSelectedMessage({
+        selectedMessage: {
+          messageId: selectingMessageData.messageId,
+          messageDateUTC: messageDateTimestamp,
+        },
+        selectedChatId: activeChatId,
+      }),
+    );
+    closeContextMenu();
   };
 
   return (
@@ -77,37 +103,27 @@ const MessageContextMenu: FC<MessageContextMenuProps> = ({
     >
       {/* кнопка копировать текст */}
       {messageText && (
-        <button
-          onClick={() => copyText(messageText)}
-          className={styles['message-context-menu__button']}
-        >
-          <CopySvg className={styles['message-context-menu__icon']} />
-          <span className={styles['message-context-menu__text']}>
-            Копировать текст
-          </span>
-        </button>
+        <MessageContextMenuButton
+          text="Копировать текст"
+          Svg={CopySvg}
+          onClick={() => onCopyButtonClick(messageText)}
+        />
       )}
 
       {/* кнопка выбрать */}
-      <button className={styles['message-context-menu__button']}>
-        <ThreadSvg className={styles['message-context-menu__icon']} />
-        <span className={styles['message-context-menu__text']}>Выбрать</span>
-      </button>
+      <MessageContextMenuButton
+        text="Выбрать"
+        Svg={ThreadSvg}
+        onClick={onSelectMessageClick}
+      />
 
       {/* кнопка удалить */}
-      <button
+      <MessageContextMenuButton
+        text="Удалить"
+        Svg={DeleteSvg}
         onClick={onDeleteButtonClick}
-        className={`${styles['message-context-menu__button']} ${styles['red']}`}
-      >
-        <DeleteSvg
-          className={`${styles['message-context-menu__icon']} ${styles['red']}`}
-        />
-        <span
-          className={`${styles['message-context-menu__text']} ${styles['red']}`}
-        >
-          Удалить
-        </span>
-      </button>
+        accentColor="red"
+      />
     </div>
   );
 };

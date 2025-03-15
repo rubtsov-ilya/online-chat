@@ -3,12 +3,16 @@ import { ISelectedMessage } from 'src/interfaces/SelectedMessage.interface';
 
 interface IInitialState {
   isMessagesSelecting: boolean;
+  isForwarding: boolean;
   selectedMessages: ISelectedMessage[];
+  selectedChatId: null | string;
 }
 
 const initialState: IInitialState = {
   isMessagesSelecting: false,
+  isForwarding: false,
   selectedMessages: [],
+  selectedChatId: null,
 };
 
 const selectedMessagesSlice = createSlice({
@@ -22,9 +26,11 @@ const selectedMessagesSlice = createSlice({
       state,
       action: PayloadAction<{
         selectedMessage: ISelectedMessage;
+        selectedChatId: string;
       }>,
     ) {
       state.isMessagesSelecting = true;
+      state.selectedChatId = action.payload.selectedChatId;
       state.selectedMessages = [
         ...state.selectedMessages,
         action.payload.selectedMessage,
@@ -53,7 +59,7 @@ const selectedMessagesSlice = createSlice({
         selectedMessage: ISelectedMessage;
       }>,
     ) {
-      state.selectedMessages = state.selectedMessages
+      const filteredSelectedMessages = state.selectedMessages
         .filter(
           (selectedMessage) =>
             selectedMessage.messageId !==
@@ -77,14 +83,34 @@ const selectedMessagesSlice = createSlice({
 
           return dateA - dateB;
         });
+      state.selectedMessages = filteredSelectedMessages;
+
+      if (filteredSelectedMessages.length === 0) {
+        state.isMessagesSelecting = false;
+        state.selectedChatId = null;
+      }
     },
     clearSelectedMessagesState(state) {
       state.isMessagesSelecting = false;
+      state.selectedChatId = null;
       state.selectedMessages = [];
+    },
+    setIsForwarding(
+      state,
+      action: PayloadAction<{
+        isForwarding: boolean;
+      }>,
+    ) {
+      state.isForwarding = action.payload.isForwarding;
     },
   },
 });
 
-export const {} = selectedMessagesSlice.actions;
+export const {
+  addSelectedMessage,
+  removeSelectedMessage,
+  clearSelectedMessagesState,
+  setIsForwarding,
+} = selectedMessagesSlice.actions;
 export const { selectMessages } = selectedMessagesSlice.selectors;
 export default selectedMessagesSlice.reducer;

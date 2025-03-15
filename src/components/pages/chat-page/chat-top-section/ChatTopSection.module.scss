@@ -13,23 +13,54 @@
     justify-content: space-between;
   }
 
+  &__back-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-right: 16px; // отступ чтобы когда есть аватарка, статус был по центру. 16 + 24 ширина картинки = 40px ширина аватарки
+  }
+
   &__back-btn {
+    position: relative;
     display: flex;
     align-items: center;
     justify-content: flex-start;
-    width: 40px;
-    /* 40px is a width of AvatarImage */
+    height: 24px;
+    width: 24px;
     cursor: default;
   }
 
-  &__left-chevron-svg {
+  &__back-icon {
+    position: absolute;
+    top: 0;
+    left: 0;
     min-width: 24px;
     min-height: 24px;
     cursor: pointer;
+    opacity: 0;
+    transform: scale(0);
+    transition: all 0.15s ease;
     path {
       fill: var(--base-black);
     }
+    &.active {
+      opacity: 1;
+      transform: scale(1);
+    }
   }
+
+  &__selected-counter {
+    font-family: var(--font-family);
+    font-weight: 700;
+    font-size: 16px;
+    text-align: center;
+    color: var(--base-black);
+    user-select: none;
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+    animation: fadeInAndScale 0.15s ease forwards;
+  }
+
   &__middle-wrapper {
     display: flex;
     flex-direction: column;
@@ -37,6 +68,7 @@
     align-items: center;
     height: 40px;
     overflow-y: hidden;
+    animation: fadeIn 0.15s ease forwards;
   }
 
   &__chatname {
@@ -75,6 +107,26 @@
       animation-delay: 0.4s;
     }
   }
+
+  &__selecting-buttons-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 16px;
+  }
+
+  &__selecting-button {
+    display: flex;
+  }
+
+  &__selecting-icon {
+    min-width: 24px;
+    min-height: 24px;
+    animation: fadeInAndScale 0.15s ease forwards;
+    path {
+      fill: var(--base-black);
+    }
+  }  
 }
 
 @keyframes bounce {
@@ -86,5 +138,25 @@
   }
   66% {
     transform: translateY(0px);
+  }
+}
+
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes fadeInAndScale {
+  0% {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
   }
 }

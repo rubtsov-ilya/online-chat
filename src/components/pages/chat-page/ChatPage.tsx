@@ -16,7 +16,6 @@ import { firebaseDatabase } from 'src/firebase';
 import useAuth from 'src/hooks/useAuth';
 import {
   IFirebaseRtDbChat,
-  IFirebaseRtDbUser,
 } from 'src/interfaces/FirebaseRealtimeDatabase.interface';
 import { useDispatch } from 'react-redux';
 import {
@@ -30,6 +29,8 @@ import {
 } from 'src/constants';
 import ChatMessagesSectionLoader from './chat-messages-section-loader/ChatMessagesSectionLoader';
 import { addChatInputValue } from 'src/redux/slices/ChatInputValuesSlice';
+import { clearSelectedMessagesState } from 'src/redux/slices/SelectedMessagesSlice';
+import useSelectedMessages from 'src/hooks/useSelectedMessages';
 
 const ChatPage: FC = () => {
   const { isMobileScreen } = useMobileScreen();
@@ -48,19 +49,8 @@ const ChatPage: FC = () => {
     activeChatname,
     activeChatMembers,
     activeChatIsGroup,
-    } = useActiveChat();
-
-    console.log(locationState)
-
-/*     console.log('activeChatId', activeChatId,
-      'activeChatAvatar',
-      activeChatAvatar,
-      'activeChatname',
-      activeChatname,
-      'activeChatMembers',
-      activeChatMembers,
-      'activeChatIsGroup',
-      activeChatIsGroup,) */
+  } = useActiveChat();
+  const { isForwarding } = useSelectedMessages();
 
   useLayoutEffect(() => {
     if (activeChatId !== null) {
@@ -77,6 +67,9 @@ const ChatPage: FC = () => {
           chatId: activeChatId,
         }),
       );
+      if (!isForwarding) {
+        dispatch(clearSelectedMessagesState());
+      }
     }
   }, [activeChatId]);
 
@@ -211,7 +204,9 @@ const ChatPage: FC = () => {
             membersRef,
             async (snapshot) => {
               if (!snapshot.exists()) return;
-              const membersIds = Object.keys(snapshot.val() as IFirebaseRtDbChat['membersIds']);
+              const membersIds = Object.keys(
+                snapshot.val() as IFirebaseRtDbChat['membersIds'],
+              );
               await updateMembersDetails(membersIds, activeChatMembers || []);
             },
             (error) => {
@@ -235,7 +230,6 @@ const ChatPage: FC = () => {
     };
   }, [activeChatId, locationState]);
 
-  
   const onDragEnter = (event: React.DragEvent) => {
     if (!isMobileScreen) {
       event.preventDefault();
@@ -248,7 +242,9 @@ const ChatPage: FC = () => {
       <ChatTopSection
         isMobileScreen={isMobileScreen}
         isSubscribeLoading={isSubscribeLoading}
-        locationUid={locationState? locationState.userUidFromGlobalSearch : null}
+        locationUid={
+          locationState ? locationState.userUidFromGlobalSearch : null
+        }
         avatar={
           activeChatAvatar !== null
             ? activeChatAvatar
@@ -282,7 +278,7 @@ const ChatPage: FC = () => {
         locationState={locationState}
       />
       <CustomToastContainer />
-      <div id='message-context-backdrop'></div>
+      <div id="message-context-backdrop"></div>
     </ComponentTag>
   );
 };

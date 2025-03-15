@@ -31,4 +31,16 @@
       min-height: 20px;
     }
   }
+  &--animated {
+    animation: fadeIn 0.15s ease forwards;
+  }
+}
+
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
 }

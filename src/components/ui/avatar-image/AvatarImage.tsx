@@ -9,9 +9,10 @@ import { IFirebaseRtDbUser } from 'src/interfaces/FirebaseRealtimeDatabase.inter
 interface UserAvatarProps {
   AvatarImg: IFirebaseRtDbUser['avatar'];
   isLittle?: boolean;
+  animated?: boolean;
 }
 
-const AvatarImage: FC<UserAvatarProps> = React.memo(({ AvatarImg, isLittle }) => {
+const AvatarImage: FC<UserAvatarProps> = React.memo(({ AvatarImg, isLittle, animated }) => {
   const [isError, setIsError] = useState(false);
   return (
     <>
@@ -22,13 +23,13 @@ const AvatarImage: FC<UserAvatarProps> = React.memo(({ AvatarImg, isLittle }) =>
           baseColor="var(--base-grey-gainsboro)"
         >
           <Skeleton
-            className={`${styles['avatar-image']} ${styles['avatar-image--svg']} ${isLittle ? styles['avatar-image--little'] : ''}`}
+            className={`${styles['avatar-image']} ${styles['avatar-image--svg']} ${isLittle ? styles['avatar-image--little'] : ''} ${animated ? styles['avatar-image--animated'] : ''}`}
           />
         </SkeletonTheme>
       )}
       {(AvatarImg?.length === 0 || isError === true) && (
         <div
-          className={`${styles['avatar-image']} ${styles['avatar-image--svg']} ${isLittle ? styles['avatar-image--little'] : ''}`}
+          className={`${styles['avatar-image']} ${styles['avatar-image--svg']} ${isLittle ? styles['avatar-image--little'] : ''} ${animated ? styles['avatar-image--animated'] : ''}`}
           onDragStart={(e: React.DragEvent<HTMLImageElement>) =>
             e.preventDefault()
           }
@@ -48,7 +49,7 @@ const AvatarImage: FC<UserAvatarProps> = React.memo(({ AvatarImg, isLittle }) =>
           onDragStart={(e: React.DragEvent<HTMLImageElement>) =>
             e.preventDefault()
           }
-          className={`${styles['avatar-image']} ${isLittle ? styles['avatar-image--little'] : ''}`}
+          className={`${styles['avatar-image']} ${isLittle ? styles['avatar-image--little'] : ''} ${animated ? styles['avatar-image--animated'] : ''}`}
         />
       )}
     </>

@@ -78,7 +78,7 @@ const ChatItem: FC<ChatItemProps> = ({
       subtitle: 'Вы точно хотите удалить чат без возможности восстановления?',
       actionBtnText: 'Удалить',
       action: async () => {
-        // TODO от сюда взять функцию
+
         if (otherMemberUid === null || blocked === null) {
           throw new Error('Ошибка удаления чата');
         }
@@ -146,7 +146,7 @@ const ChatItem: FC<ChatItemProps> = ({
         setIsActive(false);
         try {
           //у себя чат будет удалён, у иных пользователей будет удалён из membersIds
-          // из-за структуры бэкенда есть предположение, что возможна ситуация: один пользователь отправит сообщение и второй пользователь удалит чат, и если пакет дойдёт после удаления чата, то у второго пользователя будет сломанный чат отображаться без необходим для полноценной отрисовки ключей
+          // из-за структуры бэкенда есть предположение, что возможна ситуация: один пользователь отправит сообщение и второй пользователь удалит чат, и если пакет дойдёт после удаления чата, то у второго пользователя будет сломанный чат отображаться без необходим для полноценной отрисовки ключей. UPD: Вставлена защита от этого.
           const updatesMembersIdsByUserChats = Object.keys(
             chatItemData.membersIds,
           ).reduce(
@@ -297,7 +297,7 @@ const ChatItem: FC<ChatItemProps> = ({
   return (
     <>
       <div
-        className={`${styles['chat-item']} ${isActive ? styles['chat-item--active'] : ''}`}
+        className={`${styles['chat-item']} ${isActive ? styles['active'] : ''}`}
         onContextMenu={(e) => {
           if (!isMobileScreen) {
             e.preventDefault();

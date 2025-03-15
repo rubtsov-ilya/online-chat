@@ -40,6 +40,13 @@ import getLastUndeletedMessage from 'src/services/getLastUndeletedMessage';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { removeActiveChat } from 'src/redux/slices/ActiveChatSlice';
+import useSelectedMessages from 'src/hooks/useSelectedMessages';
+import {
+  addSelectedMessage,
+  removeSelectedMessage,
+} from 'src/redux/slices/SelectedMessagesSlice';
+import EmptyCircleSvg from 'src/assets/images/icons/24x24-icons/Empty cirlce.svg?react';
+import CheckCircleSvg from 'src/assets/images/icons/24x24-icons/Check Circle.svg?react';
 
 interface MessageProps {
   messageData: IMessage | ILoadingMessage;
@@ -84,6 +91,11 @@ const Message: FC<MessageProps> = ({
   const dispatch = useDispatch();
   const { isMobileScreen } = useMobileScreen();
   const { toggleModal } = useToggleModal({ setCbState: setModalOpen });
+  const { isMessagesSelecting, selectedMessages } = useSelectedMessages();
+
+  const isMessageSelected = selectedMessages.find(
+    (message) => message.messageId === messageData.messageId,
+  );
 
   const modalDuration = 100;
 
@@ -170,11 +182,8 @@ const Message: FC<MessageProps> = ({
             }
 
             if (!messagesSnapshot.exists()) {
-
               // если неудаленных сообщений нет, то удалить чат
               if (activeChatIsGroup === false) {
-                // TODO здесь прописать удаление всего чата. УДАЛЯТЬ ТОЛЬКО ДЛЯ НЕГРУППОВОГО, групповой чат нельзя удалить так
-
                 const otherMemberUid =
                   activeChatMembers.find((member) => {
                     return member.uid !== uid;
@@ -206,19 +215,21 @@ const Message: FC<MessageProps> = ({
                   );
                 } catch (error) {
                   console.error(`Ошибка удаления чата`, error);
-                  return
+                  return;
                 }
               }
             }
             return;
           }
 
-
           // проверяем, является ли последнее неудаленное сообщение тем, что на данный момент установлено в usersChats/uid/chats/chatId
           const isLastUndeletedMessageDifferent =
             lastUndeletedMessage?.messageDateUTC !== lastMessageDateUTCValue; // выдаст true если сообщения отличаются, тогда нужно обновлять значения в usersChats/uid/chats/chatId всем участникам
 
-          if (isLastUndeletedMessageDifferent && lastUndeletedMessage !== null) {
+          if (
+            isLastUndeletedMessageDifferent &&
+            lastUndeletedMessage !== null
+          ) {
             // если последнее сообщение не то, что сейчас установлено, обновляем userChats для всех участников
             const membersIds = activeChatMembers.map((member) => member.uid);
 
@@ -274,34 +285,88 @@ const Message: FC<MessageProps> = ({
     }
   };
 
+  const onMessageContextMenuClick = (
+    e: React.MouseEvent<HTMLDivElement, MouseEvent>,
+  ) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    if (isMessagesSelecting) {
+      // если идёт выбор сообщений, контекстное меню недоступно
+      return;
+    }
+
+    // координаты на странице относительно оверлея
+    const backdropElement = document.getElementById(
+      'message-context-backdrop',
+    ) as HTMLDivElement; // находится в ChatPage
+    const { width, left } = backdropElement.getBoundingClientRect();
+    setContextMenuActive({
+      positionY: e.clientY,
+      positionX: e.clientX - left, // координата X относительно backdropElement
+      backdropHeight: document.documentElement.scrollHeight, // высота всей страницы
+      backdropWidth: width,
+      isActive: true,
+    });
+  };
+
+  const onMessageClick = () => {
+    if (!isMessagesSelecting || activeChatId === null) {
+      return;
+    }
+
+    if (!isMessageSelected) {
+      // выбрать сообщение
+      const messageDateTimestamp = new Date(
+        messageData.messageDateUTC as string,
+      ).getTime(); // messageData.messageDateUTC в виде строки
+      dispatch(
+        addSelectedMessage({
+          selectedMessage: {
+            messageId: messageData.messageId,
+            messageDateUTC: messageDateTimestamp,
+          },
+          selectedChatId: activeChatId,
+        }),
+      );
+    } else {
+      // убрать сообщение из выбранных
+      const messageDateTimestamp = new Date(
+        messageData.messageDateUTC as string,
+      ).getTime(); // messageData.messageDateUTC в виде строки
+      dispatch(
+        removeSelectedMessage({
+          selectedMessage: {
+            messageId: messageData.messageId,
+            messageDateUTC: messageDateTimestamp,
+          },
+        }),
+      );
+    }
+  };
+
   return (
     <>
       <div
-        className={styles['message']}
+        className={`${styles['message']} ${isMessagesSelecting ? styles['selecting'] : ''}`}
         id={messageData.messageId}
-        onContextMenu={(e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
-          e.preventDefault();
-          e.stopPropagation();
-
-          // координаты на странице относительно оверлея
-          const backdropElement = document.getElementById(
-            'message-context-backdrop',
-          ) as HTMLDivElement; // находится в ChatPage
-          const { width, left } = backdropElement.getBoundingClientRect();
-          setContextMenuActive({
-            positionY: e.clientY,
-            positionX: e.clientX - left, // координата X относительно backdropElement
-            backdropHeight: document.documentElement.scrollHeight, // высота всей страницы
-            backdropWidth: width,
-            isActive: true,
-          });
-        }}
+        onContextMenu={onMessageContextMenuClick}
+        onClick={onMessageClick}
       >
+        <div
+          className={`${styles['message__selecting-icon-wrapper']} ${isMessagesSelecting ? styles['selecting'] : ''}`}
+        >
+          <EmptyCircleSvg className={styles['message__selecting-icon']} />
+          <CheckCircleSvg
+            className={`${styles['message__selected-icon']} ${isMessageSelected ? styles['selected'] : ''}`}
+          />
+        </div>
+
         {isLastOfGroup && uid && messageData.senderUid != uid && (
           <AvatarImage AvatarImg={avatar} isLittle={true} />
         )}
         <div
-          className={`${styles['message__wrapper']} ${messageData.senderUid === uid ? styles['own'] : ''} ${isLastOfGroup ? `${styles['border']} ${styles['margin-left']}` : ''} ${isFirstOfGroup && messageIndex !== 0 ? styles['margin-top'] : ''}`}
+          className={`${styles['message__wrapper']} ${messageData.senderUid === uid ? styles['own'] : ''} ${isLastOfGroup ? `${styles['border']} ${styles['margin-left']}` : ''} ${isFirstOfGroup && messageIndex !== 0 ? styles['margin-top'] : ''} ${isMessageSelected ? styles['selected'] : ''}`}
         >
           {/* отображение username в групповом чате */}
           {isFirstOfGroup === true &&
@@ -558,6 +623,10 @@ const Message: FC<MessageProps> = ({
       </div>
       {сontextMenuActive.isActive && (
         <MessageContextBackdrop
+          selectingMessageData={{
+            messageId: messageData.messageId,
+            messageDateUTC: messageData.messageDateUTC as number,
+          }}
           setModalOpen={(c) => setModalOpen(c)}
           messageText={messageData.messageText}
           setContextMenuActive={setContextMenuActive}
