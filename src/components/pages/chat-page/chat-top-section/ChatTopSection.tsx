@@ -10,7 +10,15 @@ import { useNavigate } from 'react-router-dom';
 import useActiveChat from 'src/hooks/useActiveChat';
 import useAuth from 'src/hooks/useAuth';
 import { firebaseDatabase } from 'src/firebase';
-import { onValue, ref } from 'firebase/database';
+import {
+  onValue,
+  equalTo,
+  get,
+  orderByChild,
+  query,
+  ref as refFirebaseDatabase,
+  update,
+} from 'firebase/database';
 import {
   CHAT_INFO_STATUS_OFFLINE,
   CHAT_INFO_STATUS_ONLINE,
@@ -23,6 +31,10 @@ import { clearSelectedMessagesState } from 'src/redux/slices/SelectedMessagesSli
 import { useDispatch } from 'react-redux';
 import FlipNumbers from 'react-flip-numbers';
 import useMessagesFromRtk from 'src/hooks/useMessagesFromRtk';
+import { IFirebaseRtDbChat } from 'src/interfaces/FirebaseRealtimeDatabase.interface';
+import getLastUndeletedMessage from 'src/services/getLastUndeletedMessage';
+import { IMessage } from 'src/interfaces/Message.interface';
+import { removeActiveChat } from 'src/redux/slices/ActiveChatSlice';
 
 interface ChatTopSectionProps {
   isMobileScreen?: boolean;
@@ -45,8 +57,13 @@ const ChatTopSection: FC<ChatTopSectionProps> = ({
   const [writingUsers, setWritingUsers] = useState<string[]>([]);
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const { activeChatMembers, activeChatIsGroup, activeChatId } =
-    useActiveChat();
+  const {
+    activeChatMembers,
+    activeChatAvatar,
+    activeChatname,
+    activeChatIsGroup,
+    activeChatId,
+  } = useActiveChat();
   const { isMessagesSelecting, selectedMessages } = useSelectedMessages();
   const { messagesArray } = useMessagesFromRtk();
 
@@ -80,7 +97,7 @@ const ChatTopSection: FC<ChatTopSectionProps> = ({
           locationUid;
 
         if (otherMemberUid) {
-          const userIsOnlineRef = ref(
+          const userIsOnlineRef = refFirebaseDatabase(
             firebaseDatabase,
             `users/${otherMemberUid}/isOnline`,
           );
@@ -123,7 +140,7 @@ const ChatTopSection: FC<ChatTopSectionProps> = ({
     if (isSubscribeLoading === true) {
       setWritingUsers([]);
     } else if (isSubscribeLoading === false && activeChatId) {
-      const writingUsersRef = ref(
+      const writingUsersRef = refFirebaseDatabase(
         firebaseDatabase,
         `chats/${activeChatId}/writingUsers`,
       );
@@ -167,6 +184,152 @@ const ChatTopSection: FC<ChatTopSectionProps> = ({
       navigate('/chats');
     }
   };
+
+  const onDeleteBtnClick = async () => {
+    try {
+      if (activeChatMembers === null || activeChatId === null) {
+        dispatch(clearSelectedMessagesState());
+        return;
+      }
+
+      const lastMessageDateUTCRef = refFirebaseDatabase(
+        firebaseDatabase,
+        `userChats/${uid}/chats/${activeChatId}/lastMessageDateUTC`,
+      );
+
+      const lastMessageDateUTCSnapshot = await get(lastMessageDateUTCRef);
+
+      if (!lastMessageDateUTCSnapshot.exists()) {
+        throw new Error('Чат не найден');
+      }
+
+      const lastMessageDateUTCValue =
+        lastMessageDateUTCSnapshot.val() as IFirebaseRtDbChat['lastMessageDateUTC'];
+
+      // обновляем сообщения как удаленные
+
+      const updatesByMessages = selectedMessages.reduce(
+        (acc, cur) => {
+          acc[`chats/${activeChatId}/messages/${cur.messageId}/isDeleted`] = true;
+          return acc;
+        },
+        {} as Record<string, any>,
+      );
+
+      await update(refFirebaseDatabase(firebaseDatabase), updatesByMessages);
+
+      dispatch(clearSelectedMessagesState());
+
+      // получаем последнее неудаленное сообщение в чате, значение в удалемом уже будет обновлено
+      const lastUndeletedMessage =
+        await getLastUndeletedMessage(activeChatId);
+
+      // lastUndeletedMessage === null в случае, если нет неудаленных сообщений
+      // тогда если чат негрупповой, нужно его удалить
+      if (lastUndeletedMessage === null && activeChatIsGroup === false) {
+        // дополнительная проверка перед удалением чата на то, что нет неудаленных сообщений и это не ошибка в getLastUndeletedMessage()
+        const messagesRef = refFirebaseDatabase(
+          firebaseDatabase,
+          `chats/${activeChatId}/messages`,
+        );
+        const messagesQuery = query(
+          messagesRef,
+          orderByChild('isDeleted'),
+          equalTo(false), // Фильтруем неудаленные сообщения
+        );
+
+        const messagesSnapshot = await get(messagesQuery);
+        if (messagesSnapshot.exists()) {
+          const undeletedMessages: IMessage[] = Object.values(
+            messagesSnapshot.val(),
+          );
+          if (undeletedMessages.length > 0) {
+            // если есть неудалённые сообщения в чате, то это ошибка в функции getLastUndeletedMessage()
+            throw new Error('Error in function getLastUndeletedMessage');
+          }
+        }
+
+        if (!messagesSnapshot.exists()) {
+          // если неудаленных сообщений нет, то удалить чат
+          if (activeChatIsGroup === false) {
+            const otherMemberUid =
+              activeChatMembers.find((member) => {
+                return member.uid !== uid;
+              })?.uid || null;
+
+            if (otherMemberUid === null) {
+              throw new Error('Ошибка удаления чата');
+            }
+
+            dispatch(removeActiveChat());
+
+            navigate('.', {
+              state: {
+                userUidFromGlobalSearch: otherMemberUid,
+                chatAvatarFromGlobalSearch: activeChatAvatar,
+                chatnameFromGlobalSearch: activeChatname,
+              },
+            });
+
+            try {
+              const updatesByDeleting = {
+                [`userChats/${uid!}/chats/${activeChatId}`]: null,
+                [`userChats/${otherMemberUid}/chats/${activeChatId}`]: null,
+                [`chats/${activeChatId}`]: null,
+              };
+              await update(
+                refFirebaseDatabase(firebaseDatabase),
+                updatesByDeleting,
+              );
+            } catch (error) {
+              console.error(`Ошибка удаления чата`, error);
+              return;
+            }
+          }
+        }
+        return;
+      }
+
+      // проверяем, является ли последнее неудаленное сообщение тем, что на данный момент установлено в usersChats/uid/chats/chatId
+      const isLastUndeletedMessageDifferent =
+        lastUndeletedMessage?.messageDateUTC !== lastMessageDateUTCValue; // выдаст true если сообщения отличаются, тогда нужно обновлять значения в usersChats/uid/chats/chatId всем участникам
+
+      if (
+        isLastUndeletedMessageDifferent &&
+        lastUndeletedMessage !== null
+      ) {
+        // если последнее сообщение не то, что сейчас установлено, обновляем userChats для всех участников
+        const membersIds = activeChatMembers.map((member) => member.uid);
+
+        const updatesByUserChats = membersIds.reduce(
+          (acc, memberUid) => {
+            acc[
+              `userChats/${memberUid}/chats/${activeChatId}/lastMessageDateUTC`
+            ] = lastUndeletedMessage.messageDateUTC;
+            acc[
+              `userChats/${memberUid}/chats/${activeChatId}/lastMessageIsChecked`
+            ] = lastUndeletedMessage.isChecked;
+            acc[
+              `userChats/${memberUid}/chats/${activeChatId}/lastMessageSenderUid`
+            ] = lastUndeletedMessage.senderUid;
+            acc[
+              `userChats/${memberUid}/chats/${activeChatId}/lastMessageText`
+            ] = lastUndeletedMessage.messageText;
+            return acc;
+          },
+          {} as Record<string, any>,
+        );
+
+        await update(
+          refFirebaseDatabase(firebaseDatabase),
+          updatesByUserChats,
+        );
+      }
+    } catch (error) {
+      console.error('Ошибка удаления сообщения:', error);
+      throw error;
+    }
+  }
 
   const onCopyBtnClick = () => {
     const selectedMessagesTextes: string[] = messagesArray
@@ -292,7 +455,7 @@ const ChatTopSection: FC<ChatTopSectionProps> = ({
                   className={styles['chat-top-section__selecting-icon']}
                 />
               </button>
-              <button className={styles['chat-top-section__selecting-button']}>
+              <button onClick={onDeleteBtnClick} className={styles['chat-top-section__selecting-button']}>
                 <DeleteSvg
                   className={styles['chat-top-section__selecting-icon']}
                 />
