@@ -597,6 +597,9 @@ const Message: FC<MessageProps> = ({
                     e: React.MouseEvent<HTMLSpanElement, MouseEvent>,
                   ) => {
                     e.stopPropagation();
+                    if (!isMobileScreen) {
+                      e.preventDefault();
+                    }
                   }}
                 >
                   <Linkify options={{ target: '_blank' }}>

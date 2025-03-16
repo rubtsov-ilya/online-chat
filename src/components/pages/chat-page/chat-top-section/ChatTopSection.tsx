@@ -22,6 +22,7 @@ import useSelectedMessages from 'src/hooks/useSelectedMessages';
 import { clearSelectedMessagesState } from 'src/redux/slices/SelectedMessagesSlice';
 import { useDispatch } from 'react-redux';
 import FlipNumbers from 'react-flip-numbers';
+import useMessagesFromRtk from 'src/hooks/useMessagesFromRtk';
 
 interface ChatTopSectionProps {
   isMobileScreen?: boolean;
@@ -40,21 +41,24 @@ const ChatTopSection: FC<ChatTopSectionProps> = ({
 }) => {
   const ComponentTag = isMobileScreen ? 'section' : 'div';
   const { uid } = useAuth();
-  const { activeChatMembers, activeChatIsGroup, activeChatId } =
-    useActiveChat();
   const [chatStatus, setChatStatus] = useState<string>('');
   const [writingUsers, setWritingUsers] = useState<string[]>([]);
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const { activeChatMembers, activeChatIsGroup, activeChatId } =
+    useActiveChat();
   const { isMessagesSelecting, selectedMessages } = useSelectedMessages();
+  const { messagesArray } = useMessagesFromRtk();
 
-  const onBackBtnClick = () => {
-    if (isMessagesSelecting) {
-      dispatch(clearSelectedMessagesState());
-    } else {
-      navigate('/chats');
-    }
-  };
+  // получаем имя печатющего пользователя для группового чата
+  const username =
+    activeChatIsGroup === true &&
+    activeChatMembers !== null &&
+    writingUsers.length > 0
+      ? activeChatMembers
+          .find((member) => member.uid === writingUsers[0])
+          ?.username.slice(0, 20) || ''
+      : '';
 
   useEffect(() => {
     let unsubscribeUserIsOnline: (() => void) | undefined;
@@ -156,15 +160,27 @@ const ChatTopSection: FC<ChatTopSectionProps> = ({
     };
   }, [activeChatMembers, isSubscribeLoading, locationUid, activeChatId]);
 
-  // получаем имя печатющего пользователя для группового чата
-  const username =
-    activeChatIsGroup === true &&
-    activeChatMembers !== null &&
-    writingUsers.length > 0
-      ? activeChatMembers
-          .find((member) => member.uid === writingUsers[0])
-          ?.username.slice(0, 20) || ''
-      : '';
+  const onBackBtnClick = () => {
+    if (isMessagesSelecting) {
+      dispatch(clearSelectedMessagesState());
+    } else {
+      navigate('/chats');
+    }
+  };
+
+  const onCopyBtnClick = () => {
+    const selectedMessagesTextes: string[] = messagesArray
+      .filter((message) =>
+        selectedMessages.some(
+          (selectedMessage) => selectedMessage.messageId === message.messageId,
+        ),
+      )
+      .filter((message) => message.messageText.trim() !== '') // Исключаем сообщения с пустым текстом
+      .map((message) => message.messageText);
+
+    navigator.clipboard.writeText(selectedMessagesTextes.join('\n\n'));
+    dispatch(clearSelectedMessagesState());
+  };
 
   return (
     <ComponentTag className={styles['chat-top-section']}>
@@ -261,7 +277,17 @@ const ChatTopSection: FC<ChatTopSectionProps> = ({
             <div
               className={styles['chat-top-section__selecting-buttons-wrapper']}
             >
-              <button className={styles['chat-top-section__selecting-button']}>
+              <button
+                onClick={onCopyBtnClick}
+                className={`${styles['chat-top-section__selecting-button']} ${styles['chat-top-section__selecting-button--animated']} ${messagesArray
+                  .filter((message) =>
+                    selectedMessages.some(
+                      (selectedMessage) =>
+                        selectedMessage.messageId === message.messageId,
+                    ),
+                  )
+                  .filter((message) => message.messageText.trim() !== '').length > 0 ? styles['active'] : ''}`}
+              >
                 <CopySvg
                   className={styles['chat-top-section__selecting-icon']}
                 />

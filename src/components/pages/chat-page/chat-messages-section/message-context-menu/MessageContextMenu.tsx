@@ -50,17 +50,12 @@ const MessageContextMenu: FC<MessageContextMenuProps> = ({
     сontextMenuActive.backdropHeight - сontextMenuActive.positionY >
     menuSize.height;
 
-  const onCopyButtonClick = async (text: string) => {
-    try {
-      await navigator.clipboard.writeText(text); // копируется текст в буфер обмена
-      closeContextMenu();
-    } catch (error) {
-      console.error('Не удалось скопировать текст: ', error);
-      closeContextMenu();
-    }
+  const onCopyBtnClick = (text: string) => {
+    navigator.clipboard.writeText(text); // копируется текст в буфер обмена
+    closeContextMenu();
   };
 
-  const onDeleteButtonClick = () => {
+  const onDeleteBtnClick = () => {
     closeContextMenu();
     setModalOpen('delete');
   };
@@ -106,7 +101,7 @@ const MessageContextMenu: FC<MessageContextMenuProps> = ({
         <MessageContextMenuButton
           text="Копировать текст"
           Svg={CopySvg}
-          onClick={() => onCopyButtonClick(messageText)}
+          onClick={() => onCopyBtnClick(messageText)}
         />
       )}
 
@@ -121,7 +116,7 @@ const MessageContextMenu: FC<MessageContextMenuProps> = ({
       <MessageContextMenuButton
         text="Удалить"
         Svg={DeleteSvg}
-        onClick={onDeleteButtonClick}
+        onClick={onDeleteBtnClick}
         accentColor="red"
       />
     </div>

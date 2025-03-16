@@ -230,7 +230,7 @@ const ChatMessagesSection: FC<ChatMessagesSectionProps> = ({
     {
       messageText:
         'Lorem Ipsum - это текст-"рыбой "рыбой" для текстов на латиницеаы цйццаа фыафыаафыаыsf ',
-      messageDateUTC: '2024-10-23T09:07:04.275Z',
+      messageDateUTC: '2024-10-23T09:06:02.275Z',
       messageId: '93bbffa4-90b0-4a31-8dbd-8fe86f76f08a',
       isChecked: false,
       senderUid: uid!,
