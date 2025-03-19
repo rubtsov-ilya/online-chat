@@ -57,6 +57,7 @@ const ChatTopSection: FC<ChatTopSectionProps> = ({
     activeChatMembers,
     activeChatIsGroup,
     activeChatId,
+    activeChatGroupAdminUrl,
   } = useActiveChat();
   const { isMessagesSelecting, selectedMessages } = useSelectedMessages();
   const { messagesArray } = useMessagesFromRtk();
@@ -254,9 +255,15 @@ const ChatTopSection: FC<ChatTopSectionProps> = ({
           {} as Record<string, any>,
         );
 
-        const updatesByChatClearing = {...updatesByUserChats, ...updatesByUnreadMessages}
+        const updatesByChatClearing = {
+          ...updatesByUserChats,
+          ...updatesByUnreadMessages,
+        };
 
-        await update(refFirebaseDatabase(firebaseDatabase), updatesByChatClearing);
+        await update(
+          refFirebaseDatabase(firebaseDatabase),
+          updatesByChatClearing,
+        );
 
         return;
       }
@@ -270,12 +277,17 @@ const ChatTopSection: FC<ChatTopSectionProps> = ({
         const membersIds = activeChatMembers.map((member) => member.uid);
         // TODO тут нужно чтобы ещё апдейтило unreadMessages
 
-        const updatesByUnreadMessages = membersIds.reduce((acc, memberId) => {
-          selectedMessages.forEach((selectedMessage) => {
-            acc[`chats/${activeChatId}/unreadMessages/${memberId}/${selectedMessage.messageId}`] = null;
-          });
-          return acc;
-        }, {} as Record<string, any>);
+        const updatesByUnreadMessages = membersIds.reduce(
+          (acc, memberId) => {
+            selectedMessages.forEach((selectedMessage) => {
+              acc[
+                `chats/${activeChatId}/unreadMessages/${memberId}/${selectedMessage.messageId}`
+              ] = null;
+            });
+            return acc;
+          },
+          {} as Record<string, any>,
+        );
 
         const updatesByUserChats = membersIds.reduce(
           (acc, memberUid) => {
@@ -296,7 +308,10 @@ const ChatTopSection: FC<ChatTopSectionProps> = ({
           {} as Record<string, any>,
         );
 
-        const updatesByChat = {...updatesByUserChats, ...updatesByUnreadMessages}
+        const updatesByChat = {
+          ...updatesByUserChats,
+          ...updatesByUnreadMessages,
+        };
 
         await update(refFirebaseDatabase(firebaseDatabase), updatesByChat);
       }
@@ -435,9 +450,27 @@ const ChatTopSection: FC<ChatTopSectionProps> = ({
                   className={styles['chat-top-section__selecting-icon']}
                 />
               </button>
+              {/*               <button
+                onClick={onDeleteBtnClick}
+                className={`${styles['chat-top-section__selecting-button']} ${styles['chat-top-section__selecting-button--animated']} ${
+                  messagesArray.filter((message) => selectedMessages.some((selectedMessage) => selectedMessage.messageId === message.messageId)).filter((message) => message.messageText.trim() !== '').length > 0 ? styles['active'] : ''
+                }`} */}
               <button
                 onClick={onDeleteBtnClick}
-                className={styles['chat-top-section__selecting-button']}
+                className={`${styles['chat-top-section__selecting-button']} ${styles['chat-top-section__selecting-button--animated']} ${
+                  activeChatIsGroup === false ||
+                  (activeChatIsGroup === true &&
+                    (activeChatGroupAdminUrl === uid ||
+                      selectedMessages.every((selectedMessage) => {
+                        const foundMessage = messagesArray.find(
+                          (message) =>
+                            message.messageId === selectedMessage.messageId,
+                        );
+                        return foundMessage?.senderUid === uid;
+                      })))
+                    ? styles['active']
+                    : ''
+                }`}
               >
                 <DeleteSvg
                   className={styles['chat-top-section__selecting-icon']}

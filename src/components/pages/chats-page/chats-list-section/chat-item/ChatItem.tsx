@@ -288,6 +288,7 @@ const ChatItem: FC<ChatItemProps> = ({
           activeChatBlocked: [], // не требуется передача get данных, стейт будет получен подпиской в ChatPage
           activeChatIsGroup: chatItemData.isGroup,
           activeChatMembers: chatItemData.membersDetails,
+          activeChatGroupAdminUrl: chatItemData.groupAdminUid,
         }),
       );
     }

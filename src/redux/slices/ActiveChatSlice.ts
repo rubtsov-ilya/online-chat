@@ -8,6 +8,7 @@ interface IInitialState {
   activeChatBlocked: null | string[]; // только не групповые чаты
   activeChatMembers: null | IMemberDetails[]; // только групповые чаты
   activeChatIsGroup: null | boolean;
+  activeChatGroupAdminUrl: null | string;
 }
 
 const initialState: IInitialState = {
@@ -17,6 +18,7 @@ const initialState: IInitialState = {
   activeChatBlocked: null,
   activeChatMembers: null,
   activeChatIsGroup: null,
+  activeChatGroupAdminUrl: null,
 };
 
 const activeChatSlice = createSlice({
@@ -32,18 +34,21 @@ const activeChatSlice = createSlice({
     ) {
       state.activeChatId = action.payload.activeChatId;
     },
-    setActiveChat(
-      state,
-      action: PayloadAction<IInitialState>,
-    ) {
+    setActiveChat(state, action: PayloadAction<IInitialState>) {
       state.activeChatId = action.payload.activeChatId;
       state.activeChatname = action.payload.activeChatname;
       state.activeChatAvatar = action.payload.activeChatAvatar;
       state.activeChatIsGroup = action.payload.activeChatIsGroup;
       state.activeChatBlocked = action.payload.activeChatBlocked;
       state.activeChatMembers = action.payload.activeChatMembers;
+      state.activeChatGroupAdminUrl = action.payload.activeChatGroupAdminUrl;
     },
-    setActiveChatnameAndAvatar(state, action: PayloadAction<Partial<Pick<IInitialState, 'activeChatname' | 'activeChatAvatar'>>>) {
+    setActiveChatnameAndAvatar(
+      state,
+      action: PayloadAction<
+        Partial<Pick<IInitialState, 'activeChatname' | 'activeChatAvatar'>>
+      >,
+    ) {
       if (action.payload.activeChatname !== undefined) {
         state.activeChatname = action.payload.activeChatname;
       }
@@ -70,6 +75,7 @@ const activeChatSlice = createSlice({
       state.activeChatBlocked = null;
       state.activeChatMembers = null;
       state.activeChatIsGroup = null;
+      state.activeChatGroupAdminUrl = null;
     },
   },
 });

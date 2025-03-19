@@ -118,11 +118,13 @@
   &__selecting-button {
     display: flex;
     &--animated {
+      display: none;
       opacity: 0;
       transform: scale(0.8);
       pointer-events: none;
       transition: all 0.15s ease; // как в animation: fadeInAndScale 0.15s ease forwards;
       &.active {
+        display: unset;
         opacity: 1;
         transform: scale(1);
         pointer-events: all;
