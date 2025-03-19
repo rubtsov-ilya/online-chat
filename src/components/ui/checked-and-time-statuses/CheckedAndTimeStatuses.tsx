@@ -9,7 +9,7 @@ import { IMessage } from 'src/interfaces/Message.interface';
 
 interface CheckedAndTimeStatusesProps {
   time: IMessage['messageDateUTC'];
-  isChecked: boolean;
+  isChecked: boolean | undefined;
   isForImage?: boolean;
   isOwn: boolean;
   isCanceled: boolean | undefined;
@@ -30,12 +30,12 @@ const CheckedAndTimeStatuses: FC<CheckedAndTimeStatusesProps> = ({
     <div className={styles['checked-and-time-statuses']} onContextMenu={(e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
       e.preventDefault();
     }}>
-      {!isCanceled && isLoading !== true && isChecked && isOwn && (
+      {!isCanceled && isLoading !== true && isChecked === true && isOwn && (
         <CheckedStatusSvg
           className={`${styles['checked-and-time-statuses__checked-icon']} ${isForImage ? styles['checked-and-time-statuses__checked-mark--image'] : ''}`}
         />
       )}
-      {!isCanceled && isLoading !== true && !isChecked && isOwn && (
+      {!isCanceled && isLoading !== true && isChecked === false && isOwn && (
         <UncheckedStatusSvg
           className={`${styles['checked-and-time-statuses__unchecked-icon']} ${isForImage ? styles['checked-and-time-statuses__unchecked-mark--image'] : ''}`}
         />

@@ -8,6 +8,7 @@ import {
   orderByChild,
   query,
   ref as refFirebaseDatabase,
+  serverTimestamp,
   update,
 } from 'firebase/database';
 import AvatarImage from 'src/components/ui/avatar-image/AvatarImage';
@@ -156,69 +157,52 @@ const Message: FC<MessageProps> = ({
           const lastUndeletedMessage =
             await getLastUndeletedMessage(activeChatId);
 
-          // lastUndeletedMessage === null в случае, если нет неудаленных сообщений
-          // тогда если чат негрупповой, нужно его удалить
           if (lastUndeletedMessage === null && activeChatIsGroup === false) {
-            // дополнительная проверка перед удалением чата на то, что нет неудаленных сообщений и это не ошибка в getLastUndeletedMessage()
-            const messagesRef = refFirebaseDatabase(
-              firebaseDatabase,
-              `chats/${activeChatId}/messages`,
+            // lastUndeletedMessage === null в случае, если нет неудаленных сообщений
+            // тогда нужно указать, что история очищена
+
+            const membersIds = activeChatMembers.map((member) => member.uid);
+
+            const updatesByUnreadMessages = {
+              [`chats/${activeChatId}/unreadMessages`]: null,
+            };
+
+            const newChatsData = {
+              lastMessageText: 'История очищена',
+              lastMessageDateUTC: serverTimestamp(),
+              lastMessageIsChecked: null,
+              lastMessageSenderUid: uid!,
+            };
+
+            const updatesByUserChats = membersIds.reduce(
+              (acc, memberUid) => {
+                acc[
+                  `userChats/${memberUid}/chats/${activeChatId}/lastMessageDateUTC`
+                ] = newChatsData.lastMessageDateUTC;
+                acc[
+                  `userChats/${memberUid}/chats/${activeChatId}/lastMessageIsChecked`
+                ] = newChatsData.lastMessageIsChecked;
+                acc[
+                  `userChats/${memberUid}/chats/${activeChatId}/lastMessageSenderUid`
+                ] = newChatsData.lastMessageSenderUid;
+                acc[
+                  `userChats/${memberUid}/chats/${activeChatId}/lastMessageText`
+                ] = newChatsData.lastMessageText;
+                return acc;
+              },
+              {} as Record<string, any>,
             );
-            const messagesQuery = query(
-              messagesRef,
-              orderByChild('isDeleted'),
-              equalTo(false), // Фильтруем неудаленные сообщения
+
+            const updatesByChatClearing = {
+              ...updatesByUserChats,
+              ...updatesByUnreadMessages,
+            };
+
+            await update(
+              refFirebaseDatabase(firebaseDatabase),
+              updatesByChatClearing,
             );
 
-            const messagesSnapshot = await get(messagesQuery);
-            if (messagesSnapshot.exists()) {
-              const undeletedMessages: IMessage[] = Object.values(
-                messagesSnapshot.val(),
-              );
-              if (undeletedMessages.length > 0) {
-                // если есть неудалённые сообщения в чате, то это ошибка в функции getLastUndeletedMessage()
-                throw new Error('Error in function getLastUndeletedMessage');
-              }
-            }
-
-            if (!messagesSnapshot.exists()) {
-              // если неудаленных сообщений нет, то удалить чат
-              if (activeChatIsGroup === false) {
-                const otherMemberUid =
-                  activeChatMembers.find((member) => {
-                    return member.uid !== uid;
-                  })?.uid || null;
-
-                if (otherMemberUid === null) {
-                  throw new Error('Ошибка удаления чата');
-                }
-
-                dispatch(removeActiveChat());
-
-                navigate('.', {
-                  state: {
-                    userUidFromGlobalSearch: otherMemberUid,
-                    chatAvatarFromGlobalSearch: activeChatAvatar,
-                    chatnameFromGlobalSearch: activeChatname,
-                  },
-                });
-
-                try {
-                  const updatesByDeleting = {
-                    [`userChats/${uid!}/chats/${activeChatId}`]: null,
-                    [`userChats/${otherMemberUid}/chats/${activeChatId}`]: null,
-                    [`chats/${activeChatId}`]: null,
-                  };
-                  await update(
-                    refFirebaseDatabase(firebaseDatabase),
-                    updatesByDeleting,
-                  );
-                } catch (error) {
-                  console.error(`Ошибка удаления чата`, error);
-                  return;
-                }
-              }
-            }
             return;
           }
 
@@ -232,6 +216,18 @@ const Message: FC<MessageProps> = ({
           ) {
             // если последнее сообщение не то, что сейчас установлено, обновляем userChats для всех участников
             const membersIds = activeChatMembers.map((member) => member.uid);
+
+            const updatesByUnreadMessages = membersIds.reduce(
+              (acc, memberId) => {
+                selectedMessages.forEach((selectedMessage) => {
+                  acc[
+                    `chats/${activeChatId}/unreadMessages/${memberId}/${selectedMessage.messageId}`
+                  ] = null;
+                });
+                return acc;
+              },
+              {} as Record<string, any>,
+            );
 
             const updatesByUserChats = membersIds.reduce(
               (acc, memberUid) => {
@@ -252,10 +248,12 @@ const Message: FC<MessageProps> = ({
               {} as Record<string, any>,
             );
 
-            await update(
-              refFirebaseDatabase(firebaseDatabase),
-              updatesByUserChats,
-            );
+            const updatesByChat = {
+              ...updatesByUserChats,
+              ...updatesByUnreadMessages,
+            };
+
+            await update(refFirebaseDatabase(firebaseDatabase), updatesByChat);
           }
         } catch (error) {
           console.error('Ошибка удаления сообщения:', error);

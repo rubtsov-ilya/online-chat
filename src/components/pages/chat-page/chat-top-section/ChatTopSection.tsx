@@ -18,6 +18,7 @@ import {
   query,
   ref as refFirebaseDatabase,
   update,
+  serverTimestamp,
 } from 'firebase/database';
 import {
   CHAT_INFO_STATUS_OFFLINE,
@@ -59,8 +60,6 @@ const ChatTopSection: FC<ChatTopSectionProps> = ({
   const dispatch = useDispatch();
   const {
     activeChatMembers,
-    activeChatAvatar,
-    activeChatname,
     activeChatIsGroup,
     activeChatId,
   } = useActiveChat();
@@ -210,7 +209,8 @@ const ChatTopSection: FC<ChatTopSectionProps> = ({
 
       const updatesByMessages = selectedMessages.reduce(
         (acc, cur) => {
-          acc[`chats/${activeChatId}/messages/${cur.messageId}/isDeleted`] = true;
+          acc[`chats/${activeChatId}/messages/${cur.messageId}/isDeleted`] =
+            true;
           return acc;
         },
         {} as Record<string, any>,
@@ -221,72 +221,48 @@ const ChatTopSection: FC<ChatTopSectionProps> = ({
       dispatch(clearSelectedMessagesState());
 
       // получаем последнее неудаленное сообщение в чате, значение в удалемом уже будет обновлено
-      const lastUndeletedMessage =
-        await getLastUndeletedMessage(activeChatId);
+      const lastUndeletedMessage = await getLastUndeletedMessage(activeChatId);
 
-      // lastUndeletedMessage === null в случае, если нет неудаленных сообщений
-      // тогда если чат негрупповой, нужно его удалить
       if (lastUndeletedMessage === null && activeChatIsGroup === false) {
-        // дополнительная проверка перед удалением чата на то, что нет неудаленных сообщений и это не ошибка в getLastUndeletedMessage()
-        const messagesRef = refFirebaseDatabase(
-          firebaseDatabase,
-          `chats/${activeChatId}/messages`,
+        // lastUndeletedMessage === null в случае, если нет неудаленных сообщений
+        // тогда нужно указать, что история очищена
+
+        const membersIds = activeChatMembers.map((member) => member.uid);
+
+        const updatesByUnreadMessages = {
+          [`chats/${activeChatId}/unreadMessages`]: null,
+        };
+
+        const newChatsData = {
+          lastMessageText: 'История очищена',
+          lastMessageDateUTC: serverTimestamp(),
+          lastMessageIsChecked: null,
+          lastMessageSenderUid: uid!,
+        };
+
+        const updatesByUserChats = membersIds.reduce(
+          (acc, memberUid) => {
+            acc[
+              `userChats/${memberUid}/chats/${activeChatId}/lastMessageDateUTC`
+            ] = newChatsData.lastMessageDateUTC;
+            acc[
+              `userChats/${memberUid}/chats/${activeChatId}/lastMessageIsChecked`
+            ] = newChatsData.lastMessageIsChecked;
+            acc[
+              `userChats/${memberUid}/chats/${activeChatId}/lastMessageSenderUid`
+            ] = newChatsData.lastMessageSenderUid;
+            acc[
+              `userChats/${memberUid}/chats/${activeChatId}/lastMessageText`
+            ] = newChatsData.lastMessageText;
+            return acc;
+          },
+          {} as Record<string, any>,
         );
-        const messagesQuery = query(
-          messagesRef,
-          orderByChild('isDeleted'),
-          equalTo(false), // Фильтруем неудаленные сообщения
-        );
 
-        const messagesSnapshot = await get(messagesQuery);
-        if (messagesSnapshot.exists()) {
-          const undeletedMessages: IMessage[] = Object.values(
-            messagesSnapshot.val(),
-          );
-          if (undeletedMessages.length > 0) {
-            // если есть неудалённые сообщения в чате, то это ошибка в функции getLastUndeletedMessage()
-            throw new Error('Error in function getLastUndeletedMessage');
-          }
-        }
+        const updatesByChatClearing = {...updatesByUserChats, ...updatesByUnreadMessages}
 
-        if (!messagesSnapshot.exists()) {
-          // если неудаленных сообщений нет, то удалить чат
-          if (activeChatIsGroup === false) {
-            const otherMemberUid =
-              activeChatMembers.find((member) => {
-                return member.uid !== uid;
-              })?.uid || null;
+        await update(refFirebaseDatabase(firebaseDatabase), updatesByChatClearing);
 
-            if (otherMemberUid === null) {
-              throw new Error('Ошибка удаления чата');
-            }
-
-            dispatch(removeActiveChat());
-
-            navigate('.', {
-              state: {
-                userUidFromGlobalSearch: otherMemberUid,
-                chatAvatarFromGlobalSearch: activeChatAvatar,
-                chatnameFromGlobalSearch: activeChatname,
-              },
-            });
-
-            try {
-              const updatesByDeleting = {
-                [`userChats/${uid!}/chats/${activeChatId}`]: null,
-                [`userChats/${otherMemberUid}/chats/${activeChatId}`]: null,
-                [`chats/${activeChatId}`]: null,
-              };
-              await update(
-                refFirebaseDatabase(firebaseDatabase),
-                updatesByDeleting,
-              );
-            } catch (error) {
-              console.error(`Ошибка удаления чата`, error);
-              return;
-            }
-          }
-        }
         return;
       }
 
@@ -294,12 +270,17 @@ const ChatTopSection: FC<ChatTopSectionProps> = ({
       const isLastUndeletedMessageDifferent =
         lastUndeletedMessage?.messageDateUTC !== lastMessageDateUTCValue; // выдаст true если сообщения отличаются, тогда нужно обновлять значения в usersChats/uid/chats/chatId всем участникам
 
-      if (
-        isLastUndeletedMessageDifferent &&
-        lastUndeletedMessage !== null
-      ) {
+      if (isLastUndeletedMessageDifferent && lastUndeletedMessage !== null) {
         // если последнее сообщение не то, что сейчас установлено, обновляем userChats для всех участников
         const membersIds = activeChatMembers.map((member) => member.uid);
+        // TODO тут нужно чтобы ещё апдейтило unreadMessages
+
+        const updatesByUnreadMessages = membersIds.reduce((acc, memberId) => {
+          selectedMessages.forEach((selectedMessage) => {
+            acc[`chats/${activeChatId}/unreadMessages/${memberId}/${selectedMessage.messageId}`] = null;
+          });
+          return acc;
+        }, {} as Record<string, any>);
 
         const updatesByUserChats = membersIds.reduce(
           (acc, memberUid) => {
@@ -320,16 +301,15 @@ const ChatTopSection: FC<ChatTopSectionProps> = ({
           {} as Record<string, any>,
         );
 
-        await update(
-          refFirebaseDatabase(firebaseDatabase),
-          updatesByUserChats,
-        );
+        const updatesByChat = {...updatesByUserChats, ...updatesByUnreadMessages}
+
+        await update(refFirebaseDatabase(firebaseDatabase), updatesByChat);
       }
     } catch (error) {
       console.error('Ошибка удаления сообщения:', error);
       throw error;
     }
-  }
+  };
 
   const onCopyBtnClick = () => {
     const selectedMessagesTextes: string[] = messagesArray
@@ -442,20 +422,28 @@ const ChatTopSection: FC<ChatTopSectionProps> = ({
             >
               <button
                 onClick={onCopyBtnClick}
-                className={`${styles['chat-top-section__selecting-button']} ${styles['chat-top-section__selecting-button--animated']} ${messagesArray
-                  .filter((message) =>
-                    selectedMessages.some(
-                      (selectedMessage) =>
-                        selectedMessage.messageId === message.messageId,
-                    ),
-                  )
-                  .filter((message) => message.messageText.trim() !== '').length > 0 ? styles['active'] : ''}`}
+                className={`${styles['chat-top-section__selecting-button']} ${styles['chat-top-section__selecting-button--animated']} ${
+                  messagesArray
+                    .filter((message) =>
+                      selectedMessages.some(
+                        (selectedMessage) =>
+                          selectedMessage.messageId === message.messageId,
+                      ),
+                    )
+                    .filter((message) => message.messageText.trim() !== '')
+                    .length > 0
+                    ? styles['active']
+                    : ''
+                }`}
               >
                 <CopySvg
                   className={styles['chat-top-section__selecting-icon']}
                 />
               </button>
-              <button onClick={onDeleteBtnClick} className={styles['chat-top-section__selecting-button']}>
+              <button
+                onClick={onDeleteBtnClick}
+                className={styles['chat-top-section__selecting-button']}
+              >
                 <DeleteSvg
                   className={styles['chat-top-section__selecting-icon']}
                 />
