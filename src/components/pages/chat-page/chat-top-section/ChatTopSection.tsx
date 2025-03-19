@@ -12,10 +12,7 @@ import useAuth from 'src/hooks/useAuth';
 import { firebaseDatabase } from 'src/firebase';
 import {
   onValue,
-  equalTo,
   get,
-  orderByChild,
-  query,
   ref as refFirebaseDatabase,
   update,
   serverTimestamp,
@@ -34,8 +31,6 @@ import FlipNumbers from 'react-flip-numbers';
 import useMessagesFromRtk from 'src/hooks/useMessagesFromRtk';
 import { IFirebaseRtDbChat } from 'src/interfaces/FirebaseRealtimeDatabase.interface';
 import getLastUndeletedMessage from 'src/services/getLastUndeletedMessage';
-import { IMessage } from 'src/interfaces/Message.interface';
-import { removeActiveChat } from 'src/redux/slices/ActiveChatSlice';
 
 interface ChatTopSectionProps {
   isMobileScreen?: boolean;

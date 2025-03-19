@@ -38,9 +38,7 @@ import useToggleModal from 'src/hooks/useToggleModal';
 import ModalBackdrop from 'src/components/ui/modal-backdrop/ModalBackdrop';
 import ModalActionConfirm from 'src/components/ui/modal-action-confirm/modalActionConfirm';
 import getLastUndeletedMessage from 'src/services/getLastUndeletedMessage';
-import { useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
-import { removeActiveChat } from 'src/redux/slices/ActiveChatSlice';
 import useSelectedMessages from 'src/hooks/useSelectedMessages';
 import {
   addSelectedMessage,
@@ -82,13 +80,11 @@ const Message: FC<MessageProps> = ({
   const {
     activeChatMembers,
     activeChatAvatar,
-    activeChatname,
     activeChatIsGroup,
     activeChatId,
   } = useActiveChat();
 
   const [modalOpen, setModalOpen] = useState<'delete' | false>(false);
-  const navigate = useNavigate();
   const dispatch = useDispatch();
   const { isMobileScreen } = useMobileScreen();
   const { toggleModal } = useToggleModal({ setCbState: setModalOpen });
@@ -219,11 +215,10 @@ const Message: FC<MessageProps> = ({
 
             const updatesByUnreadMessages = membersIds.reduce(
               (acc, memberId) => {
-                selectedMessages.forEach((selectedMessage) => {
-                  acc[
-                    `chats/${activeChatId}/unreadMessages/${memberId}/${selectedMessage.messageId}`
-                  ] = null;
-                });
+                acc[
+                  `chats/${activeChatId}/unreadMessages/${memberId}/${messageData.messageId}`
+                ] = null;
+
                 return acc;
               },
               {} as Record<string, any>,
