@@ -372,7 +372,7 @@ const Message: FC<MessageProps> = ({
             )}
 
           {/* отображение медиа файлов */}
-          {messageData.media.length > 0 && (
+          {messageData.media?.length > 0 && (
             <div className={styles['message__album']}>
               {messageData?.media.map((messageItemData, index: number) => {
                 const isArrayLengthOdd = messageData.media.length % 2 !== 0;
@@ -526,7 +526,7 @@ const Message: FC<MessageProps> = ({
                   />
                 );
               })}
-              {messageData.messageText.length === 0 &&
+              {messageData.messageText?.length === 0 &&
                 messageData.files.length === 0 &&
                 messageData.media.length > 0 && (
                   <div className={styles['message__image-info-wrapper']}>
@@ -547,7 +547,7 @@ const Message: FC<MessageProps> = ({
             </div>
           )}
           {/* отображение файлов */}
-          {messageData.files.length > 0 && (
+          {messageData.files?.length > 0 && (
             <div
               className={`${styles['message__files-wrapper']} ${messageData.messageText.length === 0 ? styles['message__files-wrapper--padding-bottom'] : ''}`}
             >
@@ -579,7 +579,7 @@ const Message: FC<MessageProps> = ({
             </div>
           )}
           {/* отображение текста */}
-          {messageData.messageText.length > 0 && (
+          {messageData.messageText?.length > 0 && (
             <div className={styles['message__text-wrapper']}>
               {messageData.messageText.length > 0 && (
                 <span
