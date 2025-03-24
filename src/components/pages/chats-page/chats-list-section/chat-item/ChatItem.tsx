@@ -13,7 +13,6 @@ import Skeleton, { SkeletonTheme } from 'react-loading-skeleton';
 import 'react-loading-skeleton/dist/skeleton.css';
 import {
   IChatWithDetails,
-  IMemberDetails,
 } from 'src/interfaces/ChatsWithDetails.interface';
 import { useDispatch } from 'react-redux';
 import {
@@ -23,14 +22,12 @@ import {
 import { useNavigate } from 'react-router-dom';
 import useActiveChat from 'src/hooks/useActiveChat';
 import {
-  get,
   ref as refFirebaseDatabase,
   set,
   update,
 } from 'firebase/database';
 import { firebaseDatabase } from 'src/firebase';
 import useAuth from 'src/hooks/useAuth';
-import { IFirebaseRtDbChat } from 'src/interfaces/FirebaseRealtimeDatabase.interface';
 
 interface ChatItemProps {
   isMobileScreen: boolean;

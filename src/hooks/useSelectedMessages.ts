@@ -6,15 +6,17 @@ const useSelectedMessages = () => {
     isMessagesSelecting,
     selectedMessages,
     selectedChatId,
-    isForwarding,
+    selectedChatMembers,
+    isMessagesForwarding,
   } = useSelector(selectMessages);
-  /* get in components - const { isMessagesSelecting, selectedMessages, selectedChatId, isForwarding, } = useSelectedMessages(); */
+  /* get in components - const { isMessagesSelecting, selectedMessages, selectedChatMembers, selectedChatId, isMessagesForwarding } = useSelectedMessages(); */
 
   return {
     isMessagesSelecting,
     selectedMessages,
     selectedChatId,
-    isForwarding,
+    selectedChatMembers,
+    isMessagesForwarding,
   };
 };
 

@@ -7,15 +7,17 @@ interface UseToggleModalProps<T> {
 const useToggleModal = <T>({ setCbState }: UseToggleModalProps<T>) => {
   const { toggleBodyLock } = useBodyLock();
 
-  const toggleModal = (state: T, timer?: number): void => {
+  const toggleModal = (state: T, timer?: number, cb?: () => void) : void => {
     if (timer) {
       // задержка для отработки анимации при закрытии окна
       toggleBodyLock();
       setTimeout(() => {
         setCbState(state);
+        cb && cb();
       }, timer);
     } else {
       setCbState(state);
+      cb && cb();
       toggleBodyLock();
     }
   };

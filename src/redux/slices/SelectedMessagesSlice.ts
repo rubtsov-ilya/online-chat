@@ -1,18 +1,21 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { IMemberDetails } from 'src/interfaces/ChatsWithDetails.interface';
 import { ISelectedMessage } from 'src/interfaces/SelectedMessage.interface';
 
 interface IInitialState {
   isMessagesSelecting: boolean;
-  isForwarding: boolean;
+  isMessagesForwarding: boolean;
   selectedMessages: ISelectedMessage[];
   selectedChatId: null | string;
+  selectedChatMembers: null | IMemberDetails[];
 }
 
 const initialState: IInitialState = {
   isMessagesSelecting: false,
-  isForwarding: false,
+  isMessagesForwarding: false,
   selectedMessages: [],
   selectedChatId: null,
+  selectedChatMembers: null,
 };
 
 const selectedMessagesSlice = createSlice({
@@ -27,10 +30,12 @@ const selectedMessagesSlice = createSlice({
       action: PayloadAction<{
         selectedMessage: ISelectedMessage;
         selectedChatId: string;
+        selectedChatMembers: IMemberDetails[];
       }>,
     ) {
       state.isMessagesSelecting = true;
       state.selectedChatId = action.payload.selectedChatId;
+      state.selectedChatMembers = action.payload.selectedChatMembers;
       state.selectedMessages = [
         ...state.selectedMessages,
         action.payload.selectedMessage,
@@ -88,20 +93,31 @@ const selectedMessagesSlice = createSlice({
       if (filteredSelectedMessages.length === 0) {
         state.isMessagesSelecting = false;
         state.selectedChatId = null;
+        state.selectedChatMembers = null;
       }
     },
     clearSelectedMessagesState(state) {
       state.isMessagesSelecting = false;
       state.selectedChatId = null;
+      state.selectedChatMembers = null;
       state.selectedMessages = [];
+      state.isMessagesForwarding = false;
     },
-    setIsForwarding(
+    setIsMessagesForwarding(
       state,
       action: PayloadAction<{
-        isForwarding: boolean;
+        isMessagesForwarding: boolean;
       }>,
     ) {
-      state.isForwarding = action.payload.isForwarding;
+      state.isMessagesForwarding = action.payload.isMessagesForwarding;
+    },
+    setIsMessagesSelecting(
+      state,
+      action: PayloadAction<{
+        isMessagesSelecting: boolean;
+      }>,
+    ) {
+      state.isMessagesSelecting = action.payload.isMessagesSelecting;
     },
   },
 });
@@ -110,7 +126,8 @@ export const {
   addSelectedMessage,
   removeSelectedMessage,
   clearSelectedMessagesState,
-  setIsForwarding,
+  setIsMessagesForwarding,
+  setIsMessagesSelecting,
 } = selectedMessagesSlice.actions;
 export const { selectMessages } = selectedMessagesSlice.selectors;
 export default selectedMessagesSlice.reducer;

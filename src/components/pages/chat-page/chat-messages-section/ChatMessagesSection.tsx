@@ -10,17 +10,20 @@ import { IUploadTasksRef } from 'src/interfaces/UploadTasks.interface';
 import useAuth from 'src/hooks/useAuth';
 import MessageDateGroup from './message-date-group/MessageDateGroup';
 import { ILoadingMessage } from 'src/interfaces/LoadingMessage.interface';
+import SectionLoader from './section-loader/SectionLoader';
 
 interface ChatMessagesSectionProps {
   isMobileScreen: boolean;
   uploadTasksRef: React.MutableRefObject<IUploadTasksRef>;
   activeChatId: string | null;
+  isSubscribeLoading: boolean;
 }
 
 const ChatMessagesSection: FC<ChatMessagesSectionProps> = ({
   isMobileScreen,
   uploadTasksRef,
   activeChatId,
+  isSubscribeLoading,
 }) => {
   const ComponentTag = isMobileScreen ? 'section' : 'div';
   /* const [messagesArray, setMessagesArray] = useState([]); */
@@ -455,7 +458,7 @@ const ChatMessagesSection: FC<ChatMessagesSectionProps> = ({
     /* логику изменить. прокручивать до непрочитанного чата надо будет, а не вниз. но если таких нет, то вниз */
     endRef.current?.scrollIntoView({ behavior: 'auto' });
     return () => {};
-  }, [doScroll]);
+  }, [doScroll, isSubscribeLoading]);
 
   const scrollToBottom = (isOwnMessage: boolean) => {
     if (chatMessagesRef.current) {
@@ -491,6 +494,10 @@ const ChatMessagesSection: FC<ChatMessagesSectionProps> = ({
     }
     return () => {};
   }, [messagesArray.length]);
+
+  if (isSubscribeLoading) {
+    return <SectionLoader />
+  }
 
   return (
     <ComponentTag

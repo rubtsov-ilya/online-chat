@@ -3,10 +3,7 @@ import { FC, useState } from 'react';
 import styles from './Message.module.scss';
 import { firebaseDatabase } from 'src/firebase';
 import {
-  equalTo,
   get,
-  orderByChild,
-  query,
   ref as refFirebaseDatabase,
   serverTimestamp,
   update,
@@ -304,12 +301,12 @@ const Message: FC<MessageProps> = ({
   };
 
   const onMessageClick = () => {
-    if (!isMessagesSelecting || activeChatId === null) {
+    if (!isMessagesSelecting || activeChatId === null || activeChatMembers === null){
       return;
     }
 
     if (!isMessageSelected) {
-      // выбрать сообщение
+      // выбрать сообщение, если оно не выбрано
       const messageDateTimestamp = new Date(
         messageData.messageDateUTC as string,
       ).getTime(); // messageData.messageDateUTC в виде строки
@@ -320,6 +317,7 @@ const Message: FC<MessageProps> = ({
             messageDateUTC: messageDateTimestamp,
           },
           selectedChatId: activeChatId,
+          selectedChatMembers: activeChatMembers,
         }),
       );
     } else {

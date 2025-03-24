@@ -1,19 +1,19 @@
 import { FC } from 'react';
-import styles from './ChatMessagesSectionLoader.module.scss';
+import styles from './SectionLoader.module.scss';
 import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
 import { CIRCULAR_LOADING_PERCENT_VALUE } from 'src/constants';
 
-const ChatMessagesSectionLoader: FC = () => {
+const SectionLoader: FC = () => {
   return (
-    <div className={styles['chat-messages-section-loader']}>
+    <div className={styles['section-loader']}>
       <div
         className={
-          styles['chat-messages-section-loader__circular-progressbar-wrapper']
+          styles['section-loader__circular-progressbar-wrapper']
         }
       >
         <CircularProgressbar
           className={
-            styles['chat-messages-section-loader__circular-progressbar']
+            styles['section-loader__circular-progressbar']
           }
           value={CIRCULAR_LOADING_PERCENT_VALUE}
           styles={buildStyles({
@@ -32,4 +32,4 @@ const ChatMessagesSectionLoader: FC = () => {
   );
 };
 
-export default ChatMessagesSectionLoader;
+export default SectionLoader;

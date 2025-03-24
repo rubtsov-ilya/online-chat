@@ -34,7 +34,7 @@ const MessageContextMenu: FC<MessageContextMenuProps> = ({
   const menuRef = useRef<HTMLDivElement | null>(null);
   const [menuSize, setMenuSize] = useState({ width: 0, height: 0 });
   const dispatch = useDispatch();
-  const { activeChatId } = useActiveChat();
+  const { activeChatId, activeChatMembers } = useActiveChat();
 
   useEffect(() => {
     if (menuRef.current) {
@@ -61,7 +61,7 @@ const MessageContextMenu: FC<MessageContextMenuProps> = ({
   };
 
   const onSelectMessageClick = () => {
-    if (activeChatId === null) {
+    if (activeChatId === null || activeChatMembers === null) {
       return;
     }
     const messageDateTimestamp = new Date(
@@ -74,6 +74,7 @@ const MessageContextMenu: FC<MessageContextMenuProps> = ({
           messageDateUTC: messageDateTimestamp,
         },
         selectedChatId: activeChatId,
+        selectedChatMembers: activeChatMembers,
       }),
     );
     closeContextMenu();

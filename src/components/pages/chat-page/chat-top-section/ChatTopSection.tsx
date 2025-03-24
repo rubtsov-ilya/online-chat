@@ -2,9 +2,9 @@ import { FC, useEffect, useState } from 'react';
 import LeftChevronSvg from 'src/assets/images/icons/24x24-icons/Left Chevron.svg?react';
 import CloseSvg from 'src/assets/images/icons/24x24-icons/Close.svg?react';
 import CopySvg from 'src/assets/images/icons/24x24-icons/Copy.svg?react';
+import ShareSvg from 'src/assets/images/icons/24x24-icons/Share-1.svg?react';
 import DeleteSvg from 'src/assets/images/icons/24x24-icons/Delete.svg?react';
 import AvatarImage from 'src/components/ui/avatar-image/AvatarImage';
-
 import styles from './ChatTopSection.module.scss';
 import { useNavigate } from 'react-router-dom';
 import useActiveChat from 'src/hooks/useActiveChat';
@@ -25,7 +25,7 @@ import {
 import { ILocationChatPage } from 'src/interfaces/LocationChatPage.interface';
 import DotsBounceLoader from 'src/components/ui/dots-bounce-loader/DotsBounceLoader';
 import useSelectedMessages from 'src/hooks/useSelectedMessages';
-import { clearSelectedMessagesState } from 'src/redux/slices/SelectedMessagesSlice';
+import { clearSelectedMessagesState, setIsMessagesForwarding, setIsMessagesSelecting } from 'src/redux/slices/SelectedMessagesSlice';
 import { useDispatch } from 'react-redux';
 import FlipNumbers from 'react-flip-numbers';
 import useMessagesFromRtk from 'src/hooks/useMessagesFromRtk';
@@ -275,7 +275,6 @@ const ChatTopSection: FC<ChatTopSectionProps> = ({
       if (isLastUndeletedMessageDifferent && lastUndeletedMessage !== null) {
         // если последнее сообщение не то, что сейчас установлено, обновляем userChats для всех участников
         const membersIds = activeChatMembers.map((member) => member.uid);
-        // TODO тут нужно чтобы ещё апдейтило unreadMessages
 
         const updatesByUnreadMessages = membersIds.reduce(
           (acc, memberId) => {
@@ -333,6 +332,12 @@ const ChatTopSection: FC<ChatTopSectionProps> = ({
 
     navigator.clipboard.writeText(selectedMessagesTextes.join('\n\n'));
     dispatch(clearSelectedMessagesState());
+  };
+
+  const onForwardBtnClick = () => {
+    dispatch(setIsMessagesForwarding({ isMessagesForwarding: true }));
+    dispatch(setIsMessagesSelecting({ isMessagesSelecting: false }));
+    navigate('/chats', { replace: true });
   };
 
   return (
@@ -473,6 +478,14 @@ const ChatTopSection: FC<ChatTopSectionProps> = ({
                 }`}
               >
                 <DeleteSvg
+                  className={styles['chat-top-section__selecting-icon']}
+                />
+              </button>
+              <button
+                onClick={onForwardBtnClick}
+                className={styles['chat-top-section__selecting-button']}
+              >
+                <ShareSvg
                   className={styles['chat-top-section__selecting-icon']}
                 />
               </button>

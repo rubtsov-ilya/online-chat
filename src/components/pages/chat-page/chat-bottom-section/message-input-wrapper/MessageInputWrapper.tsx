@@ -810,6 +810,7 @@ const MessageInputWrapper: FC<MessageInputWrapperProps> = ({
             activeChatIsGroup: false,
             activeChatMembers: membersDetails,
             activeChatBlocked: [],
+            activeChatGroupAdminUrl: '',
           }),
         );
       }

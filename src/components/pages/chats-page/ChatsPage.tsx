@@ -17,14 +17,14 @@ interface ChatsPageProps {
 const ChatsPage: FC<ChatsPageProps> = ({ isMobileScreen }) => {
   const location = useLocation();
   const dispatch = useDispatch();
-  const { isForwarding } = useSelectedMessages();
+  const { isMessagesForwarding } = useSelectedMessages();
 
   const isChatPathName = location.pathname === '/chats/chat';
 
   useEffect(() => {
     if (location.pathname === '/chats') {
       dispatch(removeActiveChat());
-      if (!isForwarding) {
+      if (!isMessagesForwarding) {
         dispatch(clearSelectedMessagesState());
       }
     }

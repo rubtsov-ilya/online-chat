@@ -1,4 +1,4 @@
-import { FC, useLayoutEffect, useRef, useState } from 'react';
+import { FC, useEffect, useLayoutEffect, useRef, useState } from 'react';
 
 import styles from './ChatPage.module.scss';
 import ChatBottomSection from './chat-bottom-section/ChatBottomSection';
@@ -11,12 +11,17 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { ILocationChatPage } from 'src/interfaces/LocationChatPage.interface';
 import useActiveChat from 'src/hooks/useActiveChat';
 
-import { ref as refFirebaseDatabase, onValue, get } from 'firebase/database';
+import {
+  ref as refFirebaseDatabase,
+  onValue,
+  get,
+  update,
+  serverTimestamp,
+  push,
+} from 'firebase/database';
 import { firebaseDatabase } from 'src/firebase';
 import useAuth from 'src/hooks/useAuth';
-import {
-  IFirebaseRtDbChat,
-} from 'src/interfaces/FirebaseRealtimeDatabase.interface';
+import { IFirebaseRtDbChat } from 'src/interfaces/FirebaseRealtimeDatabase.interface';
 import { useDispatch } from 'react-redux';
 import {
   setActiveChatBlocked,
@@ -27,21 +32,36 @@ import {
   USERNAME_DEFAULT_VALUE,
   USER_AVATAR_DEFAULT_VALUE,
 } from 'src/constants';
-import ChatMessagesSectionLoader from './chat-messages-section-loader/ChatMessagesSectionLoader';
 import { addChatInputValue } from 'src/redux/slices/ChatInputValuesSlice';
-import { clearSelectedMessagesState } from 'src/redux/slices/SelectedMessagesSlice';
+import {
+  clearSelectedMessagesState,
+  setIsMessagesForwarding,
+} from 'src/redux/slices/SelectedMessagesSlice';
 import useSelectedMessages from 'src/hooks/useSelectedMessages';
+import ModalBackdrop from 'src/components/ui/modal-backdrop/ModalBackdrop';
+import ModalActionConfirm from 'src/components/ui/modal-action-confirm/modalActionConfirm';
+import useToggleModal from 'src/hooks/useToggleModal';
+import { IMessage } from 'src/interfaces/Message.interface';
+import { addMessage } from 'src/redux/slices/MessagesArraySlice';
 
 const ChatPage: FC = () => {
-  const { isMobileScreen } = useMobileScreen();
-  const ComponentTag = isMobileScreen ? 'main' : 'section';
   const uploadTasksRef = useRef<IUploadTasksRef>({});
+  const [modalOpen, setModalOpen] = useState<'forward' | false>(false);
   const [isDrag, setIsDrag] = useState<boolean>(false);
   const [isSubscribeLoading, setIsSubscribeLoading] = useState<boolean>(false);
-  const { uid } = useAuth();
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const location = useLocation();
+  const { isMobileScreen } = useMobileScreen();
+  const {
+    isMessagesForwarding,
+    selectedMessages,
+    selectedChatId,
+    selectedChatMembers,
+  } = useSelectedMessages();
+  const { uid } = useAuth();
+  const { toggleModal } = useToggleModal({ setCbState: setModalOpen });
+  const ComponentTag = isMobileScreen ? 'main' : 'section';
   const locationState = location.state as ILocationChatPage | null; // null, если стейта нет
   const {
     activeChatId,
@@ -50,7 +70,152 @@ const ChatPage: FC = () => {
     activeChatMembers,
     activeChatIsGroup,
   } = useActiveChat();
-  const { isForwarding } = useSelectedMessages();
+
+  const modalActionData = {
+    forward: {
+      title: 'Переслать',
+      subtitle: `Переслать ${selectedMessages.length > 1 ? 'сообщения' : 'сообщение'} в чат?`,
+      actionBtnText: 'Переслать',
+      avatar: activeChatAvatar!,
+      action: async () => {
+        try {
+          if (selectedChatMembers === null) {
+            throw new Error(
+              `Ошибка при пересылке ${selectedMessages.length > 1 ? 'сообщений' : 'сообщения'}`,
+            );
+          }
+
+          const selectedMessagesFromDatabase = await Promise.all(
+            selectedMessages.map(async (message) => {
+              const messageRef = refFirebaseDatabase(
+                firebaseDatabase,
+                `chats/${selectedChatId}/messages/${message.messageId}`,
+              );
+              const messageSnapshot = await get(messageRef);
+              return messageSnapshot.val();
+            }),
+          );
+
+          const messagesWithFirebaseIds: IMessage[] =
+            selectedMessagesFromDatabase
+              .map((message: IMessage) => {
+                const messageRef = refFirebaseDatabase(
+                  firebaseDatabase,
+                  `chats/${activeChatId}/messages`,
+                );
+                const firebaseMessageId = push(messageRef).key;
+                if (firebaseMessageId === null) {
+                  return null;
+                }
+                return {
+                  ...message,
+                  messageDateUTC: serverTimestamp(),
+                  messageId: firebaseMessageId,
+                  answerToMessage: '',
+                  isChecked: false,
+                  isDeleted: false,
+                  isLoading: false,
+                  isEdited: false,
+                  senderUid: uid,
+                  media: message.media || [],
+                  files: message.files || [],
+                  messageText: message.messageText || '',
+                };
+              })
+              .filter((message) => message !== null) as IMessage[];
+
+          // добавление сообщений локально с загрузкой
+          const loadingMessagesWithFirebaseIds: IMessage[] = messagesWithFirebaseIds.map(
+            (message) => ({
+              ...message,
+              isLoading: true,
+              messageDateUTC: `${new Date()}`
+            }),
+          )
+
+          console.log(loadingMessagesWithFirebaseIds)
+
+          dispatch(addMessage(loadingMessagesWithFirebaseIds));
+          
+          // updates
+          const membersIds = selectedChatMembers.map((member) => member.uid);
+
+          // updates by unreadMessages
+          const filteredMembersIds = membersIds.filter(
+            (memberId) => memberId !== uid,
+          );
+          const updatesByUnreadMessages = filteredMembersIds.reduce(
+            (acc, memberId) => {
+              messagesWithFirebaseIds.forEach((message) => {
+                if (message !== null) {
+                  acc[
+                    `chats/${activeChatId}/unreadMessages/${memberId}/${message.messageId}`
+                  ] = true;
+                }
+              });
+              return acc;
+            },
+            {} as Record<string, any>,
+          );
+
+          // updates by userChats
+          const lastMessageWithFirebaseId =
+            messagesWithFirebaseIds[messagesWithFirebaseIds.length - 1];
+          const updatesByUserChats = membersIds.reduce(
+            (acc, memberId) => {
+              acc[
+                `userChats/${memberId}/chats/${activeChatId}/lastMessageText`
+              ] = lastMessageWithFirebaseId.messageText;
+              acc[
+                `userChats/${memberId}/chats/${activeChatId}/lastMessageDateUTC`
+              ] = lastMessageWithFirebaseId.messageDateUTC;
+              acc[
+                `userChats/${memberId}/chats/${activeChatId}/lastMessageIsChecked`
+              ] = lastMessageWithFirebaseId.isChecked;
+              acc[
+                `userChats/${memberId}/chats/${activeChatId}/lastMessageSenderUid`
+              ] = uid;
+              return acc;
+            },
+            {} as Record<string, any>,
+          );
+
+          // updates by chat
+          const updatesByChats = messagesWithFirebaseIds.reduce(
+            (acc, message) => {
+              if (message !== null) {
+                // Проверяем, что сообщение не null
+                acc[`chats/${activeChatId}/messages/${message.messageId}`] =
+                  message;
+              }
+              return acc;
+            },
+            {} as Record<string, any>,
+          );
+
+          // updates by forwarding
+          const updatesByForwarding = {
+            ...updatesByUnreadMessages,
+            ...updatesByUserChats,
+            ...updatesByChats,
+          };
+
+          await update(
+            refFirebaseDatabase(firebaseDatabase),
+            updatesByForwarding,
+          );
+
+
+        } catch (error) {
+          console.error('Ошибка пересылки сообщений:', error);
+
+          throw error;
+        }
+      },
+    },
+  };
+
+  const modalDuration = 100;
 
   useLayoutEffect(() => {
     if (activeChatId !== null) {
@@ -67,7 +232,7 @@ const ChatPage: FC = () => {
           chatId: activeChatId,
         }),
       );
-      if (!isForwarding) {
+      if (!isMessagesForwarding) {
         dispatch(clearSelectedMessagesState());
       }
     }
@@ -230,6 +395,19 @@ const ChatPage: FC = () => {
     };
   }, [activeChatId, locationState]);
 
+  useEffect(() => {
+    // открывает модальное окно пересылки сообщений, если isMessagesForwarding === true
+    if (isMessagesForwarding) {
+      setModalOpen('forward');
+    }
+    return () => {};
+  }, [isMessagesForwarding]);
+
+  const clearSelectedMessages = () => {
+    dispatch(setIsMessagesForwarding({ isMessagesForwarding: false }));
+    dispatch(clearSelectedMessagesState());
+  };
+
   const onDragEnter = (event: React.DragEvent) => {
     if (!isMobileScreen) {
       event.preventDefault();
@@ -238,48 +416,64 @@ const ChatPage: FC = () => {
   };
 
   return (
-    <ComponentTag onDragEnter={onDragEnter} className={styles['main']}>
-      <ChatTopSection
-        isMobileScreen={isMobileScreen}
-        isSubscribeLoading={isSubscribeLoading}
-        locationUid={
-          locationState ? locationState.userUidFromGlobalSearch : null
-        }
-        avatar={
-          activeChatAvatar !== null
-            ? activeChatAvatar
-            : locationState?.chatAvatarFromGlobalSearch ||
-              USER_AVATAR_DEFAULT_VALUE
-        }
-        chatname={
-          activeChatname !== null
-            ? activeChatname
-            : locationState?.chatnameFromGlobalSearch || USERNAME_DEFAULT_VALUE
-        }
-      />
-      {isSubscribeLoading === false && (
+    <>
+      <ComponentTag onDragEnter={onDragEnter} className={styles['main']}>
+        <ChatTopSection
+          isMobileScreen={isMobileScreen}
+          isSubscribeLoading={isSubscribeLoading}
+          locationUid={
+            locationState ? locationState.userUidFromGlobalSearch : null
+          }
+          avatar={
+            activeChatAvatar !== null
+              ? activeChatAvatar
+              : locationState?.chatAvatarFromGlobalSearch ||
+                USER_AVATAR_DEFAULT_VALUE
+          }
+          chatname={
+            activeChatname !== null
+              ? activeChatname
+              : locationState?.chatnameFromGlobalSearch ||
+                USERNAME_DEFAULT_VALUE
+          }
+        />
         <ChatMessagesSection
+          isSubscribeLoading={isSubscribeLoading}
           activeChatId={activeChatId}
           uploadTasksRef={uploadTasksRef}
           isMobileScreen={isMobileScreen}
         />
+        <ChatBottomSection
+          activeChatId={activeChatId}
+          isSubscribeLoading={isSubscribeLoading}
+          isDrag={isDrag}
+          setIsDrag={setIsDrag}
+          uploadTasksRef={uploadTasksRef}
+          isMobileScreen={isMobileScreen}
+          locationState={locationState}
+        />
+        <CustomToastContainer />
+        <div id="message-context-backdrop"></div>
+      </ComponentTag>
+      {modalOpen && (
+        <ModalBackdrop
+          transitionDuration={modalDuration}
+          toggleModal={() =>
+            toggleModal(false, modalDuration, clearSelectedMessages)
+          }
+          divIdFromIndexHtml={'modal-backdrop'}
+        >
+          <ModalActionConfirm
+            isMobileScreen={isMobileScreen}
+            title={modalActionData[modalOpen].title}
+            subtitle={modalActionData[modalOpen].subtitle}
+            actionBtnText={modalActionData[modalOpen].actionBtnText}
+            action={modalActionData[modalOpen].action}
+            avatar={modalActionData[modalOpen].avatar}
+          />
+        </ModalBackdrop>
       )}
-      {isSubscribeLoading === true && (
-        //УДАЛИТЬ, ОНО БУДЕТ В САМОЙ СЕКЦИИ
-        <ChatMessagesSectionLoader />
-      )}
-      <ChatBottomSection
-        activeChatId={activeChatId}
-        isSubscribeLoading={isSubscribeLoading}
-        isDrag={isDrag}
-        setIsDrag={setIsDrag}
-        uploadTasksRef={uploadTasksRef}
-        isMobileScreen={isMobileScreen}
-        locationState={locationState}
-      />
-      <CustomToastContainer />
-      <div id="message-context-backdrop"></div>
-    </ComponentTag>
+    </>
   );
 };
 

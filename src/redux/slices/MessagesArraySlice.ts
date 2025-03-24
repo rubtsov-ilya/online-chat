@@ -32,6 +32,9 @@ const messagesArraySlice = createSlice({
         },
       ];
     },
+    addMessage(state, action: PayloadAction<IMessage[]>) {
+      state.messagesArray = [...state.messagesArray, ...action.payload];
+    },
     removeLoadingMessage(state, action) {
       state.messagesArray = state.messagesArray.filter(
         (item: IMessage) => item != action.payload,
@@ -112,6 +115,7 @@ const messagesArraySlice = createSlice({
 
 export const {
   addLoadingMessage,
+  addMessage,
   removeLoadingMessage,
   addInitialMessagesArray,
   updateProgressKeyInMessage,
