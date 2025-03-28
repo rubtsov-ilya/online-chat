@@ -527,8 +527,8 @@ const Message: FC<MessageProps> = ({
                 );
               })}
               {messageData.messageText?.length === 0 &&
-                messageData.files.length === 0 &&
-                messageData.media.length > 0 && (
+                messageData.files?.length === 0 &&
+                messageData.media?.length > 0 && (
                   <div className={styles['message__image-info-wrapper']}>
                     <CheckedAndTimeStatuses
                       isCanceled={

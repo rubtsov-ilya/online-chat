@@ -113,8 +113,10 @@ const ChatsListSection: FC<ChatsListSectionProps> = ({ isMobileScreen }) => {
             chatsWithDetails.map((chat) => chat.chatId),
           );
 
+          const filteredChats = chats.filter((chat) => 'membersIds' in chat);
+
           const newChats: IChatWithDetails[] = await Promise.all(
-            chats.map(async (chat) => {
+            filteredChats.map(async (chat) => {
               // если чат уже существует, обновить только измененные ключи, оставляя username и avatar
               if (existingChatIds.has(chat.chatId)) {
                 const existingChat = chatsWithDetails.find(

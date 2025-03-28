@@ -11,7 +11,6 @@ import {
 } from 'redux-persist';
 import storage from 'redux-persist/lib/storage';
 
-import { shopApi } from './shopApi';
 import userReducer from './slices/UserSlice';
 import messagesArrayReducer from './slices/MessagesArraySlice';
 import activeChatReducer from './slices/ActiveChatSlice';
@@ -26,7 +25,6 @@ const persistConfig = {
 };
 
 const rootReduser = combineReducers({
-  [shopApi.reducerPath]: shopApi.reducer,
   user: userReducer,
   messagesArray: messagesArrayReducer,
   activeChat: activeChatReducer,
