@@ -133,7 +133,7 @@ const DragNDropZone: FC<DragNDropZoneProps> = ({
       {fileType !== null && (
         <div
           onDragOver={(e: React.DragEvent) => e.preventDefault()}
-          onDrop={(e: React.DragEvent) => onFileDrop(e)}
+          onDrop={onFileDrop}
           onDragEnter={() => setIsDragOnDropWrapper('file')}
           onDragLeave={(e: React.DragEvent) => {
             const currentTarget = e.currentTarget as HTMLElement;

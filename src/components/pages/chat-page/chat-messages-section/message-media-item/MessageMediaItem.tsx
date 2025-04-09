@@ -65,7 +65,6 @@ const MessageMediaItem: FC<MessageMediaItemProps> = ({
       {(imgUrl || (videoPreview && videoPreview.length > 0)) && (
         <>
           <img
-            loading="lazy"
             onClick={onItemClick}
             src={imgUrl || videoPreview}
             alt=""

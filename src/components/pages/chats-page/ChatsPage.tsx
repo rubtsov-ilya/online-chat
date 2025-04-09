@@ -9,6 +9,7 @@ import { useDispatch } from 'react-redux';
 import { removeActiveChat } from 'src/redux/slices/ActiveChatSlice';
 import useSelectedMessages from 'src/hooks/useSelectedMessages';
 import { clearSelectedMessagesState } from 'src/redux/slices/SelectedMessagesSlice';
+import { clearMessages } from 'src/redux/slices/MessagesArraySlice';
 
 interface ChatsPageProps {
   isMobileScreen: boolean;
@@ -24,6 +25,7 @@ const ChatsPage: FC<ChatsPageProps> = ({ isMobileScreen }) => {
   useEffect(() => {
     if (location.pathname === '/chats') {
       dispatch(removeActiveChat());
+      dispatch(clearMessages());
       if (!isMessagesForwarding) {
         dispatch(clearSelectedMessagesState());
       }

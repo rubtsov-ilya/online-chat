@@ -12,6 +12,7 @@ const ToBottomBtn: FC<ToBottomBtnProps> = ({
   scrollToBottom,
 }) => {
   const [isActive, setIsActive] = useState<boolean>(false);
+  const deadZone = 200; // px
 
   useEffect(() => {
     const chatMessagesCurrent = chatMessagesRef.current;
@@ -20,7 +21,7 @@ const ToBottomBtn: FC<ToBottomBtnProps> = ({
     const onScroll = () => {
       if (chatMessagesCurrent) {
         const { scrollTop, clientHeight, scrollHeight } = chatMessagesCurrent;
-        const deadZone = 200;
+
         /* deadZone - желаемое количество пикселей от самого низа секции в диапозоне которого не будет появляться кнопка прокрутки */
         const isAtBottom = scrollTop + clientHeight >= scrollHeight - deadZone;
         /* когда полностью прокручена до низа секция, то isAtBottom == true */

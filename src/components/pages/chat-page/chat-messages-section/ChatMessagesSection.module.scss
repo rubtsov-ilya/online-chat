@@ -38,4 +38,9 @@
     z-index: 0;
     pointer-events: none;
   }
+
+  &__messages-observer {
+    height: 0.01px;
+    background-color: red;
+  }
 }

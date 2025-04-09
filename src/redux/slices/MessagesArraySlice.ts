@@ -33,7 +33,44 @@ const messagesArraySlice = createSlice({
       ];
     },
     addMessage(state, action: PayloadAction<IMessage[]>) {
-      state.messagesArray = [...state.messagesArray, ...action.payload];
+      state.messagesArray = [
+        ...state.messagesArray,
+        ...action.payload.map((item) => ({
+          ...item,
+          messageDateUTC: `${new Date(item.messageDateUTC as string | number)}`,
+        })),
+      ];
+    },
+    addMessages(state, action: PayloadAction<IMessage[]>) {
+      const currentMessagesMap = new Map(state.messagesArray.map(m => [m.messageId, m]));
+    
+      action.payload.forEach(newMessage => {
+
+        // если сообщение уже есть в массиве, то его только обновить
+        if (currentMessagesMap.has(newMessage.messageId)) {
+          const existingMessage = currentMessagesMap.get(newMessage.messageId)!;
+          currentMessagesMap.set(newMessage.messageId, {
+            ...existingMessage,
+            ...newMessage,
+            media: existingMessage.media,
+            messageDateUTC: `${new Date(newMessage.messageDateUTC as string | number)}`
+          });
+        } else {
+          // если сообщения нет в массиве, то его добавить
+          currentMessagesMap.set(newMessage.messageId, {
+            ...newMessage,
+            messageDateUTC: `${new Date(newMessage.messageDateUTC as string | number)}`
+          });
+        }
+      });
+    
+      const allMessages = Array.from(currentMessagesMap.values());
+    
+      state.messagesArray = allMessages.sort(
+        (a, b) =>
+          new Date(a.messageDateUTC as string).getTime() -
+          new Date(b.messageDateUTC as string).getTime(),
+      );
     },
     removeLoadingMessage(state, action) {
       state.messagesArray = state.messagesArray.filter(
@@ -110,17 +147,24 @@ const messagesArraySlice = createSlice({
         message.isCanceled = true;
       }
     },
+    clearMessages(
+      state,
+    ) {
+      state.messagesArray = [];
+    },
   },
 });
 
 export const {
   addLoadingMessage,
   addMessage,
+  addMessages,
   removeLoadingMessage,
   addInitialMessagesArray,
   updateProgressKeyInMessage,
   updateProgressPreviewKeyInMessage,
   updateIsCanceledKeyInMessage,
+  clearMessages,
 } = messagesArraySlice.actions;
 export const { selectMessagesArray } = messagesArraySlice.selectors;
 export default messagesArraySlice.reducer;
