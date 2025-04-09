@@ -94,8 +94,8 @@ const ChatMessagesSection: FC<ChatMessagesSectionProps> = ({
       observerCounts.beforeCount +
       observerCounts.afterCount,
   };
-  /*     console.table(test);
-  console.table(observerCounts); */
+  console.table(test);
+  console.table(observerCounts);
 
   useEffect(() => {
     const observeBeforeMessages = (entries: IntersectionObserverEntry[]) => {
@@ -353,6 +353,15 @@ const ChatMessagesSection: FC<ChatMessagesSectionProps> = ({
             ) {
               setObserverLocked((prev) => {
                 return { ...prev, isObserverAfterLocked: true };
+              });
+            }
+            if (
+              messagesAfterUnreadFromDatabase.length >=
+                MESSAGES_LOAD_COUNT / 2 + observerCounts.afterCount &&
+                observerLocked.isObserverAfterLocked
+            ) {
+              setObserverLocked((prev) => {
+                return { ...prev, isObserverAfterLocked: false };
               });
             }
             dispatch(addMessages(messagesAfterUnreadFromDatabase));
