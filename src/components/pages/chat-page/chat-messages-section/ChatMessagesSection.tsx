@@ -49,18 +49,19 @@ const ChatMessagesSection: FC<ChatMessagesSectionProps> = ({
   const chatMessagesRef = useRef<HTMLDivElement>(null);
 
   const [doScroll, setDoScroll] = useState<boolean>(false);
+  const [isSubscribeChanged, setIsSubscribeChanged] = useState<boolean>(false);
+  const [isSubscribeChangedScrollLocked, setIsSubscribeChangedScrollLocked] = useState<boolean>(false);
 
-  const [lastChangedCounter, setLastChangedCounter] = useState<'before' | null>(null);
+  const [lastChangedCounter, setLastChangedCounter] = useState<'before' | null>(
+    null,
+  );
 
   const prevScrollStateRef = useRef<{
     scrollTop: number;
     scrollHeight: number;
     clientHeight: number;
   }>({ scrollTop: 0, scrollHeight: 0, clientHeight: 0 });
-  const [debouncerCounts, setВebouncerCounts] = useState<{
-    after: boolean;
-    before: boolean;
-  }>({ after: false, before: false });
+  const [debouncerCount, setDebouncerCount] = useState<boolean>(false);
   const [subscribeControl, setSubscribeControl] = useState<{
     isDualSubscribe: boolean;
     firstUnreadMessageId: string;
@@ -83,34 +84,26 @@ const ChatMessagesSection: FC<ChatMessagesSectionProps> = ({
 
   //TODO удалить отладку
   const test = {
-    bool:
-      MESSAGES_LOAD_COUNT +
-        observerCounts.beforeCount +
-        observerCounts.afterCount <
-      messagesArray.length,
     mesLength: messagesArray.length,
     countersLength:
       MESSAGES_LOAD_COUNT +
       observerCounts.beforeCount +
       observerCounts.afterCount,
   };
-  console.table(test);
+  /*   console.table(test);
   console.table(observerCounts);
+  console.table([subscribeControl]);
+  console.table([observerLocked]); */
 
   useEffect(() => {
     const observeBeforeMessages = (entries: IntersectionObserverEntry[]) => {
       entries.forEach((entry) => {
-        if (
-          entry.isIntersecting &&
-          !observerLocked.isObserverBeforeLocked &&
-          !debouncerCounts.before
-        ) {
-          setLastChangedCounter('before'); 
+        if (entry.isIntersecting && !observerLocked.isObserverBeforeLocked) {
+          setLastChangedCounter('before');
           setObserverCounts((prev) => ({
             ...prev,
             beforeCount: prev.beforeCount + MESSAGES_LOAD_COUNT / 2,
           }));
-          setВebouncerCounts((prev) => ({ ...prev, before: true }));
         }
       });
     };
@@ -122,14 +115,14 @@ const ChatMessagesSection: FC<ChatMessagesSectionProps> = ({
           entry.isIntersecting &&
           !observerLocked.isObserverAfterLocked &&
           subscribeControl.isDualSubscribe &&
-          !debouncerCounts.after
+          !debouncerCount
         ) {
-          setLastChangedCounter(null); 
+          setLastChangedCounter(null);
           setObserverCounts((prev) => ({
             ...prev,
             afterCount: prev.afterCount + MESSAGES_LOAD_COUNT / 2,
           }));
-          setВebouncerCounts((prev) => ({ ...prev, after: true }));
+          setDebouncerCount(true);
         }
       });
     };
@@ -158,7 +151,7 @@ const ChatMessagesSection: FC<ChatMessagesSectionProps> = ({
 
     // очистка
     return () => {
-      setВebouncerCounts({ after: false, before: false });
+      setDebouncerCount(false);
 
       if (beforeMessagesObserverRef.current) {
         beforeObserver.unobserve(beforeMessagesObserverRef.current);
@@ -235,44 +228,40 @@ const ChatMessagesSection: FC<ChatMessagesSectionProps> = ({
 
   useEffect(() => {
     requestAnimationFrame(() => {
-      if (!chatMessagesRef.current || !prevScrollStateRef.current) return;
-      
-      const newScrollHeight = chatMessagesRef.current.scrollHeight;
-      const heightDiff = newScrollHeight - prevScrollStateRef.current.scrollHeight;
-  
-      if (lastChangedCounter === 'before') {
-        // Логика для beforeCount - сохраняем позицию относительно нового контента сверху
+      if (
+        !chatMessagesRef.current ||
+        !prevScrollStateRef.current ||
+        lastChangedCounter !== 'before'
+      )
+        return;
+
+      if (isSubscribeChangedScrollLocked === false && isSubscribeChanged) {
+        // Одноразовый фикс бага с прокруткой в не то место при смене подписки
         chatMessagesRef.current.scrollTo({
-          top: prevScrollStateRef.current.scrollTop + heightDiff,
+          top: prevScrollStateRef.current.scrollTop,
           behavior: 'auto',
         });
+
+        setIsSubscribeChangedScrollLocked(true);
+        return;
       }
+
+      // Логика для beforeCount - сохраняем позицию относительно нового контента сверху
+      const newScrollHeight = chatMessagesRef.current.scrollHeight;
+      const heightDiff =
+        newScrollHeight - prevScrollStateRef.current.scrollHeight;
+
+      chatMessagesRef.current.scrollTo({
+        top: prevScrollStateRef.current.scrollTop + heightDiff,
+        behavior: 'auto',
+      });
     });
+
   }, [prevScrollStateRef.current, lastChangedCounter]);
 
   useLayoutEffect(() => {
     let unsubscribeBeforeMessages: (() => void) | undefined;
     let unsubscribeAfterMessages: (() => void) | undefined;
-
-    const saveScrollPosition = (
-      prevScrollState: {
-        scrollTop: number;
-        scrollHeight: number;
-        clientHeight: number;
-      } | null,
-    ) => {
-      requestAnimationFrame(() => {
-        if (!chatMessagesRef.current || !prevScrollState) return;
-
-        const newScrollHeight = chatMessagesRef.current.scrollHeight;
-        const heightDiff = newScrollHeight - prevScrollState.scrollHeight;
-        // восстанавить позицию с учетом новой высоты
-        chatMessagesRef.current.scrollTo({
-          top: prevScrollState.scrollTop + heightDiff,
-          behavior: 'auto',
-        });
-      });
-    };
 
     const getMessages = async () => {
       if (activeChatId === null) return;
@@ -351,19 +340,21 @@ const ChatMessagesSection: FC<ChatMessagesSectionProps> = ({
                 MESSAGES_LOAD_COUNT / 2 + observerCounts.afterCount &&
               !observerLocked.isObserverAfterLocked
             ) {
-              setObserverLocked((prev) => {
-                return { ...prev, isObserverAfterLocked: true };
+              setSubscribeControl({
+                isDualSubscribe: false,
+                firstUnreadMessageId: '',
               });
+              setObserverCounts((prev) => ({
+                beforeCount: prev.beforeCount + prev.afterCount,
+                afterCount: 0,
+              }));
+              setObserverLocked((prev) => ({
+                ...prev,
+                isObserverAfterLocked: false,
+              }));
+              setIsSubscribeChanged(true);
             }
-            if (
-              messagesAfterUnreadFromDatabase.length >=
-                MESSAGES_LOAD_COUNT / 2 + observerCounts.afterCount &&
-                observerLocked.isObserverAfterLocked
-            ) {
-              setObserverLocked((prev) => {
-                return { ...prev, isObserverAfterLocked: false };
-              });
-            }
+
             dispatch(addMessages(messagesAfterUnreadFromDatabase));
           },
           (error) => {
@@ -373,6 +364,7 @@ const ChatMessagesSection: FC<ChatMessagesSectionProps> = ({
             );
           },
         );
+
         if (prevScrollState) {
           prevScrollStateRef.current = {
             scrollTop: prevScrollState.scrollTop,
@@ -382,13 +374,13 @@ const ChatMessagesSection: FC<ChatMessagesSectionProps> = ({
         }
       } else if (!subscribeControl.isDualSubscribe) {
         // если нет непрочитанных сообщений, тогда подписка на сообщения с последнего сообщения
-
         const messagesQuery = query(
           messagesRef,
           orderByKey(),
           limitToLast(MESSAGES_LOAD_COUNT + observerCounts.beforeCount),
         );
 
+        if (unsubscribeBeforeMessages) unsubscribeBeforeMessages();
         if (unsubscribeAfterMessages) unsubscribeAfterMessages();
 
         unsubscribeAfterMessages = onValue(
@@ -417,7 +409,14 @@ const ChatMessagesSection: FC<ChatMessagesSectionProps> = ({
               : null;
 
             dispatch(addMessages(messagesFromDatabase));
-            saveScrollPosition(prevScrollState);
+            if (prevScrollState) {
+              console.log(prevScrollStateRef.current);
+              prevScrollStateRef.current = {
+                scrollTop: 0,
+                scrollHeight: prevScrollState.scrollHeight,
+                clientHeight: prevScrollState.clientHeight,
+              };
+            }
           },
           (error) => {
             console.error('Ошибка при получении списка сообщений:', error);

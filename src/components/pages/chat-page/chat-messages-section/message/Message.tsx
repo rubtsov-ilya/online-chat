@@ -365,7 +365,7 @@ const Message: FC<MessageProps> = ({
             username !== undefined &&
             messageData.senderUid !== uid && (
               <div
-                className={`${styles['message__username-wrapper']} ${messageData.media.length > 0 ? styles['message__username-wrapper--befor-media'] : ''}  ${messageData.media.length === 0 && messageData.files.length > 0 ? styles['message__username-wrapper--before-files'] : ''}`}
+                className={`${styles['message__username-wrapper']} ${messageData.media?.length > 0 ? styles['message__username-wrapper--befor-media'] : ''}  ${messageData.media?.length === 0 && messageData.files?.length > 0 ? styles['message__username-wrapper--before-files'] : ''}`}
               >
                 <span className={styles['message__username']}>{username}</span>
               </div>
