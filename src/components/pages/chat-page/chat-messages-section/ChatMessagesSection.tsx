@@ -13,7 +13,6 @@ import { IUploadTasksRef } from 'src/interfaces/UploadTasks.interface';
 import useAuth from 'src/hooks/useAuth';
 import MessageDateGroup from './message-date-group/MessageDateGroup';
 import { ILoadingMessage } from 'src/interfaces/LoadingMessage.interface';
-import SectionLoader from './section-loader/SectionLoader';
 
 import {
   ref as refFirebaseDatabase,
@@ -41,6 +40,8 @@ interface ChatMessagesSectionProps {
   uploadTasksRef: React.MutableRefObject<IUploadTasksRef>;
   activeChatId: string | null;
   isSubscribeLoading: boolean;
+  duringMessageSendingToggle: boolean;
+  isChatExist: boolean;
 }
 
 const ChatMessagesSection: FC<ChatMessagesSectionProps> = ({
@@ -48,6 +49,8 @@ const ChatMessagesSection: FC<ChatMessagesSectionProps> = ({
   uploadTasksRef,
   activeChatId,
   isSubscribeLoading,
+  duringMessageSendingToggle,
+  isChatExist,
 }) => {
   const ComponentTag = isMobileScreen ? 'section' : 'div';
   /* const [messagesArray, setMessagesArray] = useState([]); */
@@ -63,6 +66,9 @@ const ChatMessagesSection: FC<ChatMessagesSectionProps> = ({
     clientHeight: number;
   }>({ scrollTop: 0, scrollHeight: 0, clientHeight: 0 });
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isUnreadMessageLoading, setIsUnreadMessageLoading] =
+    useState<boolean>(false);
+  const [isMessagesLoading, setIsMessagesLoading] = useState<boolean>(true);
 
   const [forceBottomScroll, setForceBottomScroll] = useState<boolean>(false);
   const [isSubscribeChanged, setIsSubscribeChanged] = useState<boolean>(false);
@@ -255,36 +261,96 @@ const ChatMessagesSection: FC<ChatMessagesSectionProps> = ({
   useLayoutEffect(() => {
     const getUnreadMessageId = async () => {
       if (activeChatId === null) return;
-      // получение айди первого непрочитанного сообщения
-      const firstUnreadMessagesIdsRef = refFirebaseDatabase(
-        firebaseDatabase,
-        `chats/${activeChatId}/unreadMessages/${uid}`,
-      );
+      try {
+        // получение айди первого непрочитанного сообщения
+        setIsUnreadMessageLoading(true);
 
-      const firstUnreadMessagesIdsSnapshot = await get(
-        firstUnreadMessagesIdsRef,
-      );
+        const firstUnreadMessagesIdsRef = refFirebaseDatabase(
+          firebaseDatabase,
+          `chats/${activeChatId}/unreadMessages/${uid}`,
+        );
 
-      if (firstUnreadMessagesIdsSnapshot.exists()) {
-        // если есть непрочитанные сообщения, тогда подписка на сообщения вокруг первого непрочитанного сообщения
-        const firstUnreadMessageId = Object.keys(
-          firstUnreadMessagesIdsSnapshot.val(),
-        )[0] as string;
+        const firstUnreadMessagesIdsSnapshot = await get(
+          firstUnreadMessagesIdsRef,
+        );
 
-        setSubscribeControl({
-          isDualSubscribe: true,
-          firstUnreadMessageId: firstUnreadMessageId,
-        });
-      } else {
-        setSubscribeControl({
-          isDualSubscribe: false,
-          firstUnreadMessageId: '',
-        });
+        if (firstUnreadMessagesIdsSnapshot.exists()) {
+          // если есть непрочитанные сообщения, тогда подписка на сообщения вокруг первого непрочитанного сообщения
+          const firstUnreadMessageId = Object.keys(
+            firstUnreadMessagesIdsSnapshot.val(),
+          )[0] as string;
+
+          setSubscribeControl({
+            isDualSubscribe: true,
+            firstUnreadMessageId: firstUnreadMessageId,
+          });
+        } else {
+          setSubscribeControl({
+            isDualSubscribe: false,
+            firstUnreadMessageId: '',
+          });
+        }
+      } catch (error) {
+        console.log(
+          'Ошибка получения первого непрочитанного сообщения:',
+          error,
+        );
+      } finally {
+        setIsUnreadMessageLoading(false);
       }
     };
 
     getUnreadMessageId();
   }, [activeChatId]);
+
+  useLayoutEffect(() => {
+    // скролл при прогрузке сообщений
+    if (messagesArray.length === 0 || !isChatExist) return;
+
+    if (isMessagesLoading) {
+      if (
+        subscribeControl.isDualSubscribe &&
+        subscribeControl.firstUnreadMessageId
+      ) {
+        // если есть непрочитанное сообщение, то скролл до него
+        const checkElement = () => {
+          const element = document.getElementById(
+            subscribeControl.firstUnreadMessageId,
+          );
+          if (element) {
+            element.scrollIntoView({ behavior: 'auto' });
+            setIsMessagesLoading(false)
+          } else {
+            // Повторяем проверку, если элемент ещё не загружен
+            requestAnimationFrame(checkElement);
+          }
+        };
+
+        checkElement();
+      } else if (!subscribeControl.isDualSubscribe) {
+        // если нет непрочитанного сообщения, то скролл вниз
+        const checkElement = () => {
+          if (!chatMessagesRef.current) return;
+
+          const lastMessageId = messagesArray[messagesArray.length - 1].messageId;
+          const lastMessageElement = document.getElementById(lastMessageId);
+          
+          if (lastMessageElement) {
+            chatMessagesRef.current.scrollTo({
+              top: chatMessagesRef.current.scrollHeight,
+              behavior: 'auto',
+            });
+            setIsMessagesLoading(false)
+          } else {
+            requestAnimationFrame(checkElement);
+            return;
+          }
+        };
+
+        checkElement();
+      }
+    }
+  }, [messagesArray.length]);
 
   useLayoutEffect(() => {
     let unsubscribeBeforeMessages: (() => void) | undefined;
@@ -434,7 +500,7 @@ const ChatMessagesSection: FC<ChatMessagesSectionProps> = ({
 
             if (prevScrollState) {
               prevScrollStateRef.current = {
-                scrollTop: 0,
+                scrollTop: prevScrollState.scrollTop, // TODO было 0, если появится баг, то оно
                 scrollHeight: prevScrollState.scrollHeight,
                 clientHeight: prevScrollState.clientHeight,
               };
@@ -484,28 +550,10 @@ const ChatMessagesSection: FC<ChatMessagesSectionProps> = ({
       !subscribeControl.isDualSubscribe &&
       messagesArray[messagesArray.length - 1].senderUid !== uid
     ) {
-      // TODO оставить логику прокрутки только если мы в 80пикселях, только smooth. А логику прокрутки быстрой + остановка мягкая в отдельном useEffect
+      // есть баг из-за архитектуры бекенда. При смене подписки через докрутку до низа, может срабатывать срол на дозагрузку при смене подписки. Баг не фиксится
       scrollToBottomSmooth(false);
     }
-    return () => {};
   }, [messagesArray.length]);
-
-  //useLayoutEffect(() => {
-  //  /*  скролл вниз секции */
-  //
-  //  /* TODO переделать логику  прокручивать до непрочитанного сообщения надо будет, а не вниз. но если таких нет, то вниз */
-  //  //вот этот код выполнять, если нет unreadMessage
-  //  if (!subscribeControl.isDualSubscribe) {
-  //    setTimeout(() => {
-  //      chatMessagesRef.current?.scrollTo({
-  //        top: chatMessagesRef.current.scrollHeight,
-  //        behavior: 'auto',
-  //      });
-  //    }, 0);
-  //  }
-  //  debugger
-  //
-  //}, [forceBottomScroll, isSubscribeLoading]);
 
   const smoothScroll = () => {
     endRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -556,6 +604,36 @@ const ChatMessagesSection: FC<ChatMessagesSectionProps> = ({
     }
   };
 
+  useEffect(() => {
+    // прокрутка срабатывает при каждой отправке сообщения пользователем этого аккаунта
+    if (subscribeControl.isDualSubscribe) {
+      //прокрутка при двойной подписке
+      setIsLoading(true);
+
+      dispatch(clearMessages());
+      setSubscribeControl({
+        isDualSubscribe: false,
+        firstUnreadMessageId: '',
+      });
+      setObserverCounts((prev) => ({
+        beforeCount: prev.beforeCount + prev.afterCount,
+        afterCount: 0,
+      }));
+      setObserverLocked((prev) => ({
+        ...prev,
+        isObserverAfterLocked: false,
+      }));
+      setIsSubscribeChanged(true);
+      setForceBottomScroll(true);
+    } else {
+      //прокрутка при одинарной подписке
+      scrollToBottomSmooth();
+      scrollToBottomFastAndSmooth();
+    }
+
+    return () => {};
+  }, [duringMessageSendingToggle]);
+
   const onBottomBtnClick = async () => {
     if (subscribeControl.isDualSubscribe) {
       //прокрутка при двойной подписке
@@ -582,16 +660,15 @@ const ChatMessagesSection: FC<ChatMessagesSectionProps> = ({
         const clearOwnUnreadMessages = {
           [`chats/${activeChatId}/unreadMessages/${uid}`]: null,
         };
-
-        //TODO разлокать await
-        /* await update(
-        refFirebaseDatabase(firebaseDatabase),
-        clearOwnUnreadMessages,
-      ); */
+        await update(
+          refFirebaseDatabase(firebaseDatabase),
+          clearOwnUnreadMessages,
+        );
       } catch (error) {
         console.error('Ошибка при выполнении операции', error);
       } finally {
         setForceBottomScroll(true);
+        // setIsLoading(false); ставится в useEffect рядом с setForceBottomScroll(false)
       }
     } else {
       //прокрутка при одинарной подписке
@@ -599,10 +676,6 @@ const ChatMessagesSection: FC<ChatMessagesSectionProps> = ({
       scrollToBottomFastAndSmooth();
     }
   };
-
-  if (isSubscribeLoading) {
-    return <SectionLoader />;
-  }
 
   return (
     <ComponentTag
@@ -613,7 +686,7 @@ const ChatMessagesSection: FC<ChatMessagesSectionProps> = ({
         e.preventDefault();
       }}
     >
-      {isLoading && (
+      {(isLoading || isSubscribeLoading || isUnreadMessageLoading) && (
         <div className={styles['chat-messages__scroll-loader']}>
           <div
             className={styles['chat-messages__circular-progressbar-wrapper']}
@@ -636,67 +709,68 @@ const ChatMessagesSection: FC<ChatMessagesSectionProps> = ({
         </div>
       )}
 
-      <div
-        className={
-          isMobileScreen
-            ? 'container container--height'
-            : 'container container--max-width-unset container--height'
-        }
-      >
+      {!isSubscribeLoading && (
         <div
-          className={`${styles['chat-messages__content']} ${messagesArray.length === 0 ? styles['chat-messages__content--no-messages'] : ''}`}
+          className={
+            isMobileScreen
+              ? 'container container--height'
+              : 'container container--max-width-unset container--height'
+          }
         >
           <div
-            className={styles['chat-messages__messages-observer']}
-            ref={beforeMessagesObserverRef}
-          />
+            className={`${styles['chat-messages__content']} ${messagesArray.length === 0 ? styles['chat-messages__content--no-messages'] : ''}`}
+          >
+            <div
+              className={styles['chat-messages__messages-observer']}
+              ref={beforeMessagesObserverRef}
+            />
 
-          {messagesArray.length > 0 &&
-            Object.entries(
-              messagesArray.reduce(
-                (acc, message) => {
-                  const dateKey = new Date(
-                    message.messageDateUTC as number,
-                  ).toLocaleDateString();
-                  if (!acc[dateKey]) {
-                    acc[dateKey] = []; // Инициализируем новый массив, если такой даты еще нет
-                  }
-                  acc[dateKey].push(message); // Добавляем сообщение к соответствующему массиву
-                  return acc; // Возвращаем аккумулированный объект
-                },
-                {} as Record<string, (IMessage | ILoadingMessage)[]>,
-              ),
-            ).map(([date, messages]) => (
-              <MessageDateGroup
-                key={date}
-                messagesArray={messages}
-                uid={uid!}
-                uploadTasksRef={uploadTasksRef}
-                chatMessagesRef={chatMessagesRef}
-              />
-            ))}
+            {messagesArray.length > 0 &&
+              Object.entries(
+                messagesArray.reduce(
+                  (acc, message) => {
+                    const dateKey = new Date(
+                      message.messageDateUTC as number,
+                    ).toLocaleDateString();
+                    if (!acc[dateKey]) {
+                      acc[dateKey] = []; // Инициализируем новый массив, если такой даты еще нет
+                    }
+                    acc[dateKey].push(message); // Добавляем сообщение к соответствующему массиву
+                    return acc; // Возвращаем аккумулированный объект
+                  },
+                  {} as Record<string, (IMessage | ILoadingMessage)[]>,
+                ),
+              ).map(([date, messages]) => (
+                <MessageDateGroup
+                  key={date}
+                  messagesArray={messages}
+                  uid={uid!}
+                  uploadTasksRef={uploadTasksRef}
+                  chatMessagesRef={chatMessagesRef}
+                />
+              ))}
 
-          {!isLoading && (
             <div
               className={styles['chat-messages__messages-observer']}
               ref={afterMessagesObserverRef}
             />
-          )}
-          {messagesArray.length === 0 && (
-            <span className={styles['chat-messages__no-messages']}>
-              Нет сообщений
-            </span>
-          )}
-          <div className={styles['chat-messages__overlay-to-bottom-btn']}>
-            <ToBottomBtn
-              isDualSubscribe={subscribeControl.isDualSubscribe}
-              onBottomBtnClick={onBottomBtnClick}
-              chatMessagesRef={chatMessagesRef}
-            />
+
+            {messagesArray.length === 0 && (
+              <span className={styles['chat-messages__no-messages']}>
+                Нет сообщений
+              </span>
+            )}
+            <div className={styles['chat-messages__overlay-to-bottom-btn']}>
+              <ToBottomBtn
+                isDualSubscribe={subscribeControl.isDualSubscribe}
+                onBottomBtnClick={onBottomBtnClick}
+                chatMessagesRef={chatMessagesRef}
+              />
+            </div>
           </div>
+          <div ref={endRef}></div>
         </div>
-        <div ref={endRef}></div>
-      </div>
+      )}
     </ComponentTag>
   );
 };

@@ -21,6 +21,7 @@ interface ChatBottomSectionProps {
   isDrag: boolean; 
   locationState: ILocationChatPage | null;
   setIsDrag: React.Dispatch<React.SetStateAction<boolean>>;
+  setDuringMessageSendingToggle: React.Dispatch<React.SetStateAction<boolean>>
 }
 
 const ChatBottomSection: FC<ChatBottomSectionProps> = ({
@@ -31,6 +32,7 @@ const ChatBottomSection: FC<ChatBottomSectionProps> = ({
   isDrag,
   locationState,
   setIsDrag,
+  setDuringMessageSendingToggle
 }) => {
   const ComponentTag = isMobileScreen ? 'section' : 'div';
   const dispatch = useDispatch();
@@ -65,6 +67,7 @@ const ChatBottomSection: FC<ChatBottomSectionProps> = ({
             />
           )}
           <MessageInputWrapper
+            setDuringMessageSendingToggle={setDuringMessageSendingToggle}
             chatInputValues={chatInputValues}
             isSubscribeLoading={isSubscribeLoading}
             locationState={locationState}

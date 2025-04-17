@@ -66,6 +66,7 @@ interface MessageInputWrapperProps {
   uploadTasksRef: React.MutableRefObject<IUploadTasksRef>;
   locationState: ILocationChatPage | null;
   updateAttachedItems: (state: AttachedItemType[]) => void;
+  setDuringMessageSendingToggle: React.Dispatch<React.SetStateAction<boolean>>
 }
 
 const MessageInputWrapper: FC<MessageInputWrapperProps> = ({
@@ -76,6 +77,7 @@ const MessageInputWrapper: FC<MessageInputWrapperProps> = ({
   uploadTasksRef,
   locationState,
   updateAttachedItems,
+  setDuringMessageSendingToggle,
 }) => {
   const isWritingByChatsUpdatedRef = useRef<{ [chatId: string]: boolean }>({});
   const { uid, avatar, username, blocked } = useAuth();
@@ -819,10 +821,11 @@ const MessageInputWrapper: FC<MessageInputWrapperProps> = ({
             activeChatGroupAdminUrl: '',
           }),
         );
+        setDuringMessageSendingToggle((prev) => !prev)
       }
       // ОТПРАВИТЬ СООБЩЕНИЕ, если при создании чата уже был создан чат ранее вторым пользователем
       if (updatesByUserChats === undefined) {
-        // TODO ПРОВЕРИТЬ БУДЕТ ЛИ ОТПРАВКА СМС ОТСЮДА ИЛИ СНИЗУ СРАЗУ ИЗ РТК ПОДХВАТИТ ИЗМЕНЕНИЕ 
+        // TODO доделать бы
         // если updatesByUserChats === undefined; то чат существует и вернётся его айди и оно установится в RTK
       }
     } // ОТПРАВИТЬ СООБЩЕНИЕ
@@ -865,6 +868,7 @@ const MessageInputWrapper: FC<MessageInputWrapperProps> = ({
       );
       const updates = { ...updatesByUserChats, ...updatesByChats };
       await update(refFirebaseDatabase(firebaseDatabase), updates);
+      setDuringMessageSendingToggle((prev) => !prev)
     }
   };
 

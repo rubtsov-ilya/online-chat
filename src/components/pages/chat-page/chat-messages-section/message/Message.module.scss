@@ -17,9 +17,9 @@
     margin: 2px auto 0 40px;
     overflow: hidden;
     border-radius: 16px 16px 16px 16px;
-    background: var(--base-white);
+    background-color: var(--base-white);
     border: 1px solid var(--base-grey-whisper);
-    transition: all 0.2s ease;
+    transition: border 0.2s ease, background-color 0.2s ease;
     &.selected {
       border: 1px solid var(--light-blue-alice);
     }
@@ -31,7 +31,7 @@
     }
     &.own {
       margin: 2px 0 0 auto;
-      background: var(--base-grey-whisper);
+      background-color: var(--base-grey-whisper);
       border: unset;
       &.margin-top {
         margin-top: 8px;
@@ -44,7 +44,7 @@
       border-radius: 16px 16px 16px 0;
     }
     &.selected {
-      background: var(--light-blue-alice);
+      background-color: var(--light-blue-alice);
     }
     @include tablet-small {
       max-width: 380px;

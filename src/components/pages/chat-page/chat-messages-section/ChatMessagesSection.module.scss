@@ -55,6 +55,7 @@
     height: 100%;
     width: 100%;
     background-color: var(--base-white-snow);
+    pointer-events: none;
     z-index: 2;
   }
 

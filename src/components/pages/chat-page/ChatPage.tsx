@@ -49,6 +49,7 @@ const ChatPage: FC = () => {
   const [modalOpen, setModalOpen] = useState<'forward' | false>(false);
   const [isDrag, setIsDrag] = useState<boolean>(false);
   const [isSubscribeLoading, setIsSubscribeLoading] = useState<boolean>(false);
+  const [duringMessageSendingToggle, setDuringMessageSendingToggle] = useState<boolean>(false);
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const location = useLocation();
@@ -132,8 +133,6 @@ const ChatPage: FC = () => {
               messageDateUTC: `${new Date()}`
             }),
           )
-
-          console.log(loadingMessagesWithFirebaseIds)
 
           dispatch(addMessage(loadingMessagesWithFirebaseIds));
           
@@ -443,19 +442,22 @@ const ChatPage: FC = () => {
           }
         />
         <ChatMessagesSection
+          duringMessageSendingToggle={duringMessageSendingToggle}
           isSubscribeLoading={isSubscribeLoading}
           activeChatId={activeChatId}
           uploadTasksRef={uploadTasksRef}
           isMobileScreen={isMobileScreen}
+          isChatExist={locationState ? false : true}
         />
         <ChatBottomSection
           activeChatId={activeChatId}
           isSubscribeLoading={isSubscribeLoading}
           isDrag={isDrag}
-          setIsDrag={setIsDrag}
           uploadTasksRef={uploadTasksRef}
           isMobileScreen={isMobileScreen}
           locationState={locationState}
+          setIsDrag={setIsDrag}
+          setDuringMessageSendingToggle={setDuringMessageSendingToggle}
         />
         <CustomToastContainer />
         <div id="message-context-backdrop"></div>
