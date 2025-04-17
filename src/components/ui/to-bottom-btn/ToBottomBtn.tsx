@@ -3,13 +3,15 @@ import styles from './ToBottomBtn.module.scss';
 import ArrowSvg from 'src/assets/images/icons/24x24-icons/Arrow Right.svg?react';
 
 interface ToBottomBtnProps {
+  isDualSubscribe: boolean
+  onBottomBtnClick: () => void;
   chatMessagesRef: React.RefObject<HTMLDivElement | null>;
-  scrollToBottom: () => void;
 }
 
 const ToBottomBtn: FC<ToBottomBtnProps> = ({
+  isDualSubscribe,
+  onBottomBtnClick,
   chatMessagesRef,
-  scrollToBottom,
 }) => {
   const [isActive, setIsActive] = useState<boolean>(false);
   const deadZone = 200; // px
@@ -50,8 +52,8 @@ const ToBottomBtn: FC<ToBottomBtnProps> = ({
 
   return (
     <button
-      className={`${styles['to-bottom-button']} ${isActive ? styles['active'] : ''}`}
-      onClick={scrollToBottom}
+      className={`${styles['to-bottom-button']} ${isActive || isDualSubscribe ? styles['active'] : ''}`}
+      onClick={onBottomBtnClick}
     >
       <ArrowSvg className={styles['to-bottom-button__arrow-icon']} />
     </button>

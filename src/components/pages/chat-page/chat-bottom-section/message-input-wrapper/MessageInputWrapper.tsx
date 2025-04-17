@@ -664,10 +664,16 @@ const MessageInputWrapper: FC<MessageInputWrapperProps> = ({
       {} as Record<string, any>,
     );
 
+    const clearOwnUnreadMessages = {
+      [`chats/${chatId}/unreadMessages/${uid}`]:
+        null,
+    };
+
     const updatesByChats = {
       [`chats/${chatId}/messages/${messageWithFirebaseUrls.messageId}`]:
         messageWithFirebaseUrls,
       ...unreadMessages,
+      ...clearOwnUnreadMessages,
     };
 
     return updatesByChats;
@@ -816,8 +822,8 @@ const MessageInputWrapper: FC<MessageInputWrapperProps> = ({
       }
       // ОТПРАВИТЬ СООБЩЕНИЕ, если при создании чата уже был создан чат ранее вторым пользователем
       if (updatesByUserChats === undefined) {
+        // TODO ПРОВЕРИТЬ БУДЕТ ЛИ ОТПРАВКА СМС ОТСЮДА ИЛИ СНИЗУ СРАЗУ ИЗ РТК ПОДХВАТИТ ИЗМЕНЕНИЕ 
         // если updatesByUserChats === undefined; то чат существует и вернётся его айди и оно установится в RTK
-        /* ПРОВЕРИТЬ БУДЕТ ЛИ ОТПРАВКА СМС ОТСЮДА ИЛИ СНИЗУ СРАЗУ ИЗ РТК ПОДХВАТИТ ИЗМЕНЕНИЕ */
       }
     } // ОТПРАВИТЬ СООБЩЕНИЕ
     else if (activeChatId !== null && activeChatMembers !== null) {

@@ -3,7 +3,10 @@ import { FC, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import useMessagesFromRtk from 'src/hooks/useMessagesFromRtk';
 import styles from './ChatMessagesSection.module.scss';
 import ToBottomBtn from 'src/components/ui/to-bottom-btn/ToBottomBtn';
-import { addMessages } from 'src/redux/slices/MessagesArraySlice';
+import {
+  addMessages,
+  clearMessages,
+} from 'src/redux/slices/MessagesArraySlice';
 import { useDispatch } from 'react-redux';
 import { IMessage } from 'src/interfaces/Message.interface';
 import { IUploadTasksRef } from 'src/interfaces/UploadTasks.interface';
@@ -22,9 +25,16 @@ import {
   limitToLast,
   startAt,
   endBefore,
+  update,
 } from 'firebase/database';
 import { firebaseDatabase } from 'src/firebase';
-import { MESSAGES_LOAD_COUNT } from 'src/constants';
+import {
+  CIRCULAR_LOADING_PERCENT_VALUE,
+  MESSAGES_LOAD_COUNT,
+  SCROLL_ANIMATION_LENGTH,
+  SCROLL_COEFFICIENT,
+} from 'src/constants';
+import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
 
 interface ChatMessagesSectionProps {
   isMobileScreen: boolean;
@@ -47,21 +57,29 @@ const ChatMessagesSection: FC<ChatMessagesSectionProps> = ({
   const beforeMessagesObserverRef = useRef<HTMLDivElement>(null);
   const afterMessagesObserverRef = useRef<HTMLDivElement>(null);
   const chatMessagesRef = useRef<HTMLDivElement>(null);
-
-  const [doScroll, setDoScroll] = useState<boolean>(false);
-  const [isSubscribeChanged, setIsSubscribeChanged] = useState<boolean>(false);
-  const [isSubscribeChangedScrollLocked, setIsSubscribeChangedScrollLocked] = useState<boolean>(false);
-
-  const [lastChangedCounter, setLastChangedCounter] = useState<'before' | null>(
-    null,
-  );
-
   const prevScrollStateRef = useRef<{
     scrollTop: number;
     scrollHeight: number;
     clientHeight: number;
   }>({ scrollTop: 0, scrollHeight: 0, clientHeight: 0 });
-  const [debouncerCount, setDebouncerCount] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+
+  const [forceBottomScroll, setForceBottomScroll] = useState<boolean>(false);
+  const [isSubscribeChanged, setIsSubscribeChanged] = useState<boolean>(false);
+  const [isSubscribeChangedScrollLocked, setIsSubscribeChangedScrollLocked] =
+    useState<boolean>(false);
+
+  const [lastChangedCounter, setLastChangedCounter] = useState<'before' | null>(
+    null,
+  );
+  const [debouncerToggle, setDebouncerToggle] = useState<boolean>(false);
+  const [beforeScrollTrigger, setBeforeScrollTrigger] = useState<{
+    toggle: boolean;
+    locked: boolean;
+  }>({
+    toggle: false,
+    locked: false,
+  });
   const [subscribeControl, setSubscribeControl] = useState<{
     isDualSubscribe: boolean;
     firstUnreadMessageId: string;
@@ -82,18 +100,17 @@ const ChatMessagesSection: FC<ChatMessagesSectionProps> = ({
   }>({ beforeCount: 0, afterCount: 0 });
   const dispatch = useDispatch();
 
-  //TODO удалить отладку
-  const test = {
-    mesLength: messagesArray.length,
-    countersLength:
-      MESSAGES_LOAD_COUNT +
-      observerCounts.beforeCount +
-      observerCounts.afterCount,
-  };
-  /*   console.table(test);
-  console.table(observerCounts);
-  console.table([subscribeControl]);
-  console.table([observerLocked]); */
+  useLayoutEffect(() => {
+    // сбросить все стейты при смене чат айди
+    setBeforeScrollTrigger({ toggle: false, locked: false });
+    setObserverCounts({ beforeCount: 0, afterCount: 0 });
+    setObserverLocked({
+      isObserverBeforeLocked: false,
+      isObserverAfterLocked: false,
+    });
+    setDebouncerToggle(false);
+    setLastChangedCounter(null);
+  }, [activeChatId]);
 
   useEffect(() => {
     const observeBeforeMessages = (entries: IntersectionObserverEntry[]) => {
@@ -115,14 +132,14 @@ const ChatMessagesSection: FC<ChatMessagesSectionProps> = ({
           entry.isIntersecting &&
           !observerLocked.isObserverAfterLocked &&
           subscribeControl.isDualSubscribe &&
-          !debouncerCount
+          !debouncerToggle
         ) {
           setLastChangedCounter(null);
           setObserverCounts((prev) => ({
             ...prev,
             afterCount: prev.afterCount + MESSAGES_LOAD_COUNT / 2,
           }));
-          setDebouncerCount(true);
+          setDebouncerToggle(true);
         }
       });
     };
@@ -151,7 +168,7 @@ const ChatMessagesSection: FC<ChatMessagesSectionProps> = ({
 
     // очистка
     return () => {
-      setDebouncerCount(false);
+      setDebouncerToggle(false);
 
       if (beforeMessagesObserverRef.current) {
         beforeObserver.unobserve(beforeMessagesObserverRef.current);
@@ -192,6 +209,49 @@ const ChatMessagesSection: FC<ChatMessagesSectionProps> = ({
     }
   }, [messagesArray.length]);
 
+  useEffect(() => {
+    // сохраняем позицию относительно нового контента сверху
+    requestAnimationFrame(() => {
+      if (
+        !chatMessagesRef.current ||
+        !prevScrollStateRef.current ||
+        lastChangedCounter !== 'before'
+      )
+        return;
+
+      if (!isSubscribeChangedScrollLocked && isSubscribeChanged) {
+        // Одноразовый фикс бага с прокруткой в не то место при смене подписки
+        chatMessagesRef.current.scrollTo({
+          top: prevScrollStateRef.current.scrollTop,
+          behavior: 'auto',
+        });
+        setIsSubscribeChangedScrollLocked(true);
+        return;
+      }
+
+      if (forceBottomScroll) {
+        chatMessagesRef.current?.scrollTo({
+          top: chatMessagesRef.current.scrollHeight,
+          behavior: 'auto',
+        });
+
+        setIsLoading(false);
+        setForceBottomScroll(false);
+        return;
+      }
+
+      // Логика для beforeCount с разницей в высотах прошлой и новой
+      const newScrollHeight = chatMessagesRef.current.scrollHeight;
+      const heightDiff =
+        newScrollHeight - prevScrollStateRef.current.scrollHeight;
+
+      chatMessagesRef.current.scrollTo({
+        top: prevScrollStateRef.current.scrollTop + heightDiff,
+        behavior: 'auto',
+      });
+    });
+  }, [beforeScrollTrigger]);
+
   useLayoutEffect(() => {
     const getUnreadMessageId = async () => {
       if (activeChatId === null) return;
@@ -225,39 +285,6 @@ const ChatMessagesSection: FC<ChatMessagesSectionProps> = ({
 
     getUnreadMessageId();
   }, [activeChatId]);
-
-  useEffect(() => {
-    requestAnimationFrame(() => {
-      if (
-        !chatMessagesRef.current ||
-        !prevScrollStateRef.current ||
-        lastChangedCounter !== 'before'
-      )
-        return;
-
-      if (isSubscribeChangedScrollLocked === false && isSubscribeChanged) {
-        // Одноразовый фикс бага с прокруткой в не то место при смене подписки
-        chatMessagesRef.current.scrollTo({
-          top: prevScrollStateRef.current.scrollTop,
-          behavior: 'auto',
-        });
-
-        setIsSubscribeChangedScrollLocked(true);
-        return;
-      }
-
-      // Логика для beforeCount - сохраняем позицию относительно нового контента сверху
-      const newScrollHeight = chatMessagesRef.current.scrollHeight;
-      const heightDiff =
-        newScrollHeight - prevScrollStateRef.current.scrollHeight;
-
-      chatMessagesRef.current.scrollTo({
-        top: prevScrollStateRef.current.scrollTop + heightDiff,
-        behavior: 'auto',
-      });
-    });
-
-  }, [prevScrollStateRef.current, lastChangedCounter]);
 
   useLayoutEffect(() => {
     let unsubscribeBeforeMessages: (() => void) | undefined;
@@ -316,6 +343,14 @@ const ChatMessagesSection: FC<ChatMessagesSectionProps> = ({
               setObserverLocked((prev) => {
                 return { ...prev, isObserverBeforeLocked: true };
               });
+              setBeforeScrollTrigger((prev) => {
+                return { ...prev, locked: true };
+              });
+            } else {
+              // срабатывает именно при дозагрузке сообщений
+              setBeforeScrollTrigger((prev) => {
+                return { ...prev, toggle: !prev.toggle };
+              });
             }
 
             dispatch(addMessages(messagesBeforeUnreadFromDatabase));
@@ -337,8 +372,7 @@ const ChatMessagesSection: FC<ChatMessagesSectionProps> = ({
 
             if (
               messagesAfterUnreadFromDatabase.length <
-                MESSAGES_LOAD_COUNT / 2 + observerCounts.afterCount &&
-              !observerLocked.isObserverAfterLocked
+              MESSAGES_LOAD_COUNT / 2 + observerCounts.afterCount
             ) {
               setSubscribeControl({
                 isDualSubscribe: false,
@@ -389,16 +423,6 @@ const ChatMessagesSection: FC<ChatMessagesSectionProps> = ({
             const messagesFromDatabase: IMessage[] =
               Object.values(snapshot.val()) || [];
 
-            // если получено меньше сообщений, чем в каунтерах, то блокировка добавления каунтеров
-            if (
-              messagesFromDatabase.length <
-              MESSAGES_LOAD_COUNT + observerCounts.beforeCount
-            ) {
-              setObserverLocked((prev) => {
-                return { ...prev, isObserverBeforeLocked: true };
-              });
-            }
-
             // сохранить текущее состояние скролла до обновления
             const prevScrollState = chatMessagesRef.current
               ? {
@@ -408,15 +432,33 @@ const ChatMessagesSection: FC<ChatMessagesSectionProps> = ({
                 }
               : null;
 
-            dispatch(addMessages(messagesFromDatabase));
             if (prevScrollState) {
-              console.log(prevScrollStateRef.current);
               prevScrollStateRef.current = {
                 scrollTop: 0,
                 scrollHeight: prevScrollState.scrollHeight,
                 clientHeight: prevScrollState.clientHeight,
               };
             }
+
+            // если получено меньше сообщений, чем в каунтерах, то блокировка добавления каунтеров
+            if (
+              messagesFromDatabase.length <
+              MESSAGES_LOAD_COUNT + observerCounts.beforeCount
+            ) {
+              setObserverLocked((prev) => {
+                return { ...prev, isObserverBeforeLocked: true };
+              });
+              setBeforeScrollTrigger((prev) => {
+                return { ...prev, locked: true };
+              });
+            } else {
+              // срабатывает именно при дозагрузке сообщений
+              setBeforeScrollTrigger((prev) => {
+                return { ...prev, toggle: !prev.toggle };
+              });
+            }
+
+            dispatch(addMessages(messagesFromDatabase));
           },
           (error) => {
             console.error('Ошибка при получении списка сообщений:', error);
@@ -433,61 +475,130 @@ const ChatMessagesSection: FC<ChatMessagesSectionProps> = ({
     };
   }, [activeChatId, subscribeControl, observerCounts]);
 
-  // TODO переделать логику
+  // TODO переделать логику. Сделать в самой отправке сообщения видимо, а функцию scrollToBottomSmooth вынести в хук
+
+  useEffect(() => {
+    // прокрутка секции вниз при отправке смс со стороны иного пользователя, когда ты находишься внизу экрана и чатишься
+    if (
+      messagesArray.length > 0 &&
+      !subscribeControl.isDualSubscribe &&
+      messagesArray[messagesArray.length - 1].senderUid !== uid
+    ) {
+      // TODO оставить логику прокрутки только если мы в 80пикселях, только smooth. А логику прокрутки быстрой + остановка мягкая в отдельном useEffect
+      scrollToBottomSmooth(false);
+    }
+    return () => {};
+  }, [messagesArray.length]);
+
   //useLayoutEffect(() => {
   //  /*  скролл вниз секции */
-  // вот этот код выполнять, если нет unreadMessage
-  //  /* логику изменить. прокручивать до непрочитанного чата надо будет, а не вниз. но если таких нет, то вниз */
-  //  endRef.current?.scrollIntoView({ behavior: 'auto' });
-  //  return () => {};
-  //}, [doScroll, isSubscribeLoading]);
+  //
+  //  /* TODO переделать логику  прокручивать до непрочитанного сообщения надо будет, а не вниз. но если таких нет, то вниз */
+  //  //вот этот код выполнять, если нет unreadMessage
+  //  if (!subscribeControl.isDualSubscribe) {
+  //    setTimeout(() => {
+  //      chatMessagesRef.current?.scrollTo({
+  //        top: chatMessagesRef.current.scrollHeight,
+  //        behavior: 'auto',
+  //      });
+  //    }, 0);
+  //  }
+  //  debugger
+  //
+  //}, [forceBottomScroll, isSubscribeLoading]);
 
-  const scrollToBottom = (isOwnMessage: boolean) => {
+  const smoothScroll = () => {
+    endRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  const scrollToBottomSmooth = (isOwnMessage: boolean = true) => {
     if (chatMessagesRef.current) {
       const chatMessagesCurrent = chatMessagesRef.current;
-      const animationLength = 80;
-      const scrollCoefficient = 2.8;
       const { scrollTop, clientHeight, scrollHeight } = chatMessagesCurrent;
 
       // Функция прокрутки с плавной анимацией
-      const smoothScroll = () => {
-        endRef.current?.scrollIntoView({ behavior: 'smooth' });
-      };
 
       // setTimeout для изменений порядка выполнения кода
 
       if (isOwnMessage) {
-        if (scrollHeight - scrollTop > clientHeight * scrollCoefficient) {
-          const scrollPosition = scrollHeight - clientHeight - animationLength;
-          chatMessagesCurrent.scrollTo({
-            top: scrollPosition,
-            behavior: 'auto',
-          });
-
-          // Выполняем прокрутку плавно с задержкой
-          setTimeout(smoothScroll, 0);
-        } else {
+        if (scrollHeight - scrollTop <= clientHeight * SCROLL_COEFFICIENT) {
+          // Выполняем прокрутку плавно
           setTimeout(smoothScroll, 0);
         }
       } else if (!isOwnMessage) {
         const scrollPosition = scrollHeight - scrollTop - clientHeight;
-        if (scrollPosition < animationLength) {
+        if (scrollPosition < SCROLL_ANIMATION_LENGTH) {
+          // Выполняем прокрутку плавно
           setTimeout(smoothScroll, 0);
         }
       }
     }
   };
 
-  // TODO переделать логику. Сделать в самой отправке сообщения видимо, а функцию scrollToBottom вынести в хук
+  const scrollToBottomFastAndSmooth = () => {
+    if (chatMessagesRef.current) {
+      const chatMessagesCurrent = chatMessagesRef.current;
+      const { scrollTop, clientHeight, scrollHeight } = chatMessagesCurrent;
 
-  //useEffect(() => {
-  //  // прокрутка секции вниз при отправке смс со стороны пользователя любого, когда ты находишься внизу экрана и чатишься
-  //  if (messagesArray.length > 0) {
-  //    // TODO оставить логику прокрутки только если мы в 80пикселях, короче только smooth логику. А логику прокрутки быстрой + остановку мягкую вынести в саму отправку сообщения
-  //    scrollToBottom(messagesArray[messagesArray.length - 1].senderUid === uid);
-  //  }
-  //  return () => {};
-  //}, [messagesArray.length]);
+      // setTimeout для изменений порядка выполнения кода
+
+      if (scrollHeight - scrollTop > clientHeight * SCROLL_COEFFICIENT) {
+        const scrollPosition =
+          scrollHeight - clientHeight - SCROLL_ANIMATION_LENGTH;
+        chatMessagesCurrent.scrollTo({
+          top: scrollPosition,
+          behavior: 'auto',
+        });
+
+        // Выполняем прокрутку быстро, а в конце плавно
+        setTimeout(smoothScroll, 0);
+      }
+    }
+  };
+
+  const onBottomBtnClick = async () => {
+    if (subscribeControl.isDualSubscribe) {
+      //прокрутка при двойной подписке
+      // TODO очистить ртк массив, очистить анрид месседжес, сделать соло подписку и прокрутить в самый низ телепортацией
+      setIsLoading(true);
+
+      try {
+        dispatch(clearMessages());
+        setSubscribeControl({
+          isDualSubscribe: false,
+          firstUnreadMessageId: '',
+        });
+        setObserverCounts((prev) => ({
+          beforeCount: prev.beforeCount + prev.afterCount,
+          afterCount: 0,
+        }));
+        setObserverLocked((prev) => ({
+          ...prev,
+          isObserverAfterLocked: false,
+        }));
+        setIsSubscribeChanged(true);
+
+        // очистка unreadMessages
+        const clearOwnUnreadMessages = {
+          [`chats/${activeChatId}/unreadMessages/${uid}`]: null,
+        };
+
+        //TODO разлокать await
+        /* await update(
+        refFirebaseDatabase(firebaseDatabase),
+        clearOwnUnreadMessages,
+      ); */
+      } catch (error) {
+        console.error('Ошибка при выполнении операции', error);
+      } finally {
+        setForceBottomScroll(true);
+      }
+    } else {
+      //прокрутка при одинарной подписке
+      scrollToBottomSmooth();
+      scrollToBottomFastAndSmooth();
+    }
+  };
 
   if (isSubscribeLoading) {
     return <SectionLoader />;
@@ -495,13 +606,36 @@ const ChatMessagesSection: FC<ChatMessagesSectionProps> = ({
 
   return (
     <ComponentTag
-      className={styles['chat-messages']}
+      className={`${styles['chat-messages']} ${isLoading ? styles['loading'] : ''}`}
       ref={chatMessagesRef}
       id="chat-messages"
       onContextMenu={(e: React.MouseEvent<HTMLElement, MouseEvent>) => {
         e.preventDefault();
       }}
     >
+      {isLoading && (
+        <div className={styles['chat-messages__scroll-loader']}>
+          <div
+            className={styles['chat-messages__circular-progressbar-wrapper']}
+          >
+            <CircularProgressbar
+              className={styles['chat-messages__circular-progressbar']}
+              value={CIRCULAR_LOADING_PERCENT_VALUE}
+              styles={buildStyles({
+                // can use 'butt' or 'round'
+                strokeLinecap: 'round',
+                // How long animation takes to go from one percentage to another, in seconds
+                pathTransitionDuration: 0.5,
+                // Colors
+                pathColor: 'var(--base-accent-blue)',
+                /* textColor: '#f88', */
+                trailColor: 'none',
+              })}
+            />
+          </div>
+        </div>
+      )}
+
       <div
         className={
           isMobileScreen
@@ -515,7 +649,8 @@ const ChatMessagesSection: FC<ChatMessagesSectionProps> = ({
           <div
             className={styles['chat-messages__messages-observer']}
             ref={beforeMessagesObserverRef}
-          ></div>
+          />
+
           {messagesArray.length > 0 &&
             Object.entries(
               messagesArray.reduce(
@@ -540,10 +675,13 @@ const ChatMessagesSection: FC<ChatMessagesSectionProps> = ({
                 chatMessagesRef={chatMessagesRef}
               />
             ))}
-          <div
-            className={styles['chat-messages__messages-observer']}
-            ref={afterMessagesObserverRef}
-          ></div>
+
+          {!isLoading && (
+            <div
+              className={styles['chat-messages__messages-observer']}
+              ref={afterMessagesObserverRef}
+            />
+          )}
           {messagesArray.length === 0 && (
             <span className={styles['chat-messages__no-messages']}>
               Нет сообщений
@@ -551,7 +689,8 @@ const ChatMessagesSection: FC<ChatMessagesSectionProps> = ({
           )}
           <div className={styles['chat-messages__overlay-to-bottom-btn']}>
             <ToBottomBtn
-              scrollToBottom={() => scrollToBottom(true)}
+              isDualSubscribe={subscribeControl.isDualSubscribe}
+              onBottomBtnClick={onBottomBtnClick}
               chatMessagesRef={chatMessagesRef}
             />
           </div>

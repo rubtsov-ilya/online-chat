@@ -19,6 +19,13 @@ const MessageDateGroup: FC<MessageDateGroupProps> = ({
   uploadTasksRef,
   chatMessagesRef,
 }) => {
+
+  const undeletedMessagesArray = messagesArray.filter((message) => message.isDeleted !== true);
+  const undeletedMessagesMap = new Map();
+  undeletedMessagesArray.forEach((message, index) => {
+    undeletedMessagesMap.set(message, index);
+  });
+
   return (
     <div>
       <MessageStickyDate
@@ -30,6 +37,9 @@ const MessageDateGroup: FC<MessageDateGroupProps> = ({
           if (messageData.isDeleted === true) {
             return null
           }
+
+          const undeletedIndex = undeletedMessagesMap.get(messageData);
+
           return (
             <Message
               key={index}
@@ -38,12 +48,12 @@ const MessageDateGroup: FC<MessageDateGroupProps> = ({
               messageData={messageData}
               messageIndex={index}
               isLastOfGroup={
-                index === messagesArray.length - 1 ||
-                messageData.senderUid !== messagesArray[index + 1]?.senderUid
+                undeletedIndex === undeletedMessagesArray.length - 1 ||
+                messageData.senderUid !== undeletedMessagesArray[undeletedIndex + 1]?.senderUid
               }
               isFirstOfGroup={
-                index === 0 ||
-                messageData.senderUid !== messagesArray[index - 1]?.senderUid
+                undeletedIndex === 0 ||
+                messageData.senderUid !== undeletedMessagesArray[undeletedIndex - 1]?.senderUid
               }
             />
           );

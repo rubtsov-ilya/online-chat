@@ -42,7 +42,7 @@ import ModalBackdrop from 'src/components/ui/modal-backdrop/ModalBackdrop';
 import ModalActionConfirm from 'src/components/ui/modal-action-confirm/modalActionConfirm';
 import useToggleModal from 'src/hooks/useToggleModal';
 import { IMessage } from 'src/interfaces/Message.interface';
-import { addMessage } from 'src/redux/slices/MessagesArraySlice';
+import { addMessage, clearMessages } from 'src/redux/slices/MessagesArraySlice';
 
 const ChatPage: FC = () => {
   const uploadTasksRef = useRef<IUploadTasksRef>({});
@@ -226,13 +226,18 @@ const ChatPage: FC = () => {
   }, [locationState, activeChatId]);
 
   useLayoutEffect(() => {
+    // очистка сообщений всех при смене чат айди
+    dispatch(clearMessages());
+
     if (activeChatId !== null) {
+      // добавление чат инпута
       dispatch(
         addChatInputValue({
           chatId: activeChatId,
         }),
       );
       if (!isMessagesForwarding) {
+        // очистка выбранных сообщений
         dispatch(clearSelectedMessagesState());
       }
     }

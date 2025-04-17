@@ -5,9 +5,17 @@
   overflow-y: auto;
   position: relative;
   box-shadow: 0 1px 0 0 rgba(0, 0, 0, 0.08);
+
   @media screen and (min-width: 991px) {
     @include scrollbar;
   }
+
+  &.loading {
+    &::-webkit-scrollbar {
+      width: 0px;
+    }
+  }
+
   /* 56px = height ChatsHeader / class = .header */
   &__content {
     display: flex;
@@ -19,6 +27,35 @@
       align-items: center;
       justify-content: center;
     }
+  }
+
+  &__circular-progressbar-wrapper {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 40px;
+    height: 40px;
+    user-select: none;
+  }
+
+  &__circular-progressbar {
+    animation: rotate 2s linear infinite; /* Время анимации и бесконечный цикл */
+  }
+
+  &__scroll-loader {
+    position: sticky;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 100%;
+    width: 100%;
+    background-color: var(--base-white-snow);
+    z-index: 2;
   }
 
   &__no-messages {
@@ -42,5 +79,14 @@
   &__messages-observer {
     height: 0.01px;
     background-color: red;
+  }
+}
+
+@keyframes rotate {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
   }
 }

@@ -9,3 +9,5 @@ export const CHAT_INFO_STATUS_WRITING = 'печатает';
 
 export const MESSAGES_LOAD_COUNT = 6; // число сообщений загружаемых
 
+export const SCROLL_ANIMATION_LENGTH = 80; // число пикселей для плавной анимации в chatMessagesSection
+export const SCROLL_COEFFICIENT = 2.8; // число экранов пользователя для прокрутки в chatMessagesSection
