@@ -67,6 +67,7 @@ const ChatMessagesSection: FC<ChatMessagesSectionProps> = ({
     scrollHeight: number;
     clientHeight: number;
   }>({ scrollTop: 0, scrollHeight: 0, clientHeight: 0 });
+  const observerElements = useRef<Set<Element>>(new Set());
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isUnreadMessageLoading, setIsUnreadMessageLoading] =
     useState<boolean>(false);
@@ -106,6 +107,9 @@ const ChatMessagesSection: FC<ChatMessagesSectionProps> = ({
     beforeCount: number;
     afterCount: number;
   }>({ beforeCount: 0, afterCount: 0 });
+  const [messagesToMarkAsChecked, setMessagesToMarkAsChecked] = useState<
+    IMessage[]
+  >([]);
   const dispatch = useDispatch();
 
   useLayoutEffect(() => {
@@ -119,6 +123,99 @@ const ChatMessagesSection: FC<ChatMessagesSectionProps> = ({
     setDebouncerToggle(false);
     setLastChangedCounter(null);
   }, [activeChatId]);
+
+  useEffect(() => {
+    if (!activeChatId || !uid) return;
+
+    const observerOptions = {
+      root: chatMessagesRef.current,
+      rootMargin: '0px',
+      threshold: 0.3, // 30% видимости сообщения
+    };
+
+    const handleIntersection: IntersectionObserverCallback = (entries) => {
+      const newMessagesToMark = entries
+        .filter((entry) => entry.isIntersecting)
+        .map((entry) => {
+          const messageElement = entry.target as HTMLElement;
+          const messageId = messageElement.id;
+          return messagesArray.find((msg) => msg.messageId === messageId);
+        })
+        .filter(
+          (msg): msg is IMessage =>
+            msg !== undefined && msg.senderUid !== uid && !msg.isChecked,
+        );
+
+      if (newMessagesToMark.length > 0) {
+        setMessagesToMarkAsChecked((prev) => [
+          ...prev,
+          ...newMessagesToMark.filter(
+            (newMsg) =>
+              !prev.some((prevMsg) => prevMsg.messageId === newMsg.messageId),
+          ),
+        ]);
+      }
+    };
+
+    const observer = new IntersectionObserver(
+      handleIntersection,
+      observerOptions,
+    );
+
+    // Наблюдаем за всеми сообщениями, которые еще не прочитаны и не от текущего пользователя
+    messagesArray.forEach((message) => {
+      if (message.senderUid !== uid && !message.isChecked) {
+        const messageElement = document.getElementById(message.messageId);
+        if (messageElement && !observerElements.current.has(messageElement)) {
+          observer.observe(messageElement);
+          observerElements.current.add(messageElement);
+        }
+      }
+    });
+
+    return () => {
+      observerElements.current.forEach((el) => observer.unobserve(el));
+      observerElements.current.clear();
+      observer.disconnect();
+    };
+  }, [messagesArray, activeChatId]);
+
+  useEffect(() => {
+    if (messagesToMarkAsChecked.length === 0 || !activeChatId) return;
+
+    const markMessagesAsChecked = async () => {
+      try {
+        const updates = messagesToMarkAsChecked.reduce(
+          (acc, message) => {
+            // Помечаем сообщение как прочитанное
+            acc[
+              `chats/${activeChatId}/messages/${message.messageId}/isChecked`
+            ] = true;
+            // Удаляем из списка непрочитанных
+            acc[
+              `chats/${activeChatId}/unreadMessages/${uid}/${message.messageId}`
+            ] = null;
+            return acc;
+          },
+          {} as Record<string, any>,
+        );
+
+        await update(refFirebaseDatabase(firebaseDatabase), updates);
+
+        // Очищаем обработанные сообщения
+        setMessagesToMarkAsChecked([]);
+      } catch (error) {
+        console.error('Ошибка при обновлении статуса сообщений:', error);
+      }
+    };
+
+    // debounce для batch апдейта
+    const debounceTimer = setTimeout(() => {
+      markMessagesAsChecked();
+    }, 3000); // Задержка в мс для batch апдейта
+
+    return () => clearTimeout(debounceTimer);
+  }, [messagesToMarkAsChecked]);
 
   useEffect(() => {
     const observeBeforeMessages = (entries: IntersectionObserverEntry[]) => {
@@ -676,9 +773,8 @@ const ChatMessagesSection: FC<ChatMessagesSectionProps> = ({
           await update(refFirebaseDatabase(firebaseDatabase), updates);
         }
       };
-      
-      createAndSendUpdates()
-      
+
+      createAndSendUpdates();
     } else {
       //прокрутка при одинарной подписке
       scrollToBottomSmooth();
