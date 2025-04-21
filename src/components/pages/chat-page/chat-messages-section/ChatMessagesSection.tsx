@@ -706,6 +706,52 @@ const ChatMessagesSection: FC<ChatMessagesSectionProps> = ({
   };
 
   useEffect(() => {
+    const createAndSendUpdates = async () => {
+      const messagesRef = refFirebaseDatabase(
+        firebaseDatabase,
+        `chats/${activeChatId}/messages`,
+      );
+  
+      const messagesQuery = query(
+        messagesRef,
+        orderByChild('isChecked'),
+        equalTo(false),
+      );
+  
+      const messagesSnapshot = await get(messagesQuery);
+  
+      if (messagesSnapshot.exists() && activeChatId) {
+        const messagesValue = messagesSnapshot.val() as {
+          [key: string]: IMessage;
+        };
+        const messagesUpdates = Object.keys(messagesValue).reduce(
+          (acc, messageId) => {
+            const message = messagesValue[messageId];
+  
+            if (message.senderUid !== uid && !message.isChecked) {
+              // Добавляем обновление для текущего сообщения
+              acc[`chats/${activeChatId}/messages/${messageId}/isChecked`] =
+                true;
+            }
+  
+            return acc;
+          },
+          {} as Record<string, any>,
+        );
+  
+        // очистка unreadMessages
+        const clearOwnUnreadMessages = {
+          [`chats/${activeChatId}/unreadMessages/${uid}`]: null,
+        };
+  
+        const updates = {
+          ...messagesUpdates,
+          ...clearOwnUnreadMessages,
+        };
+  
+        await update(refFirebaseDatabase(firebaseDatabase), updates);
+      }
+    };
     // прокрутка срабатывает при каждой отправке сообщения пользователем этого аккаунта
     if (subscribeControl.isDualSubscribe) {
       //прокрутка при двойной подписке
@@ -727,58 +773,12 @@ const ChatMessagesSection: FC<ChatMessagesSectionProps> = ({
       setIsSubscribeChanged(true);
       setForceBottomScroll(true);
 
-      const createAndSendUpdates = async () => {
-        const messagesRef = refFirebaseDatabase(
-          firebaseDatabase,
-          `chats/${activeChatId}/messages`,
-        );
-
-        const messagesQuery = query(
-          messagesRef,
-          orderByChild('isChecked'),
-          equalTo(false),
-        );
-
-        const messagesSnapshot = await get(messagesQuery);
-
-        if (messagesSnapshot.exists() && activeChatId) {
-          const messagesValue = messagesSnapshot.val() as {
-            [key: string]: IMessage;
-          };
-          const messagesUpdates = Object.keys(messagesValue).reduce(
-            (acc, messageId) => {
-              const message = messagesValue[messageId];
-
-              if (message.senderUid !== uid && !message.isChecked) {
-                // Добавляем обновление для текущего сообщения
-                acc[`chats/${activeChatId}/messages/${messageId}/isChecked`] =
-                  true;
-              }
-
-              return acc;
-            },
-            {} as Record<string, any>,
-          );
-
-          // очистка unreadMessages
-          const clearOwnUnreadMessages = {
-            [`chats/${activeChatId}/unreadMessages/${uid}`]: null,
-          };
-
-          const updates = {
-            ...messagesUpdates,
-            ...clearOwnUnreadMessages,
-          };
-
-          await update(refFirebaseDatabase(firebaseDatabase), updates);
-        }
-      };
-
       createAndSendUpdates();
     } else {
       //прокрутка при одинарной подписке
       scrollToBottomSmooth();
       scrollToBottomFastAndSmooth();
+      createAndSendUpdates();
     }
 
     return () => {};
