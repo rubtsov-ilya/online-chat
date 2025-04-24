@@ -2,8 +2,5 @@
   "public": true,
   "rewrites":  [
     {"source": "/(.*)", "destination": "/"}
-  ],
-  "scripts": {
-    "install": "npm install --legacy-peer-deps"
-  }
+  ]
 }
