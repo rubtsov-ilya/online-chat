@@ -1,17 +1,10 @@
 {
-  "version": 2,
   "public": true,
-  "builds": [
+  "headers": [
     {
-      "src": "dist/**/*",
-      "use": "@vercel/static"
+      "source": "/assets/(.*).js",
+      "headers": [{ "key": "Content-Type", "value": "application/javascript" }]
     }
   ],
-  "rewrites": [
-    {
-      "source": "/(.*)",
-      "destination": "/dist/index.html"
-    }
-  ],
-  "outputDirectory": "dist"
+  "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }]
 }
