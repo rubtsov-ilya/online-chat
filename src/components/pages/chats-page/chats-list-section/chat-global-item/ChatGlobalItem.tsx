@@ -1,4 +1,4 @@
-import { FC, useEffect, useRef, useState } from 'react';
+import { FC, useEffect, useState } from 'react';
 import AvatarImage from 'src/components/ui/avatar-image/AvatarImage';
 
 import styles from './ChatGlobalItem.module.scss';
@@ -64,7 +64,7 @@ const ChatGlobalItem: FC<ChatItemProps> = ({
         onContextMenu={(e) => {
           e.preventDefault();
         }}
-        onTouchStart={(e: React.TouchEvent) => {
+        onTouchStart={() => {
           if (isMobileScreen) {
             if (!isHover) {
               setIsHover(true);

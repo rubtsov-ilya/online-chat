@@ -18,16 +18,12 @@ import {
   getAuth,
   sendPasswordResetEmail,
   signInWithEmailAndPassword,
-  User,
 } from 'firebase/auth';
-import { firebaseDatabase } from 'src/firebase';
-import { ref as refFirebaseDatabase, update } from 'firebase/database';
-/* import { useAddUserToDataBaseMutation } from 'src/redux'; */
+
 import LogoSvg from 'src/assets/images/icons/logo-icons/Logo.svg?react';
 
 import styles from './AuthForm.module.scss';
 import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
-import { USER_AVATAR_DEFAULT_VALUE } from 'src/constants';
 import useAuthContext from 'src/hooks/useAuthContext';
 
 interface AuthFormProps {

@@ -27,7 +27,6 @@ import {
   USERNAME_DEFAULT_VALUE,
   USER_AVATAR_DEFAULT_VALUE,
 } from 'src/constants';
-import useActiveChat from 'src/hooks/useActiveChat';
 
 interface ChatsListSectionProps {
   isMobileScreen: boolean;
