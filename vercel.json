@@ -1,5 +1,11 @@
 {
   "public": true,
+  "builds": [
+    {
+      "src": "dist/**/*",
+      "use": "@vercel/static"
+    }
+  ],
   "headers": [
     {
       "source": "/assets/(.*).js",
