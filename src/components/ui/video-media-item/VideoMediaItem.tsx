@@ -7,14 +7,12 @@ interface VideoMediaItemProps {
   videoUrl: string;
   setIsTopBarVisible: React.Dispatch<React.SetStateAction<boolean>>;
   isMobileScreen: boolean;
-  isTopBarVisible: boolean;
 }
 
 const VideoMediaItem: FC<VideoMediaItemProps> = ({
   setIsTopBarVisible,
   videoUrl,
   isMobileScreen,
-  isTopBarVisible,
 }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [isPauseBtnVisible, setIsPauseBtnVisible] = useState<boolean>(false);
@@ -22,10 +20,16 @@ const VideoMediaItem: FC<VideoMediaItemProps> = ({
   const onVideoPlaying = () => {
     if (!isMobileScreen) {
       setIsPauseBtnVisible(true);
-    } else if (isMobileScreen && isTopBarVisible) {
-      setIsPauseBtnVisible(true);
+    } else {
+      setIsTopBarVisible(false);
     }
   };
+
+  const onVideoPausing = () => { 
+    if (isMobileScreen) {
+      setIsTopBarVisible(true);
+    } 
+   }
 
   return (
     <div
@@ -34,11 +38,6 @@ const VideoMediaItem: FC<VideoMediaItemProps> = ({
         e.stopPropagation();
         if (isMobileScreen) {
           setIsTopBarVisible((prev) => !prev);
-          if (!videoRef.current?.paused && isTopBarVisible) {
-            setIsPauseBtnVisible(false);
-          } else if (!videoRef.current?.paused && !isTopBarVisible) {
-            setIsPauseBtnVisible(true);
-          }
         }
       }}
     >
@@ -48,9 +47,10 @@ const VideoMediaItem: FC<VideoMediaItemProps> = ({
         className={`${styles['video-item']} ${isPauseBtnVisible ? styles['video-item--off-play-button'] : ''}`}
         controls
         onPlaying={onVideoPlaying}
+        onPause={onVideoPausing}
         onEnded={() => setIsPauseBtnVisible(false)}
       />
-      {isPauseBtnVisible && (
+      {isPauseBtnVisible && !isMobileScreen && (
         <button
           className={`${styles['video-item__pause-btn']} ${isMobileScreen ? styles['video-item__pause-btn--mobile'] : ''}`}
           onClick={(e: React.MouseEvent<HTMLButtonElement>) => {

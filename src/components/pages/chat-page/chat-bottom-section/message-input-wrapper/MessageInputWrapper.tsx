@@ -770,7 +770,7 @@ const MessageInputWrapper: FC<MessageInputWrapperProps> = ({
           chatId: activeChatId,
         }),
       );
-
+      setDuringMessageSendingToggle((prev) => !prev)
       const updatesByUsers = await createNewChatForUserChatsPath(
         sendedMessageText,
         newChatId,
@@ -821,7 +821,6 @@ const MessageInputWrapper: FC<MessageInputWrapperProps> = ({
             activeChatGroupAdminUrl: '',
           }),
         );
-        setDuringMessageSendingToggle((prev) => !prev)
       }
       // ОТПРАВИТЬ СООБЩЕНИЕ, если при создании чата уже был создан чат ранее вторым пользователем
       if (updatesByUserChats === undefined) {
@@ -848,6 +847,7 @@ const MessageInputWrapper: FC<MessageInputWrapperProps> = ({
           chatId: activeChatId,
         }),
       );
+      setDuringMessageSendingToggle((prev) => !prev)
       const messageWithFirebaseUrls = await createMessageObjectWithFirebaseUrl(
         messageWithLocaleUrls,
       );
@@ -868,7 +868,6 @@ const MessageInputWrapper: FC<MessageInputWrapperProps> = ({
       );
       const updates = { ...updatesByUserChats, ...updatesByChats };
       await update(refFirebaseDatabase(firebaseDatabase), updates);
-      setDuringMessageSendingToggle((prev) => !prev)
     }
   };
 

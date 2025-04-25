@@ -72,6 +72,7 @@ const ChatMessagesSection: FC<ChatMessagesSectionProps> = ({
   const [isUnreadMessageLoading, setIsUnreadMessageLoading] =
     useState<boolean>(false);
   const [isMessagesLoading, setIsMessagesLoading] = useState<boolean>(true);
+  const [isMessagesSubscribeLoading, setIsMessagesSubscribeLoading] = useState<boolean>(true);
 
   const [forceBottomScroll, setForceBottomScroll] = useState<boolean>(false);
   const [isSubscribeChanged, setIsSubscribeChanged] = useState<boolean>(false);
@@ -520,6 +521,7 @@ const ChatMessagesSection: FC<ChatMessagesSectionProps> = ({
             }
 
             dispatch(addMessages(messagesBeforeUnreadFromDatabase));
+            setIsMessagesSubscribeLoading(false)
           },
           (error) => {
             console.error(
@@ -556,6 +558,7 @@ const ChatMessagesSection: FC<ChatMessagesSectionProps> = ({
             }
 
             dispatch(addMessages(messagesAfterUnreadFromDatabase));
+            setIsMessagesSubscribeLoading(false)
           },
           (error) => {
             console.error(
@@ -625,6 +628,7 @@ const ChatMessagesSection: FC<ChatMessagesSectionProps> = ({
             }
 
             dispatch(addMessages(messagesFromDatabase));
+            setIsMessagesSubscribeLoading(false)
           },
           (error) => {
             console.error('Ошибка при получении списка сообщений:', error);
@@ -941,7 +945,7 @@ const ChatMessagesSection: FC<ChatMessagesSectionProps> = ({
               ref={afterMessagesObserverRef}
             />
 
-            {messagesArray.length === 0 && (
+            {messagesArray.length === 0 && !isMessagesSubscribeLoading && (
               <span className={styles['chat-messages__no-messages']}>
                 Нет сообщений
               </span>

@@ -134,3 +134,9 @@
   }
 }
 
+
+@media (max-width: 991px) {
+  .video-item {
+    pointer-events: all;
+  }
+}
