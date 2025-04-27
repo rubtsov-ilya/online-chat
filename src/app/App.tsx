@@ -11,6 +11,7 @@ import ChatsPage from 'src/components/pages/chats-page/ChatsPage';
 import ChatPage from 'src/components/pages/chat-page/ChatPage';
 import useMobileScreen from 'src/hooks/useMobileScreen';
 import useAuth from 'src/hooks/useAuth';
+import CreateGroupPage from 'src/components/pages/create-group-page/CreateGroupPage';
 
 export default function App() {
   const { isAuth } = useAuth();
@@ -41,7 +42,8 @@ export default function App() {
               </Route>
               {isMobileScreen && (
                 <Route path="chats/chat" element={isAuth ? <ChatPage /> : <Navigate to="/login" replace/>} />
-              )}
+                )}
+              <Route path="chats/create-group" element={isAuth ? <CreateGroupPage /> : <Navigate to="/login" replace/>} />
               <Route path="*" element={isAuth ? <Navigate to="/chats" replace/> : <Navigate to="/login" replace/>} />
             </Route>
           </Routes>

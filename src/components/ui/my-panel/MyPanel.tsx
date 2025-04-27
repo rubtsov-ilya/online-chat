@@ -19,6 +19,7 @@ import { firebaseDatabase } from 'src/firebase';
 import { ref, update } from 'firebase/database';
 import useBodyLockContext from 'src/hooks/useBodyLockContext';
 import useNormalizedUsername from 'src/hooks/useNormalizedUsername';
+import { useNavigate } from 'react-router-dom';
 
 interface MyPanelProps {
   isPanelOpen: boolean;
@@ -34,6 +35,7 @@ const MyPanel: FC<MyPanelProps> = ({
   const { avatar: userAvatar, uid, username } = useAuth();
   const [modalOpen, setModalOpen] = useState<boolean>(false);
   const [inputValue, setInputValue] = useState<string>('');
+  const navigate = useNavigate();
   const dispatch = useDispatch();
   const auth = getAuth();
   const { toggleBodyLock } = useBodyLockContext();
@@ -45,7 +47,7 @@ const MyPanel: FC<MyPanelProps> = ({
     toggleBodyLock();
   };
 
-  const onSignOutButtonClick = () => {
+  const onSignOutBtnClick = () => {
     const userRef = ref(firebaseDatabase, `users/${uid}`);
     update(userRef, { isOnline: false }); // установка статуса оффлайн
     signOut(auth)
@@ -57,8 +59,11 @@ const MyPanel: FC<MyPanelProps> = ({
       .catch((error) => {
         console.log(error);
       });
-    /* navigate( '/' ) */
   };
+
+  const onNewGroupBtnClick = () => { 
+    navigate('/chats/create-group', { replace: true });
+   }
 
   const modalAction = async () => {
     const userRef = ref(firebaseDatabase, `users/${uid}`);
@@ -104,12 +109,12 @@ const MyPanel: FC<MyPanelProps> = ({
           />
           <MyPanelBtn
             Svg={GroupSvg}
-            onBtnClick={() => {}}
+            onBtnClick={onNewGroupBtnClick}
             text={'Новая группа'}
           />
           <MyPanelBtn
             Svg={UserSvg}
-            onBtnClick={onSignOutButtonClick}
+            onBtnClick={onSignOutBtnClick}
             text={'Выйти'}
           />
           {modalOpen && (
