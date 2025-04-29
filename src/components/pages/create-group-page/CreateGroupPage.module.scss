@@ -1,0 +1,13 @@
+.create-group-page {
+  overflow: hidden;
+  &__sections-wrapper {
+    display: flex;
+    width: 200%;
+    position: relative;
+    right: 0;
+    transition: all 0.5s ease;
+    &.right {
+      right: 100%;
+    }
+  }
+}

@@ -82,7 +82,6 @@ const CreateGroupHeader: FC<CreateGroupHeaderProps> = ({
               <ArrowRightSvg className={styles['header__arrow-right-icon']} />
             </button>
           )}
-          {/* TODO актив получать также как при регистрации имени, что минимум 3 символа именно, а не по длинне */}
           {activeSection === 'choose-group-name' && (
             <button
               onClick={onCreateBtnClick}

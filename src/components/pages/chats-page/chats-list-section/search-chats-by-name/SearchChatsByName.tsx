@@ -1,9 +1,10 @@
 import { FC, useDeferredValue, useEffect, useRef, useState } from 'react';
 
+import styles from './SearchChatsByName.module.scss';
+
 import DeleteCircleSvg from 'src/assets/images/icons/24x24-icons/Delete cirlce.svg?react';
 import SearchSvg from 'src/assets/images/icons/24x24-icons/Search.svg?react';
 
-import styles from './SearchChatsByName.module.scss';
 import { IFirebaseRtDbUser } from 'src/interfaces/FirebaseRealtimeDatabase.interface';
 import {
   IChatWithDetails,

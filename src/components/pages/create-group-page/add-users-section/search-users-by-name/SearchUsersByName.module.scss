@@ -1,0 +1,63 @@
+@use 'src/assets/css/_mixins.scss' as *;
+
+.search {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  height: 36px;
+  margin-top: 8px;
+  padding: 6px 8px;
+  border: 1px solid var(--base-grey-whisper);
+  border-radius: 999px;
+  @include fade-in-animation;
+  cursor: text;
+
+  &__search-svg {
+    width: 24px;
+    height: 24px;
+    min-width: 24px;
+    min-height: 24px;
+    @include fade-in-animation;
+    path {
+      fill: var(--base-black);
+    }
+  }
+
+  &__input {
+    width: 100%;
+    margin-left: 17px;
+    font-family: var(--font-family);
+    font-weight: 500;
+    font-size: 14px;
+    color: var(--base-black);
+    &::-webkit-search-cancel-button {
+      -webkit-appearance: none;
+      appearance: none;
+    }
+    &::-ms-clear {
+      display: none;
+      width: 0;
+      height: 0;
+    }
+  }
+
+  &__clear-btn {
+    width: 24px;
+    height: 24px;
+  }
+
+  &__delete-svg {
+    min-width: 24px;
+    min-height: 24px;
+    cursor: pointer;
+    path {
+      transition: all 0.2s ease;
+      fill: var(--base-grey);
+    }
+    &:hover {
+      path {
+        fill: var(--base-black);
+      }
+    }
+  }
+}

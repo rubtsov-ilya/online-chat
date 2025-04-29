@@ -7,9 +7,13 @@ interface ChooseGroupNameSectionProps {
 
 const ChooseGroupNameSection: FC<ChooseGroupNameSectionProps> = ({ }) => {
   return (
-    <div className={styles['ChooseGroupNameSection']}>
-      ChooseGroupNameSection
-    </div>
+    <section className={styles['choose-group-name-section']}>
+      <div className={'container'}>
+        <div className={styles['choose-group-name-section__content']}>
+          a
+        </div>
+      </div>
+    </section>
   );
 };
 

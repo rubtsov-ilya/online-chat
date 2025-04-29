@@ -34,28 +34,6 @@ interface ChatsListSectionProps {
 
 const ChatsListSection: FC<ChatsListSectionProps> = ({ isMobileScreen }) => {
   const { uid, avatar, username, blocked } = useAuth();
-/*   const {
-    activeChatId,
-    activeChatAvatar,
-    activeChatBlocked,
-    activeChatname,
-    activeChatMembers,
-    activeChatIsGroup,
-  } = useActiveChat();
-  console.log(
-    'activeChatId',
-    activeChatId,
-    'activeChatAvatar',
-    activeChatAvatar,
-    'activeChatBlocked',
-    activeChatBlocked,
-    'activeChatname',
-    activeChatname,
-    'activeChatMembers',
-    activeChatMembers,
-    'activeChatIsGroup',
-    activeChatIsGroup,
-  ); */
   const [chats, setChats] = useState<IFirebaseRtDbChat[]>([]);
   const [chatsWithDetails, setChatsWithDetails] = useState<IChatWithDetails[]>(
     [],

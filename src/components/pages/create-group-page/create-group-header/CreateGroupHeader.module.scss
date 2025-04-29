@@ -1,7 +1,11 @@
+@use 'src/assets/css/_mixins.scss' as *;
+
 .header {
   display: flex;
   align-items: center;
   height: 56px;
+  background-color: var(--base-white);
+  box-shadow: 0 1px 0 0 var(--base-grey-whisper);
   &__content {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -12,6 +16,7 @@
     align-items: center;
     justify-content: center;
     width: 24px;
+    @include fade-in-animation;
   }
 
   &__left-chevron-icon {
@@ -31,6 +36,7 @@
     font-size: 16px;
     text-wrap: nowrap;
     color: var(--base-black);
+    @include fade-in-animation;
   }
 
   &__forward-btn {
@@ -39,6 +45,7 @@
     justify-content: center;
     width: 24px;
     margin-left: auto;
+    @include fade-in-animation;
   }
 
   &__arrow-right-icon {
@@ -68,12 +75,12 @@
     border-radius: 20px;
     box-shadow: 0 1px 4px 0 rgba(0, 0, 0, 0.25);
     cursor: pointer;
+    @include fade-in-animation;
   }
 
   &__checkmark-icon {
     max-width: 24px;
     max-height: 24px;
-
     &.active path {
       transition: all 0.2s ease;
       fill: var(--base-accent-blue);
