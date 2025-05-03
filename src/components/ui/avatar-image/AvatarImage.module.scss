@@ -1,3 +1,5 @@
+@use 'src/assets/css/_mixins.scss' as *;
+
 .avatar-image {
   border-radius: 999px;
   width: 40px;
@@ -32,15 +34,6 @@
     }
   }
   &--animated {
-    animation: fadeIn 0.15s ease forwards;
-  }
-}
-
-@keyframes fadeIn {
-  0% {
-    opacity: 0;
-  }
-  100% {
-    opacity: 1;
+    @include fade-in-animation;
   }
 }

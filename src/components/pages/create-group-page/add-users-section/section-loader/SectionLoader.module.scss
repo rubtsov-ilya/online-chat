@@ -1,0 +1,31 @@
+.section-loader {
+  height: calc(100dvh - 56px);
+  overflow-y: auto;
+  position: relative;
+  box-shadow: 0 1px 0 0 rgba(0, 0, 0, 0.08);
+  &__circular-progressbar {
+    animation: rotate 2s linear infinite; /* Время анимации и бесконечный цикл */
+  }
+
+  &__circular-progressbar-wrapper {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 40px;
+    height: 40px;
+    user-select: none;
+  }
+
+  @keyframes rotate {
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
+  }
+}

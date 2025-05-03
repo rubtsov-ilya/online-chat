@@ -1,4 +1,17 @@
-.add-users-section {
-  width: 50%;
+@use 'src/assets/css/_mixins.scss' as *;
 
+.add-users-section {
+  display: flex;
+  width: 50%;
+  height: 100%;
+  padding-top: 8px;
+  overflow-y: auto; 
+
+  @include scrollbar;
+  
+  &__content {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+  }
 }

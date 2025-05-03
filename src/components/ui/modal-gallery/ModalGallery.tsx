@@ -143,7 +143,6 @@ const ModalGallery: FC<ModalGalleryProps> = ({
                 isMobileScreen={isMobileScreen}
                 setIsTopBarVisible={setIsTopBarVisible}
                 videoUrl={mediaItem.videoUrl}
-                isTopBarVisible={isTopBarVisible}
               />
             )}
           </SwiperSlide>

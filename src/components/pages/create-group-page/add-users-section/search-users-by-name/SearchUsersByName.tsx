@@ -1,13 +1,25 @@
-import { FC, useDeferredValue, useRef, useState } from 'react';
+import { FC, useDeferredValue, useEffect, useRef, useState } from 'react';
 import styles from './SearchUsersByName.module.scss';
 
 import DeleteCircleSvg from 'src/assets/images/icons/24x24-icons/Delete cirlce.svg?react';
 import SearchSvg from 'src/assets/images/icons/24x24-icons/Search.svg?react';
 import useAuth from 'src/hooks/useAuth';
+import {
+  GroupedUsersType,
+  IUserWithDetails,
+} from 'src/interfaces/UserWithDetails.interface';
 
-interface SearchUsersByNameProps {}
+interface SearchUsersByNameProps {
+  groupedUsers: GroupedUsersType;
+  setSearchedUsers: React.Dispatch<React.SetStateAction<IUserWithDetails[]>>;
+  setIsSearching: React.Dispatch<React.SetStateAction<boolean>>;
+}
 
-const SearchUsersByName: FC<SearchUsersByNameProps> = ({}) => {
+const SearchUsersByName: FC<SearchUsersByNameProps> = ({
+  groupedUsers,
+  setSearchedUsers,
+  setIsSearching,
+}) => {
   const { uid } = useAuth();
   const [searchInputValue, setSearchInputValue] = useState<string>('');
   const deferredSearchInputValue = useDeferredValue(searchInputValue);
@@ -21,6 +33,24 @@ const SearchUsersByName: FC<SearchUsersByNameProps> = ({}) => {
       searchRef.current.focus();
     }
   };
+
+  useEffect(() => {
+    if (!deferredSearchInputValue) {
+      setIsSearching(false)
+      setSearchedUsers([]);
+      return;
+    } else {
+      setIsSearching(true)
+      const users = Object.values(groupedUsers).flatMap((user) => user);
+      const filteredUsers = users.filter((user) =>
+        user.username
+          .toLowerCase()
+          .includes(deferredSearchInputValue.toLowerCase()),
+      );
+
+      setSearchedUsers(filteredUsers)
+    }
+  }, [deferredSearchInputValue]);
 
   return (
     <div onClick={onSearchInputClick} className={styles['search']}>

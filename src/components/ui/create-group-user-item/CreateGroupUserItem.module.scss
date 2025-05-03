@@ -1,0 +1,24 @@
+@use 'src/assets/css/_mixins.scss' as *;
+
+.create-group-user-item {
+  display: flex;
+  align-items: center;
+  height: 64px;
+  padding: 12px 20px 12px 0px;
+  cursor: pointer;
+
+  @include tablet {
+    padding: 12px 20px 12px 8px;
+  }
+  &:not(:last-child) {
+    box-shadow: 0 1px 0 0 rgba(0, 0, 0, 0.08);
+  }
+
+  &__username {
+    margin-left: 8px;
+    font-family: var(--font-family);
+    font-weight: 700;
+    font-size: 14px;
+    color: var(--base-black);
+  }
+}

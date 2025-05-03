@@ -3,6 +3,7 @@
 .header {
   display: flex;
   align-items: center;
+  flex-shrink: 0;
   height: 56px;
   background-color: var(--base-white);
   box-shadow: 0 1px 0 0 var(--base-grey-whisper);

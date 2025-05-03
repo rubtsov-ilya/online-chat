@@ -1,9 +1,17 @@
 .create-group-page {
-  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  height: 100dvh;
+  &__main {
+    overflow: hidden;
+    height: 100%;
+  }
+
   &__sections-wrapper {
+    position: relative;
     display: flex;
     width: 200%;
-    position: relative;
+    height: 100%;
     right: 0;
     transition: all 0.5s ease;
     &.right {
