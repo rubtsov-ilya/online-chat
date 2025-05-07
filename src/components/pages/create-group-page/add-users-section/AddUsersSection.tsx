@@ -24,9 +24,11 @@ import NoResults from './no-results/NoResults';
 
 interface AddUsersSectionProps {
   isMobileScreen: boolean;
+  selectedUsers: IUserWithDetails['uid'][];
+  setSelectedUsers: React.Dispatch<React.SetStateAction<string[]>>;
 }
 
-const AddUsersSection: FC<AddUsersSectionProps> = ({ isMobileScreen }) => {
+const AddUsersSection: FC<AddUsersSectionProps> = ({ isMobileScreen, selectedUsers, setSelectedUsers }) => {
   const [isUsersLoading, setIsUsersLoading] = useState<boolean>(false);
   const [searchedUsers, setSearchedUsers] = useState<IUserWithDetails[]>([]);
   const [isSearching, setIsSearching] = useState<boolean>(false);
@@ -145,12 +147,13 @@ const AddUsersSection: FC<AddUsersSectionProps> = ({ isMobileScreen }) => {
                 setSearchedUsers={setSearchedUsers}
                 setIsSearching={setIsSearching}
               />
-              {!isSearching && <UserList groupedUsers={groupedUsers} />}
-              {isSearching && searchedUsers.length > 0 &&
+              {!isSearching && <UserList selectedUsers={selectedUsers} setSelectedUsers={setSelectedUsers} groupedUsers={groupedUsers} />}
+              {isSearching &&
+                searchedUsers.length > 0 &&
                 searchedUsers.map((user) => (
-                  <CreateGroupUserItem key={user.uid} user={user} />
+                  <CreateGroupUserItem selectedUsers={selectedUsers} setSelectedUsers={setSelectedUsers} key={user.uid} user={user} />
                 ))}
-              {isSearching && searchedUsers.length === 0 && <NoResults /> }
+              {isSearching && searchedUsers.length === 0 && <NoResults />}
             </>
           )}
         </div>

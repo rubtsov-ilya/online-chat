@@ -1,13 +1,22 @@
 import { FC } from 'react';
 import styles from './UserList.module.scss';
-import { GroupedUsersType } from 'src/interfaces/UserWithDetails.interface';
+import {
+  GroupedUsersType,
+  IUserWithDetails,
+} from 'src/interfaces/UserWithDetails.interface';
 import CreateGroupUserItem from 'src/components/ui/create-group-user-item/CreateGroupUserItem';
 
 interface UserListProps {
-  groupedUsers: GroupedUsersType
+  groupedUsers: GroupedUsersType;
+  selectedUsers: IUserWithDetails['uid'][];
+  setSelectedUsers: React.Dispatch<React.SetStateAction<string[]>>;
 }
 
-const UserList: FC<UserListProps> = ({ groupedUsers }) => {
+const UserList: FC<UserListProps> = ({
+  groupedUsers,
+  selectedUsers,
+  setSelectedUsers,
+}) => {
   return (
     <div className={styles['user-list']}>
       {Object.keys(groupedUsers).map((letter) => (
@@ -17,7 +26,12 @@ const UserList: FC<UserListProps> = ({ groupedUsers }) => {
           </div>
           <div>
             {groupedUsers[letter].map((user) => (
-              <CreateGroupUserItem key={user.uid} user={user} />
+              <CreateGroupUserItem
+                selectedUsers={selectedUsers}
+                setSelectedUsers={setSelectedUsers}
+                key={user.uid}
+                user={user}
+              />
             ))}
           </div>
         </div>

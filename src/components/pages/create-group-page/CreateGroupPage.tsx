@@ -4,6 +4,7 @@ import CreateGroupHeader from './create-group-header/CreateGroupHeader';
 import AddUsersSection from './add-users-section/AddUsersSection';
 import ChooseGroupNameSection from './choose-group-name-section/ChooseGroupNameSection';
 import useMobileScreen from 'src/hooks/useMobileScreen';
+import { IUserWithDetails } from 'src/interfaces/UserWithDetails.interface';
 
 interface CreateGroupPageProps {}
 
@@ -11,7 +12,7 @@ const CreateGroupPage: FC<CreateGroupPageProps> = ({}) => {
   const [activeSection, setActiveSection] = useState<
     'add-users' | 'choose-group-name'
   >('add-users');
-  const [selectedUsers, setSelectedUsers] = useState(['f']);
+  const [selectedUsers, setSelectedUsers] = useState<IUserWithDetails['uid'][]>([]);
   const [groupName, setGroupName] = useState<string>('');
   const [groupNameError, setGroupNameError] = useState<string>('');
   const { isMobileScreen } = useMobileScreen();
@@ -31,6 +32,8 @@ const CreateGroupPage: FC<CreateGroupPageProps> = ({}) => {
         >
           <AddUsersSection
             isMobileScreen={isMobileScreen}
+            selectedUsers={selectedUsers}
+            setSelectedUsers={setSelectedUsers}
           />
           <ChooseGroupNameSection />
         </div>

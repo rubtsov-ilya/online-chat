@@ -36,11 +36,11 @@ const SearchUsersByName: FC<SearchUsersByNameProps> = ({
 
   useEffect(() => {
     if (!deferredSearchInputValue) {
-      setIsSearching(false)
+      setIsSearching(false);
       setSearchedUsers([]);
       return;
     } else {
-      setIsSearching(true)
+      setIsSearching(true);
       const users = Object.values(groupedUsers).flatMap((user) => user);
       const filteredUsers = users.filter((user) =>
         user.username
@@ -48,31 +48,33 @@ const SearchUsersByName: FC<SearchUsersByNameProps> = ({
           .includes(deferredSearchInputValue.toLowerCase()),
       );
 
-      setSearchedUsers(filteredUsers)
+      setSearchedUsers(filteredUsers);
     }
   }, [deferredSearchInputValue]);
 
   return (
-    <div onClick={onSearchInputClick} className={styles['search']}>
-      <SearchSvg className={`${styles['search__search-svg']}`} />
-      <input
-        ref={searchRef}
-        value={searchInputValue}
-        type="text"
-        autoComplete="off"
-        onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-          setSearchInputValue(e.target.value)
-        }
-        placeholder="Поиск"
-        className={styles['search__input']}
-      />
-      {searchInputValue.length > 0 && (
-        <DeleteCircleSvg
-          onClick={onClearButtonClick}
-          role="button"
-          className={styles['search__delete-svg']}
+    <div className={styles['search']}>
+      <div onClick={onSearchInputClick} className={styles['search__content']}>
+        <SearchSvg className={`${styles['search__search-svg']}`} />
+        <input
+          ref={searchRef}
+          value={searchInputValue}
+          type="text"
+          autoComplete="off"
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+            setSearchInputValue(e.target.value)
+          }
+          placeholder="Поиск"
+          className={styles['search__input']}
         />
-      )}
+        {searchInputValue.length > 0 && (
+          <DeleteCircleSvg
+            onClick={onClearButtonClick}
+            role="button"
+            className={styles['search__delete-svg']}
+          />
+        )}
+      </div>
     </div>
   );
 };

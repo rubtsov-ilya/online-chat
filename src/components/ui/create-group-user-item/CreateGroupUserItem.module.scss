@@ -21,4 +21,14 @@
     font-size: 14px;
     color: var(--base-black);
   }
+
+  &__check-circle-icon {
+    max-width: 24px;
+    max-height: 24px;
+    margin-left: auto;
+    @include fade-in-animation;
+    path {
+      fill: var(--base-accent-blue);
+    }
+  }
 }
