@@ -31,4 +31,25 @@
       fill: var(--base-accent-blue);
     }
   }
+
+  &__close-button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 24px;
+    height: 24px;
+    margin-left: auto;
+    
+  }
+
+  &__close-icon {
+    width: 24px;
+    height: 24px;
+    max-width: 24px;
+    max-height: 24px;
+    @include fade-in-animation;
+    path {
+      fill: var(--base-black);
+    }
+  }
 }

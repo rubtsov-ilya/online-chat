@@ -8,10 +8,7 @@
   white-space: nowrap;
   will-change: transform;
   @media screen and (min-width: 991px) {
-    @include scrollbar;
-    &::-webkit-scrollbar {
-      height: 9px;
-    }
+    @include scrollbar-horizontal;
   }
 
   &__item {

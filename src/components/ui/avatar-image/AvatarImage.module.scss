@@ -15,6 +15,11 @@
     height: 32px;
     min-width: 32px;
   }
+  &--big {
+    width: 60px;
+    height: 60px;
+    min-width: 60px;
+  }
   &--svg {
     display: flex;
     justify-content: center;
@@ -31,6 +36,12 @@
       height: 20px;
       min-width: 20px;
       min-height: 20px;
+    }
+    &--big {
+      width: 36px;
+      height: 36px;
+      min-width: 36px;
+      min-height: 36px;
     }
   }
   &--animated {

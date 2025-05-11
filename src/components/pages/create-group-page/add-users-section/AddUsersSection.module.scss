@@ -2,16 +2,20 @@
 
 .add-users-section {
   display: flex;
-  width: 50%;
   height: 100%;
+  width: 50%;
+  max-width: 50%;
   padding-top: 8px;
-  overflow-y: auto; 
+  overflow-y: auto;
+  @media (min-width: 991px) {
+    @include scrollbar;
+  }
 
-  @include scrollbar;
-  
   &__content {
     display: flex;
     flex-direction: column;
     height: 100%;
+    width: 100%;
+    max-width: 100%;
   }
 }

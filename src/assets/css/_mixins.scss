@@ -55,6 +55,23 @@
   }
 }
 
+@mixin scrollbar-horizontal {
+  &::-webkit-scrollbar {
+    height: 9px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background-color: rgb(142, 142, 142);
+    border: 2px solid rgb(245, 245, 245);
+    border-radius: 99px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background-color: rgb(245, 245, 245);
+    border-radius: 99px;
+  }
+}
+
 @mixin scrollbar-without-track {
   &::-webkit-scrollbar {
     width: 5px;

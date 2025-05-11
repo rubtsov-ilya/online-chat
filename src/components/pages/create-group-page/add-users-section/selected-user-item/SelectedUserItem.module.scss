@@ -1,0 +1,46 @@
+@use 'src/assets/css/_mixins.scss' as *;
+
+.selected-user-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+
+  @include fade-in-animation;
+
+  &__image-wrapper {
+    position: relative;
+    height: 60px; // размер AvatarImage с isBig true
+    width: 60px; // размер AvatarImage с isBig true
+  }
+  &__close-icon {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 24px;
+    height: 24px;
+    border-radius: 999px;
+    background-color: var(--base-white-snow);
+    path {
+      width: 24px;
+      height: 24px;
+      max-width: 24px;
+      max-height: 24px;
+      fill: var(--base-black);
+    }
+  }
+
+  &__username-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  &__username {
+    font-family: var(--font-family);
+    font-weight: 600;
+    font-size: 12px;
+    line-height: 100%;
+    color: var(--base-black);
+  }
+}

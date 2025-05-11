@@ -12,7 +12,7 @@ const CreateGroupPage: FC<CreateGroupPageProps> = ({}) => {
   const [activeSection, setActiveSection] = useState<
     'add-users' | 'choose-group-name'
   >('add-users');
-  const [selectedUsers, setSelectedUsers] = useState<IUserWithDetails['uid'][]>([]);
+  const [selectedUsers, setSelectedUsers] = useState<IUserWithDetails[]>([]);
   const [groupName, setGroupName] = useState<string>('');
   const [groupNameError, setGroupNameError] = useState<string>('');
   const { isMobileScreen } = useMobileScreen();
@@ -31,11 +31,12 @@ const CreateGroupPage: FC<CreateGroupPageProps> = ({}) => {
           className={`${styles['create-group-page__sections-wrapper']} ${activeSection === 'choose-group-name' ? styles['right'] : ''}`}
         >
           <AddUsersSection
+            activeSection={activeSection}
             isMobileScreen={isMobileScreen}
             selectedUsers={selectedUsers}
             setSelectedUsers={setSelectedUsers}
           />
-          <ChooseGroupNameSection />
+          <ChooseGroupNameSection groupName={groupName} setGroupName={setGroupName} setSelectedUsers={setSelectedUsers} activeSection={activeSection} selectedUsers={selectedUsers} groupNameError={groupNameError} isMobileScreen={isMobileScreen}/>
         </div>
       </main>
     </div>

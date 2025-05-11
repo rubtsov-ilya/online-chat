@@ -4,10 +4,11 @@ import LeftChevronSvg from 'src/assets/images/icons/24x24-icons/Left Chevron.svg
 import ArrowRightSvg from 'src/assets/images/icons/24x24-icons/Arrow Right.svg?react';
 import CheckmarkSvg from 'src/assets/images/icons/24x24-icons/Checkmark.svg?react';
 import { useNavigate } from 'react-router-dom';
+import { IUserWithDetails } from 'src/interfaces/UserWithDetails.interface';
 
 interface CreateGroupHeaderProps {
   activeSection: 'add-users' | 'choose-group-name';
-  selectedUsers: string[];
+  selectedUsers: IUserWithDetails[];
   groupName: string;
   setActiveSection: React.Dispatch<
     React.SetStateAction<'add-users' | 'choose-group-name'>

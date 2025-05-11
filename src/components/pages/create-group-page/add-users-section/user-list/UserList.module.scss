@@ -1,9 +1,8 @@
 @use 'src/assets/css/_mixins.scss' as *;
 
 .user-list {
-
   &__wrapper {
-    &:first-child {
+    &--margin-top:first-child {
       margin-top: 8px;
     }
   }

@@ -25,7 +25,11 @@ import {
 import { ILocationChatPage } from 'src/interfaces/LocationChatPage.interface';
 import DotsBounceLoader from 'src/components/ui/dots-bounce-loader/DotsBounceLoader';
 import useSelectedMessages from 'src/hooks/useSelectedMessages';
-import { clearSelectedMessagesState, setIsMessagesForwarding, setIsMessagesSelecting } from 'src/redux/slices/SelectedMessagesSlice';
+import {
+  clearSelectedMessagesState,
+  setIsMessagesForwarding,
+  setIsMessagesSelecting,
+} from 'src/redux/slices/SelectedMessagesSlice';
 import { useDispatch } from 'react-redux';
 import FlipNumbers from 'react-flip-numbers';
 import useMessagesFromRtk from 'src/hooks/useMessagesFromRtk';
@@ -121,12 +125,17 @@ const ChatTopSection: FC<ChatTopSectionProps> = ({
       ) {
         // если чат групповой
         const membersCount = activeChatMembers.length;
+        const lastDigit = membersCount % 10;
+        const lastTwoDigits = membersCount % 100;
         const membersText =
-          membersCount === 1
-            ? 'участник'
-            : membersCount >= 2 && membersCount <= 4
-              ? 'участника'
-              : 'участников';
+          lastTwoDigits >= 11 && lastTwoDigits <= 19
+            ? 'участников'
+            : lastDigit === 1
+              ? 'участник'
+              : lastDigit >= 2 && lastDigit <= 4
+                ? 'участника'
+                : 'участников';
+
         setChatStatus(`${membersCount} ${membersText}`);
       }
     }

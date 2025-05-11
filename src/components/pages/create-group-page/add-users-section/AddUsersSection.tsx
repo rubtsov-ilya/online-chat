@@ -1,4 +1,4 @@
-import { FC, useLayoutEffect, useState } from 'react';
+import { FC, useLayoutEffect, useRef, useState } from 'react';
 import styles from './AddUsersSection.module.scss';
 
 import {
@@ -19,20 +19,28 @@ import {
 import SectionLoader from './section-loader/SectionLoader';
 import UserList from './user-list/UserList';
 import CreateGroupUserItem from 'src/components/ui/create-group-user-item/CreateGroupUserItem';
-import EmptyChatsWrapper from '../../chats-page/chats-list-section/empty-chats-wrapper/EmptyChatsWrapper';
 import NoResults from './no-results/NoResults';
+import SelectedUserList from './selected-user-list/SelectedUserList';
 
 interface AddUsersSectionProps {
   isMobileScreen: boolean;
-  selectedUsers: IUserWithDetails['uid'][];
-  setSelectedUsers: React.Dispatch<React.SetStateAction<string[]>>;
+  selectedUsers: IUserWithDetails[];
+  activeSection: 'add-users' | 'choose-group-name';
+  setSelectedUsers: React.Dispatch<React.SetStateAction<IUserWithDetails[]>>;
 }
 
-const AddUsersSection: FC<AddUsersSectionProps> = ({ isMobileScreen, selectedUsers, setSelectedUsers }) => {
+const AddUsersSection: FC<AddUsersSectionProps> = ({
+  isMobileScreen,
+  selectedUsers,
+  activeSection,
+  setSelectedUsers,
+}) => {
   const [isUsersLoading, setIsUsersLoading] = useState<boolean>(false);
   const [searchedUsers, setSearchedUsers] = useState<IUserWithDetails[]>([]);
   const [isSearching, setIsSearching] = useState<boolean>(false);
   const [groupedUsers, setGroupedUsers] = useState<GroupedUsersType>({});
+  const sectionRef = useRef<HTMLDivElement>(null)
+
   const { uid } = useAuth();
   useLayoutEffect(() => {
     const userChatsRef = refFirebaseDatabase(
@@ -134,7 +142,7 @@ const AddUsersSection: FC<AddUsersSectionProps> = ({ isMobileScreen, selectedUse
   }, []);
 
   return (
-    <section className={styles['add-users-section']}>
+    <section ref={sectionRef} className={styles['add-users-section']}>
       <div
         className={`container container--height ${isMobileScreen ? 'container--no-padding' : ''}`}
       >
@@ -147,11 +155,26 @@ const AddUsersSection: FC<AddUsersSectionProps> = ({ isMobileScreen, selectedUse
                 setSearchedUsers={setSearchedUsers}
                 setIsSearching={setIsSearching}
               />
-              {!isSearching && <UserList selectedUsers={selectedUsers} setSelectedUsers={setSelectedUsers} groupedUsers={groupedUsers} />}
+              {!isSearching && selectedUsers.length !== 0 && <SelectedUserList setSelectedUsers={setSelectedUsers} sectionRef={sectionRef} selectedUsers={selectedUsers} />}
+
+              {!isSearching && (
+                <UserList
+                  activeSection={activeSection}
+                  selectedUsers={selectedUsers}
+                  setSelectedUsers={setSelectedUsers}
+                  groupedUsers={groupedUsers}
+                />
+              )}
               {isSearching &&
                 searchedUsers.length > 0 &&
                 searchedUsers.map((user) => (
-                  <CreateGroupUserItem selectedUsers={selectedUsers} setSelectedUsers={setSelectedUsers} key={user.uid} user={user} />
+                  <CreateGroupUserItem
+                    activeSection={activeSection}
+                    selectedUsers={selectedUsers}
+                    setSelectedUsers={setSelectedUsers}
+                    key={user.uid}
+                    user={user}
+                  />
                 ))}
               {isSearching && searchedUsers.length === 0 && <NoResults />}
             </>
