@@ -1,15 +1,26 @@
 import { FC, useState } from 'react';
 import styles from './NameAndAvatar.module.scss';
-import AvatarImage from 'src/components/ui/avatar-image/AvatarImage';
 import useActiveChat from 'src/hooks/useActiveChat';
-import CheckmarkSvg  from 'src/assets/images/icons/24x24-icons/Checkmark.svg?react';
+import CheckmarkSvg from 'src/assets/images/icons/24x24-icons/Checkmark.svg?react';
+import UploadGroupAvatar from 'src/components/ui/upload-group-avatar/UploadGroupAvatar';
+import useAuth from 'src/hooks/useAuth';
+import { useDispatch } from 'react-redux';
+import { firebaseDatabase } from 'src/firebase';
+import {
+  ref as refFirebaseDatabase,
+  update,
+} from 'firebase/database';
+import { setActiveChatnameAndAvatar } from 'src/redux/slices/ActiveChatSlice';
 
 interface NameAndAvatarProps {}
 
 const NameAndAvatar: FC<NameAndAvatarProps> = ({}) => {
-  const { activeChatname, activeChatAvatar } = useActiveChat();
+  const { uid } = useAuth();
+  const { activeChatname, activeChatAvatar, activeChatMembers, activeChatId } =
+    useActiveChat();
   const [groupName, setGroupName] = useState<string>(activeChatname || '');
   const [groupNameError, setGroupNameError] = useState<string>('');
+  const dispatch = useDispatch();
 
   const validateInput = (value: string): string => {
     if (value.replace(/\s/g, '').length < 3)
@@ -22,9 +33,47 @@ const NameAndAvatar: FC<NameAndAvatarProps> = ({}) => {
     return '';
   };
 
+  const createNewDataForChatsPath = (
+    chatId: string,
+    usersIds: string[],
+    name: string,
+  ) => {
+    const updatesByUserChats = usersIds.reduce(
+      (acc, userId) => {
+        acc[`userChats/${userId}/chats/${chatId}/groupChatname`] = name;
+        return acc;
+      },
+      {} as Record<string, string>,
+    );
+
+    return updatesByUserChats;
+  };
+
+  const updateGroupName = async (name: string) => {
+    if (activeChatMembers === null || activeChatId === null) {
+      return;
+    }
+
+    const allUsersIds = activeChatMembers.map((user) => user.uid);
+
+    const updates = createNewDataForChatsPath(
+      activeChatId,
+      allUsersIds,
+      name,
+    );
+
+    await update(refFirebaseDatabase(firebaseDatabase), updates);
+
+    dispatch(
+      setActiveChatnameAndAvatar({
+        activeChatname: name,
+      }),
+    );
+  };
+
   const onConfirmButtonClick = (groupNameDuringConfirming: string) => {
     if (groupNameDuringConfirming === activeChatname) {
-      return
+      return;
     }
     const validateError = validateInput(groupNameDuringConfirming);
     if (validateError) {
@@ -32,7 +81,7 @@ const NameAndAvatar: FC<NameAndAvatarProps> = ({}) => {
       setGroupNameError(validateError);
       return;
     } else {
-
+      updateGroupName(groupNameDuringConfirming);
     }
   };
 
@@ -48,7 +97,12 @@ const NameAndAvatar: FC<NameAndAvatarProps> = ({}) => {
       )}
 
       <div className={styles['name-and-avatar__wrapper']}>
-        <AvatarImage AvatarImg={activeChatAvatar || ''} isGroup={true} />
+        <UploadGroupAvatar
+          groupAvatar={activeChatAvatar ? activeChatAvatar : ''}
+          uid={uid!}
+          activeChatMembers={activeChatMembers}
+          activeChatId={activeChatId}
+        />
         {/*  здесь переделать UploadAvatar */}
         <input
           id="groupNameInput"
@@ -64,7 +118,9 @@ const NameAndAvatar: FC<NameAndAvatarProps> = ({}) => {
           onClick={() => onConfirmButtonClick(groupName)}
           disabled={activeChatname === groupName}
         >
-          <CheckmarkSvg className={`${styles['name-and-avatar__confirm-icon']} ${activeChatname !== groupName ? styles['name-and-avatar__confirm-icon--active'] : ''}`}/>
+          <CheckmarkSvg
+            className={`${styles['name-and-avatar__confirm-icon']} ${activeChatname !== groupName ? styles['name-and-avatar__confirm-icon--active'] : ''}`}
+          />
         </button>
       </div>
     </div>
