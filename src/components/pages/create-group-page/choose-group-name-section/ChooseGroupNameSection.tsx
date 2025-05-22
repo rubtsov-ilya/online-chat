@@ -1,4 +1,4 @@
-import { FC, useState } from 'react';
+import { FC } from 'react';
 import styles from './ChooseGroupNameSection.module.scss';
 import { IUserWithDetails } from 'src/interfaces/UserWithDetails.interface';
 import CreateGroupUserItem from 'src/components/ui/create-group-user-item/CreateGroupUserItem';

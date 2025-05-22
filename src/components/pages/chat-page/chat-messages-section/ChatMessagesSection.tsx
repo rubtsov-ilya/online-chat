@@ -535,6 +535,10 @@ const ChatMessagesSection: FC<ChatMessagesSectionProps> = ({
         unsubscribeAfterMessages = onValue(
           afterQuery,
           (snapshot) => {
+            if (!snapshot.val()) {
+              setIsMessagesSubscribeLoading(false)
+              return
+            }
             const messagesAfterUnreadFromDatabase: IMessage[] =
               Object.values(snapshot.val()) || [];
 
@@ -589,6 +593,11 @@ const ChatMessagesSection: FC<ChatMessagesSectionProps> = ({
         unsubscribeAfterMessages = onValue(
           messagesQuery,
           (snapshot) => {
+            if (!snapshot.val()) {
+              setIsMessagesSubscribeLoading(false)
+              return
+            }
+            
             const messagesFromDatabase: IMessage[] =
               Object.values(snapshot.val()) || [];
 

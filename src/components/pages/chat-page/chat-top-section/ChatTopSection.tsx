@@ -35,6 +35,8 @@ import FlipNumbers from 'react-flip-numbers';
 import useMessagesFromRtk from 'src/hooks/useMessagesFromRtk';
 import { IFirebaseRtDbChat } from 'src/interfaces/FirebaseRealtimeDatabase.interface';
 import getLastUndeletedMessage from 'src/services/getLastUndeletedMessage';
+import ChatInfo from '../chat-info-section/ChatInfoSection';
+import useToggleModal from 'src/hooks/useToggleModal';
 
 interface ChatTopSectionProps {
   isMobileScreen?: boolean;
@@ -55,6 +57,8 @@ const ChatTopSection: FC<ChatTopSectionProps> = ({
   const { uid } = useAuth();
   const [chatStatus, setChatStatus] = useState<string>('');
   const [writingUsers, setWritingUsers] = useState<string[]>([]);
+  const [isChatInfoOpen, setIsChatInfoOpen] = useState<boolean>(false);
+  const { toggleModal } = useToggleModal({ setCbState: setIsChatInfoOpen });
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const {
@@ -181,7 +185,8 @@ const ChatTopSection: FC<ChatTopSectionProps> = ({
     };
   }, [activeChatMembers, isSubscribeLoading, locationUid, activeChatId]);
 
-  const onBackBtnClick = () => {
+  const onBackBtnClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.stopPropagation();
     if (isMessagesSelecting) {
       dispatch(clearSelectedMessagesState());
     } else {
@@ -349,14 +354,19 @@ const ChatTopSection: FC<ChatTopSectionProps> = ({
     navigate('/chats', { replace: true });
   };
 
+  const openChatInfo = () => { 
+    toggleModal(true)
+  }
+
   return (
     <ComponentTag className={styles['chat-top-section']}>
+      {isChatInfoOpen && <ChatInfo isMobileScreen={isMobileScreen} closeChatInfo={() => toggleModal(false, 150)} />}
       <div
         className={
           isMobileScreen ? 'container' : 'container container--max-width-unset'
         }
       >
-        <div className={styles['chat-top-section__content']}>
+        <div onClick={openChatInfo} className={styles['chat-top-section__content']}>
           <div className={styles['chat-top-section__back-wrapper']}>
             <button
               onClick={onBackBtnClick}
@@ -437,7 +447,7 @@ const ChatTopSection: FC<ChatTopSectionProps> = ({
                     </span>
                   )}
               </div>
-              <AvatarImage animated={true} AvatarImg={avatar} />
+              <AvatarImage animated={true} AvatarImg={avatar} isGroup={activeChatIsGroup || false}/>
             </>
           )}
           {isMessagesSelecting && (

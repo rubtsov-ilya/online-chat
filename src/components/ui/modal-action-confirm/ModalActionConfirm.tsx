@@ -8,6 +8,7 @@ interface ModalActionConfirmProps {
   subtitle: string;
   actionBtnText: string;
   isMobileScreen: boolean;
+  isGroup?: boolean
   action: () => void;
   closeModal?: () => void;
   /* closeModal !== undefined, передаётся из ModalBackdrop через 
@@ -24,6 +25,7 @@ const ModalActionConfirm: FC<ModalActionConfirmProps> = ({
   actionBtnText,
   avatar,
   isMobileScreen,
+  isGroup,
   action,
   closeModal,
 }) => {
@@ -40,7 +42,7 @@ const ModalActionConfirm: FC<ModalActionConfirmProps> = ({
       {(avatar !== undefined || title !== undefined) && (
         <div className={styles['modal-action-confirm__info-wrapper']}>
           {avatar !== undefined && (
-            <AvatarImage isLittle={true} AvatarImg={avatar} />
+            <AvatarImage isLittle={true} AvatarImg={avatar} isGroup={isGroup ? isGroup : false} />
           )}
           {title !== undefined && (
             <span className={styles['modal-action-confirm__title']}>

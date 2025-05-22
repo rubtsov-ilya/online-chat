@@ -78,6 +78,7 @@ const ChatPage: FC = () => {
       subtitle: `Переслать ${selectedMessages.length > 1 ? 'сообщения' : 'сообщение'} в чат?`,
       actionBtnText: 'Переслать',
       avatar: activeChatAvatar!,
+      isGroup:activeChatIsGroup!,
       action: async () => {
         try {
           if (selectedChatMembers === null) {
@@ -477,6 +478,7 @@ const ChatPage: FC = () => {
             actionBtnText={modalActionData[modalOpen].actionBtnText}
             action={modalActionData[modalOpen].action}
             avatar={modalActionData[modalOpen].avatar}
+            isGroup={modalActionData[modalOpen].isGroup}
           />
         </ModalBackdrop>
       )}

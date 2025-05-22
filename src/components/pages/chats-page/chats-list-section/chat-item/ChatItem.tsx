@@ -383,7 +383,7 @@ const ChatItem: FC<ChatItemProps> = ({
           className={`${styles['chat-item__foreground']} ${isActive ? (chatItemData.isGroup === false ? styles['chat-item__foreground--active'] : styles['chat-item__foreground--active-group']) : ''}  ${isHover && isMobileScreen ? styles['chat-item__foreground--hover'] : ''}`}
         >
           <div className={styles['chat-item__left-wrapper']}>
-            <AvatarImage AvatarImg={chatAvatar} />
+            <AvatarImage AvatarImg={chatAvatar} isGroup={chatItemData.isGroup}/>
 
             <div className={styles['chat-item__user-details-wrapper']}>
               <SkeletonTheme
@@ -474,6 +474,7 @@ const ChatItem: FC<ChatItemProps> = ({
             actionBtnText={modalActionData[modalOpen].actionBtnText}
             action={modalActionData[modalOpen].action}
             avatar={chatAvatar}
+            isGroup={chatItemData.isGroup}
           />
         </ModalBackdrop>
       )}

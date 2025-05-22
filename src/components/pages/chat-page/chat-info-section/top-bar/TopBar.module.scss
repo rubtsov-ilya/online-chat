@@ -1,0 +1,55 @@
+.top-bar {
+  background-color: var(--base-white);
+  box-shadow: 0 1px 0 0 var(--base-grey-whisper);
+
+  &__content {
+    display: grid;
+    grid-template-columns: 24px 1fr 24px;
+    align-items: center;
+    height: 56px;
+  }
+
+  &__back-btn {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    height: 24px;
+    width: 24px;
+    cursor: default;
+    animation : fadeInAndScale 0.15s ease forwards;
+  }
+
+  &__back-icon {
+    position: absolute;
+    top: 0;
+    left: 0;
+    min-width: 24px;
+    min-height: 24px;
+    cursor: pointer;
+    path {
+      fill: var(--base-black);
+    }
+  }
+
+  &__text {
+    font-family: var(--font-family);
+    font-weight: 700;
+    font-size: 16px;
+    text-align: center;
+    color: var(--base-black);
+    user-select: none;
+    white-space: nowrap;
+  }
+}
+
+@keyframes fadeInAndScale {
+  0% {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
