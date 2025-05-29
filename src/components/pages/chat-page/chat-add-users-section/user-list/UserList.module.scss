@@ -1,0 +1,30 @@
+@use 'src/assets/css/_mixins.scss' as *;
+
+.user-list {
+  &__wrapper {
+    &--margin-top:first-child {
+      margin-top: 8px;
+    }
+  }
+
+  &__letter-wrapper {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    height: 24px;
+    padding-left: 8.5px;
+    background: var(--base-white-smoke);
+    border-radius: 999px;
+
+    @include tablet {
+      border-radius: 0px;
+    }
+  }
+
+  &__letter {
+    font-family: var(--font-family);
+    font-weight: 700;
+    font-size: 14px;
+    color: var(--base-grey);
+  }
+}

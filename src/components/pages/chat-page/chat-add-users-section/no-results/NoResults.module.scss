@@ -1,0 +1,36 @@
+.no-results {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-around;
+  height: 100%;
+  &__link {
+    font-family: var(--third-family);
+    font-weight: 700;
+    font-size: 14px;
+    color: var(--base-accent-blue);
+    transition: color 0.2s ease;
+
+    &:hover {
+      color: var(--base-accent-dark-blue);
+    }
+  }
+  &__icon-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+  }
+  &__svg {
+    path {
+      fill: var(--base-grey-gainsboro);
+    }
+  }
+  &__text {
+    font-size: 16px;
+    font-family: var(--third-family);
+    font-weight: 500;
+    color: var(--base-black);
+  }
+  
+}

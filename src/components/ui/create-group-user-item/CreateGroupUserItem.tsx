@@ -37,7 +37,7 @@ const CreateGroupUserItem: FC<CreateGroupUserItemProps> = ({
   };
 
   return (
-    <div style={{cursor: `${activeSection === 'add-users' ? 'pointer' : 'default'}`}} onClick={onUserItemClick} className={styles['create-group-user-item']}>
+    <div onClick={onUserItemClick} className={`${styles['create-group-user-item']} ${activeSection === 'add-users' ? styles['create-group-user-item--pointer'] : ''}`}>
       <AvatarImage AvatarImg={user.avatar} />
       <span className={styles['create-group-user-item__username']}>
         {user.username}

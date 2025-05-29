@@ -1,0 +1,26 @@
+@use 'src/assets/css/_mixins.scss' as *;
+
+.selected-user-list {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  padding: 16px 0px 8px 0px;
+  width: 100%;
+  flex-shrink: 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+  @media (max-width: 1166px) {
+    width: calc(100vw - 16px);
+    &.has-scroll {
+      width: calc(100vw - 25px);
+    }
+  }
+  @include tablet {
+    padding: 16px 8px 8px 8px;
+    width: 100vw;
+  }
+  @media screen and (min-width: 991px) {
+    @include scrollbar-horizontal;
+  }
+  @include fade-in-animation;
+}

@@ -35,7 +35,7 @@ import FlipNumbers from 'react-flip-numbers';
 import useMessagesFromRtk from 'src/hooks/useMessagesFromRtk';
 import { IFirebaseRtDbChat } from 'src/interfaces/FirebaseRealtimeDatabase.interface';
 import getLastUndeletedMessage from 'src/services/getLastUndeletedMessage';
-import ChatInfo from '../chat-info-section/ChatInfoSection';
+import ChatInfoSection from '../chat-info-section/ChatInfoSection';
 import useToggleModal from 'src/hooks/useToggleModal';
 
 interface ChatTopSectionProps {
@@ -79,6 +79,16 @@ const ChatTopSection: FC<ChatTopSectionProps> = ({
           .find((member) => member.uid === writingUsers[0])
           ?.username.slice(0, 20) || ''
       : '';
+
+  const closeChatInfo = () => { 
+    toggleModal(false, 150)
+   }
+
+  useEffect(() => {
+    // закрытие модалки при смене чата
+    toggleModal(false)
+  }, [activeChatId])
+  
 
   useEffect(() => {
     let unsubscribeUserIsOnline: (() => void) | undefined;
@@ -354,19 +364,21 @@ const ChatTopSection: FC<ChatTopSectionProps> = ({
     navigate('/chats', { replace: true });
   };
 
-  const openChatInfo = () => { 
-    toggleModal(true)
+  const openChatInfo = () => {
+    if (activeChatIsGroup) {
+      toggleModal(true)
+    }
   }
 
   return (
     <ComponentTag className={styles['chat-top-section']}>
-      {isChatInfoOpen && <ChatInfo isMobileScreen={isMobileScreen} closeChatInfo={() => toggleModal(false, 150)} />}
+      {isChatInfoOpen && <ChatInfoSection isMobileScreen={isMobileScreen} closeChatInfo={closeChatInfo} />}
       <div
         className={
           isMobileScreen ? 'container' : 'container container--max-width-unset'
         }
       >
-        <div onClick={openChatInfo} className={styles['chat-top-section__content']}>
+        <div onClick={openChatInfo} className={`${styles['chat-top-section__content']} ${ activeChatIsGroup ? styles['chat-top-section__content--pointer'] : ''}`}>
           <div className={styles['chat-top-section__back-wrapper']}>
             <button
               onClick={onBackBtnClick}

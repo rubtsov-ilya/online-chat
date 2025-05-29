@@ -1,0 +1,95 @@
+@use 'src/assets/css/_mixins.scss' as *;
+
+.top-bar {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  height: 56px;
+  background-color: var(--base-white);
+  box-shadow: 0 1px 0 0 var(--base-grey-whisper);
+  &__content {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  &__back-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    @include fade-in-animation;
+  }
+
+  &__left-chevron-icon {
+    max-width: 24px;
+    max-height: 24px;
+    path {
+      fill: var(--base-black);
+    }
+  }
+
+  &__text {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: var(--font-family);
+    font-weight: 700;
+    font-size: 16px;
+    text-wrap: nowrap;
+    color: var(--base-black);
+    @include fade-in-animation;
+  }
+
+  &__forward-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    margin-left: auto;
+    @include fade-in-animation;
+  }
+
+  &__arrow-right-icon {
+    max-width: 24px;
+    max-height: 24px;
+    path {
+      transition: all 0.2s ease;
+      fill: var(--base-accent-blue);
+    }
+    &:hover {
+      path {
+        fill: var(--base-accent-dark-blue);
+      }
+    }
+  }
+
+  &__create-btn {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: auto;
+    flex-shrink: 0;
+    background: var(--light-white);
+    border: 1px solid var(--base-grey-whisper);
+    border-radius: 20px;
+    box-shadow: 0 1px 4px 0 rgba(0, 0, 0, 0.25);
+    cursor: pointer;
+    @include fade-in-animation;
+  }
+
+  &__checkmark-icon {
+    max-width: 24px;
+    max-height: 24px;
+    &.active path {
+      transition: all 0.2s ease;
+      fill: var(--base-accent-blue);
+    }
+    &.active:hover {
+      path {
+        fill: var(--base-accent-dark-blue);
+      }
+    }
+  }
+}

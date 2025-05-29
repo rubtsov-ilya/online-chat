@@ -2,6 +2,7 @@ import { FC } from 'react';
 import styles from './ChooseGroupNameSection.module.scss';
 import { IUserWithDetails } from 'src/interfaces/UserWithDetails.interface';
 import CreateGroupUserItem from 'src/components/ui/create-group-user-item/CreateGroupUserItem';
+import usePluralizeMember from 'src/hooks/usePluralizeMember';
 
 interface ChooseGroupNameSectionProps {
   selectedUsers: IUserWithDetails[];
@@ -22,19 +23,8 @@ const ChooseGroupNameSection: FC<ChooseGroupNameSectionProps> = ({
   setSelectedUsers,
   setGroupName,
 }) => {
-  const membersCountString = (() => {
-    const lastDigit = selectedUsers.length % 10;
-    const lastTwoDigits = selectedUsers.length % 100;
-    const membersText =
-      lastTwoDigits >= 11 && lastTwoDigits <= 19
-        ? 'участников'
-        : lastDigit === 1
-          ? 'участник'
-          : lastDigit >= 2 && lastDigit <= 4
-            ? 'участника'
-            : 'участников';
-    return `${selectedUsers.length} ${membersText}`;
-  })();
+
+  const membersCountString = usePluralizeMember(selectedUsers);
 
   return (
     <section className={styles['choose-group-name-section']}>

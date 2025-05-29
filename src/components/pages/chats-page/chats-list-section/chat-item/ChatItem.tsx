@@ -161,8 +161,7 @@ const ChatItem: FC<ChatItemProps> = ({
             [`userChats/${uid!}/chats/${chatItemData.chatId}`]: null,
             ...updatesMembersIdsByUserChats,
           };
-          console.log(updatesByLeaving);
-          /* await update(refFirebaseDatabase(firebaseDatabase), updatesByDeleting); */
+          await update(refFirebaseDatabase(firebaseDatabase), updatesByLeaving);
         } catch (error) {
           console.error(`Ошибка покидания чата`, error);
         }

@@ -1,13 +1,17 @@
 @use 'src/assets/css/_mixins.scss' as *;
 
-.create-group-user-item {
+.chat-info-user-item {
   display: flex;
   align-items: center;
   height: 64px;
-  padding: 12px 20px 12px 0px;
+  padding: 12px 20px 12px 8px;
 
   &--pointer {
     cursor: pointer;
+  }
+
+  &--no-padding {
+    padding: 12px 20px 12px 0px;
   }
 
   @include tablet {
