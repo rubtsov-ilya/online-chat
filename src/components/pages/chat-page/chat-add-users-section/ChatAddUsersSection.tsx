@@ -22,6 +22,7 @@ import SelectedUserList from './selected-user-list/SelectedUserList';
 import NoResults from './no-results/NoResults';
 import SectionLoader from './section-loader/SectionLoader';
 import TopBar from './top-bar/TopBar';
+import useActiveChat from 'src/hooks/useActiveChat';
 
 interface ChatAddUsersSectionProps {
   isMobileScreen: boolean | undefined;
@@ -41,6 +42,8 @@ const ChatAddUsersSection: FC<ChatAddUsersSectionProps> = ({
   const sectionRef = useRef<HTMLDivElement>(null);
 
   const { uid } = useAuth();
+  const { activeChatMembers } = useActiveChat()
+
   useLayoutEffect(() => {
     const userChatsRef = refFirebaseDatabase(
       firebaseDatabase,
@@ -64,7 +67,7 @@ const ChatAddUsersSection: FC<ChatAddUsersSectionProps> = ({
           ) as IFirebaseRtDbChat[];
           const usersIds = userChatsValue
             .flatMap((userChat) => Object.keys(userChat.membersIds))
-            .filter((memberIds) => memberIds !== uid);
+            .filter((memberId) => memberId !== uid && !activeChatMembers?.map((member) => member.uid).includes(memberId));
 
           const usersWithDetails: IUserWithDetails[] = await Promise.all(
             usersIds.map(async (userId) => {
@@ -159,7 +162,7 @@ const ChatAddUsersSection: FC<ChatAddUsersSectionProps> = ({
     >
       <TopBar onCloseBtnClick={onCloseBtnClick} isMobileScreen={isMobileScreen} selectedUsers={selectedUsers} />
       <div
-        className={`container container--height ${isMobileScreen ? '' : 'container--max-width-unset'}`}
+        className={`container container--height container--no-padding ${isMobileScreen ? '' : 'container--max-width-unset'}`}
       >
         <div className={styles['chat-add-users-section__content']}>
           {isUsersLoading && <SectionLoader />}
@@ -194,7 +197,6 @@ const ChatAddUsersSection: FC<ChatAddUsersSectionProps> = ({
                     setSelectedUsers={setSelectedUsers}
                     key={user.uid}
                     user={user}
-                    hasNoPadding={true}
                   />
                 ))}
               {isSearching && searchedUsers.length === 0 && <NoResults />}

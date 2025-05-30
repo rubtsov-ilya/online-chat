@@ -10,10 +10,6 @@
     cursor: pointer;
   }
 
-  &--no-padding {
-    padding: 12px 20px 12px 0px;
-  }
-
   @include tablet {
     padding: 12px 20px 12px 8px;
   }

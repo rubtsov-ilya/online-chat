@@ -1,9 +1,7 @@
 @use 'src/assets/css/_mixins.scss' as *;
 
 .search {
-  @include tablet {
-    padding: 0 8px;
-  }
+  padding: 0 8px;
   &__content {
     display: flex;
     align-items: center;

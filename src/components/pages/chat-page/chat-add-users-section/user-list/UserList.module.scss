@@ -14,11 +14,6 @@
     height: 24px;
     padding-left: 8.5px;
     background: var(--base-white-smoke);
-    border-radius: 999px;
-
-    @include tablet {
-      border-radius: 0px;
-    }
   }
 
   &__letter {

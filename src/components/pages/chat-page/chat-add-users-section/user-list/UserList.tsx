@@ -32,7 +32,6 @@ const UserList: FC<UserListProps> = ({
                 setSelectedUsers={setSelectedUsers}
                 key={user.uid}
                 user={user}
-                hasNoPadding={true}
               />
             ))}
           </div>

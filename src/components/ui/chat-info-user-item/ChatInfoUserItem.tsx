@@ -15,7 +15,6 @@ interface ChatInfoUserItemProps {
   activeChatMembers?: IMemberDetails[];
   activeChatId?: string | null;
   selectedUsers?: IUserWithDetails[];
-  hasNoPadding?: boolean;
   setSelectedUsers?: React.Dispatch<React.SetStateAction<IUserWithDetails[]>>;
 }
 
@@ -25,7 +24,6 @@ const ChatInfoUserItem: FC<ChatInfoUserItemProps> = ({
   activeChatMembers,
   activeChatId,
   selectedUsers,
-  hasNoPadding,
   setSelectedUsers,
 }) => {
   const { uid } = useAuth()
@@ -71,7 +69,7 @@ const ChatInfoUserItem: FC<ChatInfoUserItemProps> = ({
   return (
     <div
       onClick={onUserItemClick}
-      className={`${styles['chat-info-user-item']} ${isSelectable ? styles['chat-info-user-item--pointer'] : ''}  ${hasNoPadding ? styles['chat-info-user-item--no-padding'] : ''}`}
+      className={`${styles['chat-info-user-item']} ${isSelectable ? styles['chat-info-user-item--pointer'] : ''}`}
     >
       <AvatarImage AvatarImg={user.avatar} />
       <span className={styles['chat-info-user-item__username']}>

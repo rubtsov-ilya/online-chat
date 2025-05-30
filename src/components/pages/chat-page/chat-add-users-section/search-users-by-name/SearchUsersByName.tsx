@@ -20,7 +20,6 @@ const SearchUsersByName: FC<SearchUsersByNameProps> = ({
   setSearchedUsers,
   setIsSearching,
 }) => {
-  const { uid } = useAuth();
   const [searchInputValue, setSearchInputValue] = useState<string>('');
   const deferredSearchInputValue = useDeferredValue(searchInputValue);
   const searchRef = useRef<HTMLInputElement>(null);

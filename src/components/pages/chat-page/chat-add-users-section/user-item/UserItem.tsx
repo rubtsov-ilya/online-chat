@@ -15,7 +15,6 @@ interface UserItemProps {
   activeChatMembers: IMemberDetails[];
   activeChatId: string | null;
   selectedUsers?: IUserWithDetails[];
-  setSelectedUsers?: React.Dispatch<React.SetStateAction<IUserWithDetails[]>>;
 }
 
 const UserItem: FC<UserItemProps> = ({
@@ -24,7 +23,6 @@ const UserItem: FC<UserItemProps> = ({
   activeChatMembers,
   activeChatId,
   selectedUsers,
-  setSelectedUsers,
 }) => {
   const { uid } = useAuth()
 
