@@ -3,7 +3,6 @@ import styles from './NameAndAvatar.module.scss';
 import useActiveChat from 'src/hooks/useActiveChat';
 import CheckmarkSvg from 'src/assets/images/icons/24x24-icons/Checkmark.svg?react';
 import UploadGroupAvatar from 'src/components/ui/upload-group-avatar/UploadGroupAvatar';
-import useAuth from 'src/hooks/useAuth';
 import { useDispatch } from 'react-redux';
 import { firebaseDatabase } from 'src/firebase';
 import {
@@ -15,13 +14,11 @@ import { setActiveChatnameAndAvatar } from 'src/redux/slices/ActiveChatSlice';
 interface NameAndAvatarProps {}
 
 const NameAndAvatar: FC<NameAndAvatarProps> = ({}) => {
-  const { uid } = useAuth();
   const { activeChatname, activeChatAvatar, activeChatMembers, activeChatId } =
     useActiveChat();
   const [groupName, setGroupName] = useState<string>(activeChatname || '');
   const [groupNameError, setGroupNameError] = useState<string>('');
   const dispatch = useDispatch();
-
   const validateInput = (value: string): string => {
     if (value.replace(/\s/g, '').length < 3)
       return 'Минимальная длина 3 символа';
@@ -99,7 +96,6 @@ const NameAndAvatar: FC<NameAndAvatarProps> = ({}) => {
       <div className={styles['name-and-avatar__wrapper']}>
         <UploadGroupAvatar
           groupAvatar={activeChatAvatar ? activeChatAvatar : ''}
-          uid={uid!}
           activeChatMembers={activeChatMembers}
           activeChatId={activeChatId}
         />

@@ -7,7 +7,6 @@ import { useNavigate } from 'react-router-dom';
 import { IUserWithDetails } from 'src/interfaces/UserWithDetails.interface';
 import {
   ref as refFirebaseDatabase,
-  get,
   update,
   serverTimestamp,
 } from 'firebase/database';

@@ -8,7 +8,7 @@ import styles from './ChatItem.module.scss';
 import CheckedAndTimeStatuses from 'src/components/ui/checked-and-time-statuses/CheckedAndTimeStatuses';
 import useToggleModal from 'src/hooks/useToggleModal';
 import ModalBackdrop from 'src/components/ui/modal-backdrop/ModalBackdrop';
-import ModalActionConfirm from 'src/components/ui/modal-action-confirm/modalActionConfirm';
+import ModalActionConfirm from 'src/components/ui/modal-action-confirm/ModalActionConfirm';
 import Skeleton, { SkeletonTheme } from 'react-loading-skeleton';
 import 'react-loading-skeleton/dist/skeleton.css';
 import {

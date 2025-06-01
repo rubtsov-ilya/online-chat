@@ -39,7 +39,7 @@ import {
 } from 'src/redux/slices/SelectedMessagesSlice';
 import useSelectedMessages from 'src/hooks/useSelectedMessages';
 import ModalBackdrop from 'src/components/ui/modal-backdrop/ModalBackdrop';
-import ModalActionConfirm from 'src/components/ui/modal-action-confirm/modalActionConfirm';
+import ModalActionConfirm from 'src/components/ui/modal-action-confirm/ModalActionConfirm';
 import useToggleModal from 'src/hooks/useToggleModal';
 import { IMessage } from 'src/interfaces/Message.interface';
 import { addMessage, clearMessages } from 'src/redux/slices/MessagesArraySlice';

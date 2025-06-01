@@ -3,7 +3,6 @@ import styles from './SearchUsersByName.module.scss';
 
 import DeleteCircleSvg from 'src/assets/images/icons/24x24-icons/Delete cirlce.svg?react';
 import SearchSvg from 'src/assets/images/icons/24x24-icons/Search.svg?react';
-import useAuth from 'src/hooks/useAuth';
 import {
   GroupedUsersType,
   IUserWithDetails,

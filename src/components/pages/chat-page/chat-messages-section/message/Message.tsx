@@ -33,7 +33,7 @@ import MessageContextBackdrop from '../message-context-backdrop/MessageContextBa
 import useMobileScreen from 'src/hooks/useMobileScreen';
 import useToggleModal from 'src/hooks/useToggleModal';
 import ModalBackdrop from 'src/components/ui/modal-backdrop/ModalBackdrop';
-import ModalActionConfirm from 'src/components/ui/modal-action-confirm/modalActionConfirm';
+import ModalActionConfirm from 'src/components/ui/modal-action-confirm/ModalActionConfirm';
 import getLastUndeletedMessage from 'src/services/getLastUndeletedMessage';
 import { useDispatch } from 'react-redux';
 import useSelectedMessages from 'src/hooks/useSelectedMessages';

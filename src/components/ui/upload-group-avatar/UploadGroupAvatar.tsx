@@ -1,6 +1,6 @@
 import { FC, useRef, useState } from 'react';
 import { firebaseDatabase } from 'src/firebase';
-import { ref as refFirebaseDatabase, set, update } from 'firebase/database';
+import { ref as refFirebaseDatabase, update } from 'firebase/database';
 import styles from './UploadGroupAvatar.module.scss';
 import AvatarImage from '../avatar-image/AvatarImage';
 import useToggleModal from 'src/hooks/useToggleModal';
@@ -14,13 +14,11 @@ import { v4 as uuidv4 } from 'uuid';
 import useMobileScreen from 'src/hooks/useMobileScreen';
 import { getDownloadURL, ref, uploadBytesResumable } from 'firebase/storage';
 import { IMemberDetails } from 'src/interfaces/ChatsWithDetails.interface';
-import { IFirebaseRtDbChat } from 'src/interfaces/FirebaseRealtimeDatabase.interface';
 import { useDispatch } from 'react-redux';
-import { setActiveChat, setActiveChatnameAndAvatar } from 'src/redux/slices/ActiveChatSlice';
+import { setActiveChatnameAndAvatar } from 'src/redux/slices/ActiveChatSlice';
 
 interface UploadGroupAvatarProps {
   groupAvatar: string;
-  uid: string;
   activeChatMembers: IMemberDetails[] | null;
   activeChatId: string | null;
 }
@@ -32,7 +30,6 @@ interface IAvatar {
 
 const UploadGroupAvatar: FC<UploadGroupAvatarProps> = ({
   groupAvatar,
-  uid,
   activeChatMembers,
   activeChatId,
 }) => {
