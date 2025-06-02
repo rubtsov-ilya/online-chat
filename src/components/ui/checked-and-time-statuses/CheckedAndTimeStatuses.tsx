@@ -11,6 +11,7 @@ interface CheckedAndTimeStatusesProps {
   time: IMessage['messageDateUTC'];
   isChecked: boolean | undefined;
   isForImage?: boolean;
+  onContextMenuClick?: (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => void
   isOwn: boolean;
   isCanceled: boolean | undefined;
   isLoading: boolean;
@@ -20,6 +21,7 @@ const CheckedAndTimeStatuses: FC<CheckedAndTimeStatusesProps> = ({
   time,
   isChecked,
   isForImage,
+  onContextMenuClick,
   isOwn,
   isCanceled,
   isLoading,
@@ -28,7 +30,11 @@ const CheckedAndTimeStatuses: FC<CheckedAndTimeStatusesProps> = ({
   const formattedTime = `${timeDate.getHours().toString().padStart(2, '0')}:${timeDate.getMinutes().toString().padStart(2, '0')}`;
   return (
     <div className={styles['checked-and-time-statuses']} onContextMenu={(e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
-      e.preventDefault();
+      if (onContextMenuClick) {
+        onContextMenuClick(e)
+      } else {
+        e.preventDefault();
+      }
     }}>
       {!isCanceled && isLoading !== true && isChecked === true && isOwn && (
         <CheckedStatusSvg

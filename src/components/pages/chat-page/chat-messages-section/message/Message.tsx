@@ -605,6 +605,7 @@ const Message: FC<MessageProps> = ({
                       }
                       isLoading={messageData.isLoading}
                       isChecked={messageData.isChecked}
+                      onContextMenuClick={onMessageContextMenuClick}
                       time={messageData.messageDateUTC}
                       isOwn={messageData.senderUid === uid}
                     />

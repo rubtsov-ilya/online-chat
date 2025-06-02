@@ -50,9 +50,20 @@ const MessageContextMenu: FC<MessageContextMenuProps> = ({
     сontextMenuActive.backdropHeight - сontextMenuActive.positionY >
     menuSize.height;
 
-  const onCopyBtnClick = (text: string) => {
-    navigator.clipboard.writeText(text); // копируется текст в буфер обмена
-    closeContextMenu();
+  const onCopyBtnClick = async (text: string) => {
+    try {
+      await navigator.clipboard.writeText(text); // копируется текст в буфер обмена
+    } catch (err) {
+      // Fallback для HTTP
+      const textarea = document.createElement('textarea');
+      textarea.value = text;
+      document.body.appendChild(textarea);
+      textarea.select();
+      document.execCommand('copy');
+      document.body.removeChild(textarea);
+    } finally {
+      closeContextMenu();
+    }
   };
 
   const onDeleteBtnClick = () => {

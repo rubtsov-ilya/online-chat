@@ -8,4 +8,6 @@ A real-time chat application built with React, TypeScript, and modern web techno
 - **API**: Firebase
 
 ---
+## Backend has routing issues due to flask
 [![Live Demo](https://img.shields.io/badge/-Live%20Demo-brightgreen)](http://45.139.78.250:6969)
+
